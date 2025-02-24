@@ -1,4 +1,6 @@
 #pragma once
+#ifndef _ASYNCFATFS_H_
+#define _ASYNCFATFS_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -43,7 +45,7 @@ typedef enum {
 typedef void (*afatfsFileCallback_t)(afatfsFilePtr_t file, void *user);
 typedef void (*afatfsCallback_t)(void *user);
 
-bool afatfs_fopen(const char *filename, const char *mode, afatfsFileCallback_t complete, void *user);
+bool afatfs_fopen(const char *fileName, const char *mode, afatfsFileCallback_t complete, void *user);
 bool afatfs_ftruncate(afatfsFilePtr_t file, afatfsFileCallback_t callback, void *user);
 bool afatfs_fclose(afatfsFilePtr_t file, afatfsCallback_t callback, void *user);
 bool afatfs_funlink(afatfsFilePtr_t file, afatfsCallback_t callback, void *user);
@@ -55,8 +57,9 @@ uint32_t afatfs_fread(afatfsFilePtr_t file, uint8_t *buffer, uint32_t len);
 afatfsOperationStatus_e afatfs_fseek(afatfsFilePtr_t file, int32_t offset, afatfsSeek_e whence);
 bool afatfs_ftell(afatfsFilePtr_t file, uint32_t *position);
 bool afatfs_fGetSize(afatfsFilePtr_t file, uint32_t *size);
+bool afatfs_fGetFileInfo(afatfsFilePtr_t file, fatDirectoryEntry_t **entry);
 
-bool afatfs_mkdir(const char *filename, afatfsFileCallback_t complete, void *user);
+bool afatfs_mkdir(const char *fileName, afatfsFileCallback_t complete, void *user);
 bool afatfs_chdir(afatfsFilePtr_t dirHandle);
 
 void afatfs_findFirst(afatfsFilePtr_t directory, afatfsFinder_t *finder);
@@ -74,3 +77,5 @@ bool afatfs_isFull();
 
 afatfsFilesystemState_e afatfs_getFilesystemState();
 afatfsError_e afatfs_getLastError();
+
+#endif /* _ASYNCFATFS_H_ */

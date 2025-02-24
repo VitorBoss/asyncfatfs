@@ -117,7 +117,7 @@ static bool continueTesting() {
                 } else {
                     sprintf(filenameBuffer, "LOG%05dTXT", validateLogFileNumber);
 
-                    if (memcmp(filenameBuffer, dirEntry->filename, FAT_FILENAME_LENGTH)== 0) {
+                    if (memcmp(filenameBuffer, dirEntry->fileName, FAT_FILENAME_LENGTH)== 0) {
                         validateLogFileNumber++;
                     }
                 }
@@ -139,7 +139,7 @@ static bool continueTesting() {
 int main(int argc, char **argv)
 {
     if (argc < 2) {
-        fprintf(stderr, "Missing argument for sdcard image filename\n");
+        fprintf(stderr, "Missing argument for sdcard image fileName\n");
         return EXIT_FAILURE;
     }
 

@@ -51,9 +51,9 @@ static uint32_t getCurrentTime()
     return ((uint64_t) clock() * 1000000) / CLOCKS_PER_SEC;
 }
 
-bool sdcard_sim_init(const char *filename)
+bool sdcard_sim_init(const char *fileName)
 {
-    simFile = fopen(filename, "r+b");
+    simFile = fopen(fileName, "r+b");
 
     if (!simFile) {
         return false;

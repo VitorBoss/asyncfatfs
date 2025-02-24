@@ -138,8 +138,8 @@ depending on the cluster size of the FAT).
 
 `#define AFATFS_FREESPACE_FILENAME "FREESPAC.E"`
 
-Choose the filename that the freespace feature uses for its special reservation file. Note that this file
-never contains user data, only reserved blocks to be used when writing other files. The filename must respect
+Choose the fileName that the freespace feature uses for its special reservation file. Note that this file
+never contains user data, only reserved blocks to be used when writing other files. The fileName must respect
 the FAT "8.3" name limitation.
 
 ### User API
@@ -211,9 +211,9 @@ blocks to storage. THIS WILL CAUSE DATA LOSS!
 
 #### Directory Operations
 
-`bool afatfs_mkdir(const char *filename, afatfsFileCallback_t complete, void *user)`
+`bool afatfs_mkdir(const char *fileName, afatfsFileCallback_t complete, void *user)`
 
-Create or open a directory in the CWD with the filename supplied. Note that the filename must respect the
+Create or open a directory in the CWD with the fileName supplied. Note that the fileName must respect the
 FAT 8.3 limitation. If the directory already exists, the operation will proceed as if it had created the
 directory, but the files within the directory will not be affected. Returns `true` if the operation has
 begun, or `false` if there are no free file descriptors available to start the operation. The user must supply
@@ -295,14 +295,14 @@ there are no further valid entities after this one.
 
 #### File Operations
 
-`bool afatfs_fopen(const char *filename, const char *mode, afatfsFileCallback_t complete, void *user)`
+`bool afatfs_fopen(const char *fileName, const char *mode, afatfsFileCallback_t complete, void *user)`
 
 Begin creating or opening a file or directory within the CWD. Note that path separator characters (`/` or `\`)
 are NOT supported. Only files or directories immediately within the CWD may be opened. To access files within
 a subdirectory, use the `afatfs_chdir` or `afatfs_mkdir` commands to change the CWD.
 
-The `filename` argument must be an ASCII string that follows the FAT 8.3 filename convention. If the special
-filename string `"."` is passed, the CWD is opened. This is useful for the `afatfs_findFirst` directory
+The `fileName` argument must be an ASCII string that follows the FAT 8.3 fileName convention. If the special
+fileName string `"."` is passed, the CWD is opened. This is useful for the `afatfs_findFirst` directory
 listing command.
 
 The `mode` argument is a variation on the standard fopen mode strings. Only the following modes strings are

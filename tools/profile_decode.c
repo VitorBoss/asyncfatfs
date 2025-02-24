@@ -35,7 +35,7 @@ void printLogEntry(uint8_t *buffer)
 int main(int argc, char **argv)
 {
     if (argc < 2) {
-        fprintf(stderr, "Missing filename argument\n");
+        fprintf(stderr, "Missing fileName argument\n");
 
         return EXIT_FAILURE;
     }

@@ -90,7 +90,7 @@ static void filesizeTestFileOpenedForRead(afatfsFilePtr_t file)
  *
  * Returns true if the test is still continuing, or false if the test was completed successfully.
  */
-bool continueFilesizeTest(bool start, const char *filename, const char *fileMode, uint32_t logEntriesToWrite)
+bool continueFilesizeTest(bool start, const char *fileName, const char *fileMode, uint32_t logEntriesToWrite)
 {
     static uint32_t logEntryIndex = 0;
 
@@ -108,7 +108,7 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
 
             logEntryIndex = 0;
 
-            afatfs_fopen(filename, fileMode, filesizeTestFileCreatedForAppend);
+            afatfs_fopen(fileName, fileMode, filesizeTestFileCreatedForAppend);
         break;
         case FILESIZE_TEST_STAGE_APPEND:
             // Write just more than one sector of log entries
@@ -145,7 +145,7 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
         case FILESIZE_TEST_STAGE_READ_OPEN:
             filesizeStage = FILESIZE_TEST_STAGE_IDLE;
             logEntryIndex = 0;
-            afatfs_fopen(filename, "r", filesizeTestFileOpenedForRead);
+            afatfs_fopen(fileName, "r", filesizeTestFileOpenedForRead);
         break;
         case FILESIZE_TEST_STAGE_READ_SEEK_TO_END:
             testAssert(afatfs_fseek(filesizeFile, 0, AFATFS_SEEK_END) != AFATFS_OPERATION_FAILURE, "Seek to end should work");
@@ -238,7 +238,7 @@ bool continueTesting() {
 int main(int argc, char **argv)
 {
     if (argc < 2) {
-        fprintf(stderr, "Missing argument for sdcard image filename\n");
+        fprintf(stderr, "Missing argument for sdcard image fileName\n");
         return EXIT_FAILURE;
     }
 

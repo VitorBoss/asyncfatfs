@@ -79,7 +79,7 @@ void logFileOpenedForRead(afatfsFilePtr_t file)
 
 bool continueTesting() {
     char testBuffer[64];
-    char filename[13];
+    char fileName[13];
     uint32_t readBytes;
 
     switch (testStage) {
@@ -105,9 +105,9 @@ bool continueTesting() {
                 writtenBytesThisFile = 0;
 
                 // Write a file in contigous-append mode
-                sprintf(filename, "LOG%05d.TXT", writeLogFileNumber);
+                sprintf(fileName, "LOG%05d.TXT", writeLogFileNumber);
 
-                afatfs_fopen(filename, "as", logFileCreatedForSolidAppend);
+                afatfs_fopen(fileName, "as", logFileCreatedForSolidAppend);
             }
         break;
         case TEST_STAGE_WRITE_LOG:
@@ -151,9 +151,9 @@ bool continueTesting() {
                 readLogEntryCount = 0;
                 readBytesThisFile = 0;
 
-                sprintf(filename, "LOG%05d.TXT", readLogFileNumber);
+                sprintf(fileName, "LOG%05d.TXT", readLogFileNumber);
 
-                afatfs_fopen(filename, "r", logFileOpenedForRead);
+                afatfs_fopen(fileName, "r", logFileOpenedForRead);
             }
         break;
         case TEST_STAGE_READ_LOG:
@@ -204,7 +204,7 @@ bool continueTesting() {
 int main(int argc, char **argv)
 {
     if (argc < 2) {
-        fprintf(stderr, "Missing argument for sdcard image filename\n");
+        fprintf(stderr, "Missing argument for sdcard image fileName\n");
         return EXIT_FAILURE;
     }
 

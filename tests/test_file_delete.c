@@ -492,7 +492,7 @@ bool continueTesting()
 int main(int argc, char **argv)
 {
     if (argc < 2) {
-        fprintf(stderr, "Missing argument for sdcard image filename\n");
+        fprintf(stderr, "Missing argument for sdcard image fileName\n");
         return EXIT_FAILURE;
     }
 

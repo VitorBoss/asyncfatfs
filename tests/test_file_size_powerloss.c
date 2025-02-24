@@ -91,7 +91,7 @@ static void powerlossTestFileOpenedForRead(afatfsFilePtr_t file)
  *
  * Returns true if the test is still continuing, or false if the test was completed successfully.
  */
-bool continueFilesizeTest(bool start, const char *filename, const char *fileMode, uint32_t logEntriesToWrite)
+bool continueFilesizeTest(bool start, const char *fileName, const char *fileMode, uint32_t logEntriesToWrite)
 {
     static uint32_t logEntryIndex = 0;
 
@@ -109,7 +109,7 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
 
             logEntryIndex = 0;
 
-            afatfs_fopen(filename, fileMode, powerlossTestFileCreatedForAppend);
+            afatfs_fopen(fileName, fileMode, powerlossTestFileCreatedForAppend);
         break;
         case POWERLOSS_TEST_STAGE_APPEND:
             // Write just more than one sector of log entries
@@ -140,7 +140,7 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
         case POWERLOSS_TEST_STAGE_READ_OPEN:
             powerlossStage = POWERLOSS_TEST_STAGE_IDLE;
             logEntryIndex = 0;
-            afatfs_fopen(filename, "r", powerlossTestFileOpenedForRead);
+            afatfs_fopen(fileName, "r", powerlossTestFileOpenedForRead);
         break;
         case POWERLOSS_TEST_STAGE_READ_SEEK_TO_END:
             testAssert(afatfs_fseek(powerlossFile, 0, AFATFS_SEEK_END) != AFATFS_OPERATION_FAILURE, "Seek to end should work");
@@ -234,7 +234,7 @@ bool continueTesting() {
 int main(int argc, char **argv)
 {
     if (argc < 2) {
-        fprintf(stderr, "Missing argument for sdcard image filename\n");
+        fprintf(stderr, "Missing argument for sdcard image fileName\n");
         return EXIT_FAILURE;
     }
 
