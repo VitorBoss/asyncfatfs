@@ -35,7 +35,12 @@ typedef enum {
 typedef void(*sdcard_operationCompleteCallback_c)(sdcardBlockOperation_e operation, uint32_t blockIndex, uint8_t *buffer, uint32_t callbackData);
 
 typedef void(*sdcard_profilerCallback_c)(sdcardBlockOperation_e operation, uint32_t blockIndex, uint32_t duration);
-
+// Synchronously cancel queued/in-flight I/O (including DMA and multi-block writes).
+// After return no old request may access a buffer or write to the medium, and reset
+// must not start new I/O. Late software completion notifications may still be delivered;
+// preserve their original callbackData so the retired mount can reject them.
+// Called by init, forced/clean teardown and media-removal notification.
+void sdcard_reset(void);
 /**
  * Read the 512-byte block with the given index into the given 512-byte buffer.
  *
@@ -101,7 +106,6 @@ sdcardOperationStatus_e sdcard_beginWriteBlocks(uint32_t blockIndex, uint32_t bl
  *     SDCARD_OPERATION_BUSY        - The card is busy with another operation and could not cancel the multi-block write.
  */
 sdcardOperationStatus_e sdcard_endWriteBlocks();
-// TODO: get rid of this? It is never called.
 
 /**
  * Only required to be provided when using AFATFS_USE_INTROSPECTIVE_LOGGING.

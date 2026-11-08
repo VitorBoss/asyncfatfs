@@ -66,8 +66,9 @@ static void initFilesystem()
     }
 }
 
-static void filesizeTestFileCreatedForAppend(afatfsFilePtr_t file)
+static void filesizeTestFileCreatedForAppend(afatfsFilePtr_t file, void *user)
 {
+    (void)user;
     testAssert(file, "Creating testfile failed");
     testAssert(afatfs_feof(file), "feof() should be true after creating file");
 
@@ -75,8 +76,9 @@ static void filesizeTestFileCreatedForAppend(afatfsFilePtr_t file)
     filesizeStage = FILESIZE_TEST_STAGE_APPEND;
 }
 
-static void filesizeTestFileOpenedForRead(afatfsFilePtr_t file)
+static void filesizeTestFileOpenedForRead(afatfsFilePtr_t file, void *user)
 {
+    (void)user;
     testAssert(file, "Opening log for read failed");
 
     filesizeFile = file;
@@ -108,7 +110,7 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
 
             logEntryIndex = 0;
 
-            afatfs_fopen(filename, fileMode, filesizeTestFileCreatedForAppend);
+            afatfs_fopen(filename, fileMode, filesizeTestFileCreatedForAppend, NULL);
         break;
         case FILESIZE_TEST_STAGE_APPEND:
             // Write just more than one sector of log entries
@@ -117,7 +119,7 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
                 testAssert(afatfs_ftell(filesizeFile, &logFileSize), "ftell() expected to work when no file operation queued");
                 testAssert(logFileSize == bytesToWrite, "Log file correct after writes within a cluster");
 
-                testAssert(afatfs_fseek(filesizeFile, 0, AFATFS_SEEK_END) == AFATFS_OPERATION_SUCCESS, "Seeks to end of file when we're already at end should be immediate");
+                testAssert(afatfs_fseek(filesizeFile, 0, AFATFS_SEEK_END, NULL, NULL) == AFATFS_OPERATION_SUCCESS, "Seeks to end of file when we're already at end should be immediate");
                 testAssert(afatfs_ftell(filesizeFile, &logFileSize), "ftell() should work after immediate seek");
                 testAssert(logFileSize == bytesToWrite, "fseek() seeked to the wrong position for AFATFS_SEEK_END");
 
@@ -125,7 +127,7 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
             }
         break;
         case FILESIZE_TEST_STAGE_CLOSE:
-            if (afatfs_fclose(filesizeFile, NULL)) {
+            if (closeFileAndWait(filesizeFile)) {
                 filesizeStage = FILESIZE_TEST_STAGE_FLUSH;
                 return false; // Test is over now!
             }
@@ -145,10 +147,10 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
         case FILESIZE_TEST_STAGE_READ_OPEN:
             filesizeStage = FILESIZE_TEST_STAGE_IDLE;
             logEntryIndex = 0;
-            afatfs_fopen(filename, "r", filesizeTestFileOpenedForRead);
+            afatfs_fopen(filename, "r", filesizeTestFileOpenedForRead, NULL);
         break;
         case FILESIZE_TEST_STAGE_READ_SEEK_TO_END:
-            testAssert(afatfs_fseek(filesizeFile, 0, AFATFS_SEEK_END) != AFATFS_OPERATION_FAILURE, "Seek to end should work");
+            testAssert(afatfs_fseek(filesizeFile, 0, AFATFS_SEEK_END, NULL, NULL) != AFATFS_OPERATION_FAILURE, "Seek to end should work");
 
             filesizeStage = FILESIZE_TEST_STAGE_READ_MEASURE_FILE_LENGTH;
         break;
@@ -157,7 +159,7 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
             if (afatfs_ftell(filesizeFile, &position) == AFATFS_OPERATION_SUCCESS) {
                 testAssert(position == bytesToWrite, "Logical filesize was not recorded correctly after close");
 
-                testAssert(afatfs_fseek(filesizeFile, 0, AFATFS_SEEK_SET) == AFATFS_OPERATION_SUCCESS, "Should be able to seek to begininng of file instantly");
+                testAssert(afatfs_fseek(filesizeFile, 0, AFATFS_SEEK_SET, NULL, NULL) == AFATFS_OPERATION_SUCCESS, "Should be able to seek to begininng of file instantly");
                 filesizeStage = FILESIZE_TEST_STAGE_READ_VALIDATE;
             }
         break;
@@ -168,7 +170,7 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
             }
         break;
         case FILESIZE_TEST_STAGE_READ_CLOSE:
-            if (afatfs_fclose(filesizeFile, NULL)) {
+            if (closeFileAndWait(filesizeFile)) {
                 return false; // Test is over now!
             }
         break;

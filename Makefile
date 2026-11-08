@@ -9,12 +9,25 @@ CFLAGS = -O0 \
 	-Ilib/
 
 AFATFS_SOURCE = lib/fat_standard.c lib/asyncfatfs.c
+AFATFS_HEADERS = lib/asyncfatfs.h lib/fat_standard.h lib/asyncfatfs_journal.h lib/asyncfatfs_journal.inc lib/asyncfatfs_api.inc lib/asyncfatfs_format.inc
 TEST_SOURCE = tests/sdcard_sim.c tests/common.c
 SDCARD_TEMP_FILE = tests/sdcard_temp.dmg
 
-.PHONY: all test test-long clean test-binaries
+.PHONY: all test test-long test-exfat clean test-binaries
 
 all: test-binaries tools/profile_decode
+
+test-exfat: tests/test_exfat
+	@tests/test_exfat
+
+tests/test_exfat: $(AFATFS_SOURCE) $(AFATFS_HEADERS) tests/test_exfat.c
+	$(CC) $(CFLAGS) -o $@ tests/test_exfat.c $(AFATFS_SOURCE)
+
+tests/test_exfat_external: $(AFATFS_SOURCE) $(AFATFS_HEADERS) tests/sdcard_sim.c tests/test_exfat_external.c
+	$(CC) $(CFLAGS) -o $@ tests/test_exfat_external.c tests/sdcard_sim.c $(AFATFS_SOURCE)
+
+tests/test_exfat_powercut: $(AFATFS_SOURCE) $(AFATFS_HEADERS) tests/test_exfat_powercut.c tests/test_exfat_external.c
+	$(CC) $(CFLAGS) -o $@ tests/test_exfat_powercut.c $(AFATFS_SOURCE)
 
 test-binaries: tests/test_root_fill tests/test_subdir_fill tests/test_volume_fill tests/test_file_modes tests/test_file_delete tests/test_logging_workload tests/test_file_size tests/test_file_size_powerloss
 
@@ -109,4 +122,5 @@ tests/test_file_size_powerloss : $(AFATFS_SOURCE) $(TEST_SOURCE) tests/test_file
 tools/profile_decode: tools/profile_decode.c
 
 clean :
+	rm -f tests/test_exfat tests/test_exfat_external tests/test_exfat_powercut
 	rm -f tests/test_root_fill tests/test_subdir_fill tests/test_volume_fill tests/test_file_modes tests/test_file_delete tests/test_logging_workload tests/test_file_size tests/test_file_size_powerloss tools/profile_decode

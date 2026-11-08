@@ -39,8 +39,9 @@ static bool shouldKeepLog(uint32_t logNumber)
     return ((uint32_t) (logNumber * 1103515245 + 12345) & 0x02) != 0;
 }
 
-void logFileCreatedForSolidAppend(afatfsFilePtr_t file)
+void logFileCreatedForSolidAppend(afatfsFilePtr_t file, void *user)
 {
+    (void)user;
     if (file) {
         testFile = file;
 
@@ -51,8 +52,9 @@ void logFileCreatedForSolidAppend(afatfsFilePtr_t file)
     }
 }
 
-void logDirCreated(afatfsFilePtr_t dir)
+void logDirCreated(afatfsFilePtr_t dir, void *user)
 {
+    (void)user;
     if (!dir) {
         fprintf(stderr, "Creating 'logs' directory failed\n");
         exit(EXIT_FAILURE);
@@ -60,13 +62,14 @@ void logDirCreated(afatfsFilePtr_t dir)
 
     afatfs_chdir(dir);
 
-    testAssert(afatfs_fclose(dir, NULL), "Expected to be able to close idle directory immediately");
+    testAssert(afatfs_fclose(dir, NULL, NULL), "Expected to be able to close idle directory immediately");
 
     testStage = TEST_STAGE_CREATE_LOG_FILE;
 }
 
-void logFileOpenedForRead(afatfsFilePtr_t file)
+void logFileOpenedForRead(afatfsFilePtr_t file, void *user)
 {
+    (void)user;
     if (shouldKeepLog(readLogFileNumber)) {
         if (file) {
             testFile = file;
@@ -102,7 +105,7 @@ bool continueTesting() {
             testStage = TEST_STAGE_IDLE;
             writeLogFileNumber = 0;
 
-            afatfs_mkdir("logs", logDirCreated);
+            afatfs_mkdir("logs", logDirCreated, NULL);
         break;
         case TEST_STAGE_CREATE_LOG_FILE:
             writeLogFileNumber++;
@@ -118,7 +121,7 @@ bool continueTesting() {
                 // Write a file in contigous-append mode
                 sprintf(filename, "LOG%05d.TXT", writeLogFileNumber);
 
-                afatfs_fopen(filename, "as", logFileCreatedForSolidAppend);
+                afatfs_fopen(filename, "as", logFileCreatedForSolidAppend, NULL);
             }
         break;
         case TEST_STAGE_WRITE_LOG:
@@ -133,11 +136,11 @@ bool continueTesting() {
              * operation to complete before continuing on to open more files.
              */
             if (shouldKeepLog(writeLogFileNumber)) {
-                if (!afatfs_fclose(testFile, NULL)) {
+                if (!closeFileAndWait(testFile)) {
                     break;
                 }
             } else {
-                if (!afatfs_funlink(testFile, NULL)) {
+                if (!afatfs_funlink(testFile, NULL, NULL)) {
                     break;
                 }
             }
@@ -159,7 +162,7 @@ bool continueTesting() {
 
                 sprintf(filename, "LOG%05d.TXT", readLogFileNumber);
 
-                afatfs_fopen(filename, "r", logFileOpenedForRead);
+                afatfs_fopen(filename, "r", logFileOpenedForRead, NULL);
             }
         break;
         case TEST_STAGE_READ_LOG:
@@ -169,7 +172,7 @@ bool continueTesting() {
             }
         break;
         case TEST_STAGE_READ_LOG_CLOSE:
-            if (afatfs_fclose(testFile, NULL)) {
+            if (closeFileAndWait(testFile)) {
                 sprintf(filename, "LOG%05d.TXT", readLogFileNumber);
                 testFile = NULL;
                 testStage = TEST_STAGE_OPEN_LOG_FOR_READ;

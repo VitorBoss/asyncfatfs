@@ -3,6 +3,31 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+static afatfsFilePtr_t closingFile;
+static bool closeComplete;
+
+static void closeDone(void *user)
+{
+    (void)user;
+    closeComplete = true;
+}
+
+bool closeFileAndWait(afatfsFilePtr_t file)
+{
+    if (!closingFile) {
+        closeComplete = false;
+        closingFile = file;
+        if (!afatfs_fclose(file, closeDone, NULL)) {
+            closingFile = NULL;
+            return false;
+        }
+    }
+    testAssert(file == closingFile, "Only one test close may be awaited at a time");
+    if (!closeComplete) return false;
+    closingFile = NULL;
+    return true;
+}
+
 /**
  * Write test log entries to the given file, starting from *entryIndex. Increments *entryIndex to keep track of the
  * progress so far until it reaches targetEntries.

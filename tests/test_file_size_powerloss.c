@@ -67,8 +67,9 @@ static void initFilesystem()
     }
 }
 
-static void powerlossTestFileCreatedForAppend(afatfsFilePtr_t file)
+static void powerlossTestFileCreatedForAppend(afatfsFilePtr_t file, void *user)
 {
+    (void)user;
     testAssert(file, "Creating testfile failed");
     testAssert(afatfs_feof(file), "feof() should be true after creating file");
 
@@ -76,8 +77,9 @@ static void powerlossTestFileCreatedForAppend(afatfsFilePtr_t file)
     powerlossStage = POWERLOSS_TEST_STAGE_APPEND;
 }
 
-static void powerlossTestFileOpenedForRead(afatfsFilePtr_t file)
+static void powerlossTestFileOpenedForRead(afatfsFilePtr_t file, void *user)
 {
+    (void)user;
     testAssert(file, "Opening log for read failed");
 
     powerlossFile = file;
@@ -109,7 +111,7 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
 
             logEntryIndex = 0;
 
-            afatfs_fopen(filename, fileMode, powerlossTestFileCreatedForAppend);
+            afatfs_fopen(filename, fileMode, powerlossTestFileCreatedForAppend, NULL);
         break;
         case POWERLOSS_TEST_STAGE_APPEND:
             // Write just more than one sector of log entries
@@ -118,7 +120,7 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
                 testAssert(afatfs_ftell(powerlossFile, &logFileSize), "ftell() expected to work when no file operation queued");
                 testAssert(logFileSize == bytesToWrite, "Log file correct after writes within a cluster");
 
-                testAssert(afatfs_fseek(powerlossFile, 0, AFATFS_SEEK_END) == AFATFS_OPERATION_SUCCESS, "Seeks to end of file when we're already at end should be immediate");
+                testAssert(afatfs_fseek(powerlossFile, 0, AFATFS_SEEK_END, NULL, NULL) == AFATFS_OPERATION_SUCCESS, "Seeks to end of file when we're already at end should be immediate");
                 testAssert(afatfs_ftell(powerlossFile, &logFileSize), "ftell() should work after immediate seek");
                 testAssert(logFileSize == bytesToWrite, "fseek() seeked to the wrong position for AFATFS_SEEK_END");
 
@@ -140,10 +142,10 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
         case POWERLOSS_TEST_STAGE_READ_OPEN:
             powerlossStage = POWERLOSS_TEST_STAGE_IDLE;
             logEntryIndex = 0;
-            afatfs_fopen(filename, "r", powerlossTestFileOpenedForRead);
+            afatfs_fopen(filename, "r", powerlossTestFileOpenedForRead, NULL);
         break;
         case POWERLOSS_TEST_STAGE_READ_SEEK_TO_END:
-            testAssert(afatfs_fseek(powerlossFile, 0, AFATFS_SEEK_END) != AFATFS_OPERATION_FAILURE, "Seek to end should work");
+            testAssert(afatfs_fseek(powerlossFile, 0, AFATFS_SEEK_END, NULL, NULL) != AFATFS_OPERATION_FAILURE, "Seek to end should work");
 
             powerlossStage = POWERLOSS_TEST_STAGE_READ_MEASURE_FILE_LENGTH;
         break;
@@ -153,7 +155,7 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
                 // We expect all of the sectors we completely wrote to have made it to the card
                 testAssert(position >= (bytesToWrite / SDCARD_SECTOR_SIZE) * SDCARD_SECTOR_SIZE, "Filesize after power interruption was smaller than expected");
 
-                testAssert(afatfs_fseek(powerlossFile, 0, AFATFS_SEEK_SET) == AFATFS_OPERATION_SUCCESS, "Should be able to seek to begininng of file instantly");
+                testAssert(afatfs_fseek(powerlossFile, 0, AFATFS_SEEK_SET, NULL, NULL) == AFATFS_OPERATION_SUCCESS, "Should be able to seek to begininng of file instantly");
                 powerlossStage = POWERLOSS_TEST_STAGE_READ_VALIDATE;
             }
         break;
@@ -164,7 +166,7 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
             }
         break;
         case POWERLOSS_TEST_STAGE_READ_CLOSE:
-            if (afatfs_fclose(powerlossFile, NULL)) {
+            if (closeFileAndWait(powerlossFile)) {
                 return false; // Test is over now!
             }
         break;

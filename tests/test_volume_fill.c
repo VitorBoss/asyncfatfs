@@ -39,8 +39,9 @@ static uint32_t readBytesThisFile = 0;
 static uint32_t writtenBytesTotal = 0;
 static uint32_t readBytesTotal = 0;
 
-void logFileCreatedForSolidAppend(afatfsFilePtr_t file)
+void logFileCreatedForSolidAppend(afatfsFilePtr_t file, void *user)
 {
+    (void)user;
     if (file) {
         testFile = file;
 
@@ -51,8 +52,9 @@ void logFileCreatedForSolidAppend(afatfsFilePtr_t file)
     }
 }
 
-void logDirCreated(afatfsFilePtr_t dir)
+void logDirCreated(afatfsFilePtr_t dir, void *user)
 {
+    (void)user;
     if (!dir) {
         fprintf(stderr, "Creating 'logs' directory failed\n");
         exit(EXIT_FAILURE);
@@ -60,13 +62,14 @@ void logDirCreated(afatfsFilePtr_t dir)
 
     afatfs_chdir(dir);
 
-    testAssert(afatfs_fclose(dir, NULL), "Expected to be able to queue close on directory");
+    testAssert(afatfs_fclose(dir, NULL, NULL), "Expected to be able to queue close on directory");
 
     testStage = TEST_STAGE_CREATE_LOG_FILE;
 }
 
-void logFileOpenedForRead(afatfsFilePtr_t file)
+void logFileOpenedForRead(afatfsFilePtr_t file, void *user)
 {
+    (void)user;
     if (file) {
         testFile = file;
 
@@ -92,7 +95,7 @@ bool continueTesting() {
              */
             testStage = TEST_STAGE_IDLE;
 
-            afatfs_mkdir("logs", logDirCreated);
+            afatfs_mkdir("logs", logDirCreated, NULL);
         break;
         case TEST_STAGE_CREATE_LOG_FILE:
 
@@ -107,7 +110,7 @@ bool continueTesting() {
                 // Write a file in contigous-append mode
                 sprintf(filename, "LOG%05d.TXT", writeLogFileNumber);
 
-                afatfs_fopen(filename, "as", logFileCreatedForSolidAppend);
+                afatfs_fopen(filename, "as", logFileCreatedForSolidAppend, NULL);
             }
         break;
         case TEST_STAGE_WRITE_LOG:
@@ -118,7 +121,7 @@ bool continueTesting() {
 
                 uint32_t writtenBytes;
 
-                writtenBytes = afatfs_fwrite(testFile, (uint8_t*) testBuffer, strlen(testBuffer));
+                writtenBytes = afatfs_fwrite(testFile, (uint8_t*) testBuffer, (uint32_t)strlen(testBuffer));
 
                 if (writtenBytes > 0) {
                     writtenBytesThisFile += writtenBytes;
@@ -133,7 +136,7 @@ bool continueTesting() {
         break;
         case TEST_STAGE_CLOSE_LOG:
             // Wait for the file to close
-            if (!afatfs_fclose(testFile, NULL)) {
+            if (!closeFileAndWait(testFile)) {
                 break;
             }
 
@@ -153,14 +156,14 @@ bool continueTesting() {
 
                 sprintf(filename, "LOG%05d.TXT", readLogFileNumber);
 
-                afatfs_fopen(filename, "r", logFileOpenedForRead);
+                afatfs_fopen(filename, "r", logFileOpenedForRead, NULL);
             }
         break;
         case TEST_STAGE_READ_LOG:
             readBytes = afatfs_fread(testFile, (uint8_t*)testBuffer, sizeof(testBuffer));
 
             if (readBytes == 0 && afatfs_feof(testFile)) {
-                testAssert(afatfs_fclose(testFile, NULL), "Expected to be able to queue close on file");
+                testAssert(afatfs_fclose(testFile, NULL, NULL), "Expected to be able to queue close on file");
 
                 readBytesTotal += readBytesThisFile;
 

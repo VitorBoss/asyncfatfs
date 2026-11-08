@@ -5,8 +5,14 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <time.h>
+#include <string.h>
 
 #include "sdcard_sim.h"
+
+#ifdef _WIN32
+#define ftello _ftelli64
+#define fseeko _fseeki64
+#endif
 
 static FILE *simFile;
 
@@ -72,7 +78,15 @@ bool sdcard_sim_init(const char *filename)
 void sdcard_sim_destroy()
 {
     fclose(simFile);
+    simFile = NULL;
     sdcard.state = SDCARD_STATE_NOT_PRESENT;
+}
+
+void sdcard_reset(void)
+{
+    memset(&sdcard.currentOperation, 0, sizeof(sdcard.currentOperation));
+    sdcard.multiWriteBlocksRemain = 0;
+    sdcard.state = simFile ? SDCARD_STATE_READY : SDCARD_STATE_NOT_PRESENT;
 }
 
 static void sdcard_continueReadBlock()

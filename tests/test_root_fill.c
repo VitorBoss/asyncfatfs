@@ -29,19 +29,25 @@ static int validateLogFileNumber = 0;
 static afatfsFilePtr_t rootDirectory;
 static afatfsFinder_t finder;
 
-void logFileCreated(afatfsFilePtr_t file)
+static void logFileClosed(void *user)
 {
-    if (file) {
-        testAssert(afatfs_fclose(file, NULL), "Expected close to be queued successfully");
+    (void)user;
+    testLogFileNumber++;
+    testStage = TEST_STAGE_CREATE_LOG_FILES;
+}
 
-        testLogFileNumber++;
-        testStage = TEST_STAGE_CREATE_LOG_FILES;
+void logFileCreated(afatfsFilePtr_t file, void *user)
+{
+    (void)user;
+    if (file) {
+        testAssert(afatfs_fclose(file, logFileClosed, NULL), "Expected close to be queued successfully");
     } else {
         testStage = TEST_STAGE_OPEN_ROOT;
     }
 }
 
-void logDirectoryOpened(afatfsFilePtr_t file) {
+void logDirectoryOpened(afatfsFilePtr_t file, void *user) {
+    (void)user;
     rootDirectory = file;
 
     if (rootDirectory) {
@@ -67,7 +73,7 @@ bool continueTesting() {
 
                 sprintf(filenameBuffer, "LOG%05d.TXT", testLogFileNumber);
 
-                afatfs_fopen(filenameBuffer, "a", logFileCreated);
+                afatfs_fopen(filenameBuffer, "a", logFileCreated, NULL);
             }
         break;
         case TEST_STAGE_IDLE:
@@ -78,7 +84,7 @@ bool continueTesting() {
                 fprintf(stderr, "[Fail]     Failed to create any files in the root directory\n");
                 exit(-1);
             } else {
-                afatfs_fopen(".", "r", logDirectoryOpened);
+                afatfs_fopen(".", "r", logDirectoryOpened, NULL);
             }
         break;
         case TEST_STAGE_VALIDATE_DIRECTORY_CONTENTS:
@@ -98,7 +104,7 @@ bool continueTesting() {
                 } else {
                     sprintf(filenameBuffer, "LOG%05dTXT", validateLogFileNumber);
 
-                    if (memcmp(filenameBuffer, dirEntry->filename, FAT_FILENAME_LENGTH) == 0) {
+                    if (memcmp(filenameBuffer, dirEntry->fileName, FAT_FILENAME_LENGTH) == 0) {
                         validateLogFileNumber++;
                     }
                 }

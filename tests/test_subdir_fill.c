@@ -31,32 +31,39 @@ static int validateLogFileNumber = 0;
 static afatfsFilePtr_t logDirectory;
 static afatfsFinder_t finder;
 
-static void logDirCreated(afatfsFilePtr_t dir)
+static void logDirCreated(afatfsFilePtr_t dir, void *user)
 {
+    (void)user;
     if (!dir) {
         fprintf(stderr, "Creating 'logs' directory failed\n");
         exit(EXIT_FAILURE);
     }
 
     afatfs_chdir(dir);
-    testAssert(afatfs_fclose(dir, NULL), "Expected to be able to queue close on directory");
+    testAssert(afatfs_fclose(dir, NULL, NULL), "Expected to be able to queue close on directory");
 
     testStage = TEST_STAGE_CREATE_LOG_FILES;
 }
 
-static void logFileCreated(afatfsFilePtr_t file)
+static void logFileClosed(void *user)
 {
-    if (file) {
-        afatfs_fclose(file, NULL);
+    (void)user;
+    testLogFileNumber++;
+    testStage = TEST_STAGE_CREATE_LOG_FILES;
+}
 
-        testLogFileNumber++;
-        testStage = TEST_STAGE_CREATE_LOG_FILES;
+static void logFileCreated(afatfsFilePtr_t file, void *user)
+{
+    (void)user;
+    if (file) {
+        testAssert(afatfs_fclose(file, logFileClosed, NULL), "Expected close to be queued successfully");
     } else {
         testStage = TEST_STAGE_OPEN_LOG_DIRECTORY;
     }
 }
 
-static void logDirectoryOpened(afatfsFilePtr_t file) {
+static void logDirectoryOpened(afatfsFilePtr_t file, void *user) {
+    (void)user;
     logDirectory = file;
 
     if (logDirectory) {
@@ -84,7 +91,7 @@ static bool continueTesting() {
              */
             testStage = TEST_STAGE_IDLE;
 
-            afatfs_mkdir("logs", logDirCreated);
+            afatfs_mkdir("logs", logDirCreated, NULL);
         break;
         case TEST_STAGE_CREATE_LOG_FILES:
             if (testLogFileNumber == MAX_TEST_FILES) {
@@ -94,11 +101,11 @@ static bool continueTesting() {
 
                 sprintf(filenameBuffer, "LOG%05d.TXT", testLogFileNumber);
 
-                afatfs_fopen(filenameBuffer, "a", logFileCreated);
+                afatfs_fopen(filenameBuffer, "a", logFileCreated, NULL);
             }
         break;
         case TEST_STAGE_OPEN_LOG_DIRECTORY:
-            afatfs_fopen(".", "r", logDirectoryOpened);
+            afatfs_fopen(".", "r", logDirectoryOpened, NULL);
         break;
         case TEST_STAGE_VALIDATE_DIRECTORY_CONTENTS:
             status = afatfs_findNext(logDirectory, &finder, &dirEntry);
@@ -117,7 +124,7 @@ static bool continueTesting() {
                 } else {
                     sprintf(filenameBuffer, "LOG%05dTXT", validateLogFileNumber);
 
-                    if (memcmp(filenameBuffer, dirEntry->filename, FAT_FILENAME_LENGTH)== 0) {
+                    if (memcmp(filenameBuffer, dirEntry->fileName, FAT_FILENAME_LENGTH)== 0) {
                         validateLogFileNumber++;
                     }
                 }
