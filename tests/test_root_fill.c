@@ -29,19 +29,26 @@ static int validateLogFileNumber = 0;
 static afatfsFilePtr_t rootDirectory;
 static afatfsFinder_t finder;
 
-void logFileCreated(afatfsFilePtr_t file)
+static void logFileClosed(void *user)
 {
-    if (file) {
-        testAssert(afatfs_fclose(file, NULL), "Expected close to be queued successfully");
+    (void)user;
+    testLogFileNumber++;
+    testStage = TEST_STAGE_CREATE_LOG_FILES;
+}
 
-        testLogFileNumber++;
-        testStage = TEST_STAGE_CREATE_LOG_FILES;
+void logFileCreated(afatfsFilePtr_t file, void *user)
+{
+    (void)user;
+    if (file) {
+        testAssert(afatfs_fclose(file, logFileClosed, NULL), "Expected close to be queued successfully");
     } else {
         testStage = TEST_STAGE_OPEN_ROOT;
     }
 }
 
-void logDirectoryOpened(afatfsFilePtr_t file) {
+void logDirectoryOpened(afatfsFilePtr_t file, void *user)
+{
+    (void)user;
     rootDirectory = file;
 
     if (rootDirectory) {
@@ -53,7 +60,8 @@ void logDirectoryOpened(afatfsFilePtr_t file) {
     }
 }
 
-bool continueTesting() {
+bool continueTesting()
+{
     char filenameBuffer[13];
     afatfsOperationStatus_e status;
     fatDirectoryEntry_t *dirEntry;
@@ -67,20 +75,20 @@ bool continueTesting() {
 
                 sprintf(filenameBuffer, "LOG%05d.TXT", testLogFileNumber);
 
-                afatfs_fopen(filenameBuffer, "a", logFileCreated);
+                afatfs_fopen(filenameBuffer, "a", logFileCreated, NULL);
             }
-        break;
+            break;
         case TEST_STAGE_IDLE:
             // Waiting for file operations...
-        break;
+            break;
         case TEST_STAGE_OPEN_ROOT:
             if (testLogFileNumber == 0) {
                 fprintf(stderr, "[Fail]     Failed to create any files in the root directory\n");
                 exit(-1);
             } else {
-                afatfs_fopen(".", "r", logDirectoryOpened);
+                afatfs_fopen(".", "r", logDirectoryOpened, NULL);
             }
-        break;
+            break;
         case TEST_STAGE_VALIDATE_DIRECTORY_CONTENTS:
             status = afatfs_findNext(rootDirectory, &finder, &dirEntry);
 
@@ -98,14 +106,15 @@ bool continueTesting() {
                 } else {
                     sprintf(filenameBuffer, "LOG%05dTXT", validateLogFileNumber);
 
-                    if (memcmp(filenameBuffer, dirEntry->filename, FAT_FILENAME_LENGTH) == 0) {
+                    if (memcmp(filenameBuffer, dirEntry->fileName, FAT_FILENAME_LENGTH) == 0) {
                         validateLogFileNumber++;
                     }
                 }
             }
-        break;
+            break;
         case TEST_STAGE_FAILURE:
-            fprintf(stderr, "[Fail]     Root directory only retained %d/%d files\n", validateLogFileNumber, testLogFileNumber);
+            fprintf(stderr, "[Fail]     Root directory only retained %d/%d files\n", validateLogFileNumber,
+                testLogFileNumber);
             exit(-1);
 
         case TEST_STAGE_COMPLETE:
@@ -142,12 +151,11 @@ int main(int argc, char **argv)
                     keepGoing = false;
                     break;
                 }
-           break;
-           case AFATFS_FILESYSTEM_STATE_FATAL:
+                break;
+            case AFATFS_FILESYSTEM_STATE_FATAL:
                 fprintf(stderr, "[Fail]     Fatal filesystem error\n");
                 exit(-1);
-           default:
-               ;
+            default:;
         }
     }
 

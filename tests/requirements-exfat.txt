@@ -1,0 +1,2 @@
+FATtools==1.1.23
+hexdump==3.3

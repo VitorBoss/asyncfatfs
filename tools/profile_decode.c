@@ -9,7 +9,7 @@
 
 void printLogEntry(uint8_t *buffer)
 {
-    sdcardBlockOperation_e operation = (sdcardBlockOperation_e) buffer[0];
+    sdcardBlockOperation_e operation = (sdcardBlockOperation_e)buffer[0];
     const char *operationText;
 
     uint32_t blockIndex = buffer[4] | (buffer[5] << 8) | (buffer[6] << 16) | (buffer[7] << 24);
@@ -18,13 +18,13 @@ void printLogEntry(uint8_t *buffer)
     switch (operation) {
         case SDCARD_BLOCK_OPERATION_ERASE:
             operationText = "erase";
-        break;
+            break;
         case SDCARD_BLOCK_OPERATION_READ:
             operationText = "read";
-        break;
+            break;
         case SDCARD_BLOCK_OPERATION_WRITE:
             operationText = "write";
-        break;
+            break;
         default:
             operationText = "unknown";
     }

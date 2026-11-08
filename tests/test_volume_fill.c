@@ -39,8 +39,9 @@ static uint32_t readBytesThisFile = 0;
 static uint32_t writtenBytesTotal = 0;
 static uint32_t readBytesTotal = 0;
 
-void logFileCreatedForSolidAppend(afatfsFilePtr_t file)
+void logFileCreatedForSolidAppend(afatfsFilePtr_t file, void *user)
 {
+    (void)user;
     if (file) {
         testFile = file;
 
@@ -51,8 +52,9 @@ void logFileCreatedForSolidAppend(afatfsFilePtr_t file)
     }
 }
 
-void logDirCreated(afatfsFilePtr_t dir)
+void logDirCreated(afatfsFilePtr_t dir, void *user)
 {
+    (void)user;
     if (!dir) {
         fprintf(stderr, "Creating 'logs' directory failed\n");
         exit(EXIT_FAILURE);
@@ -60,13 +62,14 @@ void logDirCreated(afatfsFilePtr_t dir)
 
     afatfs_chdir(dir);
 
-    testAssert(afatfs_fclose(dir, NULL), "Expected to be able to queue close on directory");
+    testAssert(afatfs_fclose(dir, NULL, NULL), "Expected to be able to queue close on directory");
 
     testStage = TEST_STAGE_CREATE_LOG_FILE;
 }
 
-void logFileOpenedForRead(afatfsFilePtr_t file)
+void logFileOpenedForRead(afatfsFilePtr_t file, void *user)
 {
+    (void)user;
     if (file) {
         testFile = file;
 
@@ -77,7 +80,8 @@ void logFileOpenedForRead(afatfsFilePtr_t file)
     }
 }
 
-bool continueTesting() {
+bool continueTesting()
+{
     char testBuffer[64];
     char filename[13];
     uint32_t readBytes;
@@ -92,8 +96,8 @@ bool continueTesting() {
              */
             testStage = TEST_STAGE_IDLE;
 
-            afatfs_mkdir("logs", logDirCreated);
-        break;
+            afatfs_mkdir("logs", logDirCreated, NULL);
+            break;
         case TEST_STAGE_CREATE_LOG_FILE:
 
             if (writeLogFileNumber >= 1000) {
@@ -107,18 +111,19 @@ bool continueTesting() {
                 // Write a file in contigous-append mode
                 sprintf(filename, "LOG%05d.TXT", writeLogFileNumber);
 
-                afatfs_fopen(filename, "as", logFileCreatedForSolidAppend);
+                afatfs_fopen(filename, "as", logFileCreatedForSolidAppend, NULL);
             }
-        break;
+            break;
         case TEST_STAGE_WRITE_LOG:
             if (writeLogEntryCount >= LOG_ENTRY_COUNT) {
                 testStage = TEST_STAGE_CLOSE_LOG;
             } else {
-                sprintf(testBuffer, "Log %05d entry %6d/%6d\n", writeLogFileNumber, writeLogEntryCount + 1, LOG_ENTRY_COUNT);
+                sprintf(testBuffer, "Log %05d entry %6d/%6d\n", writeLogFileNumber, writeLogEntryCount + 1,
+                    LOG_ENTRY_COUNT);
 
                 uint32_t writtenBytes;
 
-                writtenBytes = afatfs_fwrite(testFile, (uint8_t*) testBuffer, strlen(testBuffer));
+                writtenBytes = afatfs_fwrite(testFile, (uint8_t *)testBuffer, (uint32_t)strlen(testBuffer));
 
                 if (writtenBytes > 0) {
                     writtenBytesThisFile += writtenBytes;
@@ -130,10 +135,10 @@ bool continueTesting() {
                     testStage = TEST_STAGE_CLOSE_LOG;
                 }
             }
-        break;
+            break;
         case TEST_STAGE_CLOSE_LOG:
             // Wait for the file to close
-            if (!afatfs_fclose(testFile, NULL)) {
+            if (!closeFileAndWait(testFile)) {
                 break;
             }
 
@@ -141,7 +146,7 @@ bool continueTesting() {
             writeLogFileNumber++;
 
             testStage = TEST_STAGE_OPEN_LOG_FOR_READ;
-        break;
+            break;
         case TEST_STAGE_OPEN_LOG_FOR_READ:
             if (readLogFileNumber == writeLogFileNumber) {
                 testStage = TEST_STAGE_COMPLETE;
@@ -153,24 +158,26 @@ bool continueTesting() {
 
                 sprintf(filename, "LOG%05d.TXT", readLogFileNumber);
 
-                afatfs_fopen(filename, "r", logFileOpenedForRead);
+                afatfs_fopen(filename, "r", logFileOpenedForRead, NULL);
             }
-        break;
+            break;
         case TEST_STAGE_READ_LOG:
-            readBytes = afatfs_fread(testFile, (uint8_t*)testBuffer, sizeof(testBuffer));
+            readBytes = afatfs_fread(testFile, (uint8_t *)testBuffer, sizeof(testBuffer));
 
             if (readBytes == 0 && afatfs_feof(testFile)) {
-                testAssert(afatfs_fclose(testFile, NULL), "Expected to be able to queue close on file");
+                testAssert(afatfs_fclose(testFile, NULL, NULL), "Expected to be able to queue close on file");
 
                 readBytesTotal += readBytesThisFile;
 
                 if (readLogEntryCount < writeLogEntryCount) {
-                    fprintf(stderr, "[Fail]     Wrote %u log entries but only read back %u\n", writeLogEntryCount, readLogEntryCount);
+                    fprintf(stderr, "[Fail]     Wrote %u log entries but only read back %u\n", writeLogEntryCount,
+                        readLogEntryCount);
                     exit(-1);
                 }
 
                 if (readBytesThisFile < writtenBytesThisFile) {
-                    fprintf(stderr, "[Fail]     Wrote %u bytes but only read back %u\n", writtenBytesThisFile, readBytesThisFile);
+                    fprintf(stderr, "[Fail]     Wrote %u bytes but only read back %u\n", writtenBytesThisFile,
+                        readBytesThisFile);
                     exit(-1);
                 }
 
@@ -188,12 +195,13 @@ bool continueTesting() {
                     }
                 }
             }
-        break;
+            break;
         case TEST_STAGE_IDLE:
             // Waiting for file operations...
-        break;
+            break;
         case TEST_STAGE_COMPLETE:
-            fprintf(stderr, "[Success]  Wrote %u bytes in %u files to fill the device\n", writtenBytesTotal, writeLogFileNumber);
+            fprintf(stderr, "[Success]  Wrote %u bytes in %u files to fill the device\n", writtenBytesTotal,
+                writeLogFileNumber);
             return false;
     }
 
@@ -226,12 +234,11 @@ int main(int argc, char **argv)
                     keepGoing = false;
                     break;
                 }
-           break;
-           case AFATFS_FILESYSTEM_STATE_FATAL:
+                break;
+            case AFATFS_FILESYSTEM_STATE_FATAL:
                 fprintf(stderr, "[Fail]     Fatal filesystem error\n");
                 exit(-1);
-           default:
-               ;
+            default:;
         }
     }
 

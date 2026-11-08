@@ -1,0 +1,26 @@
+# Run from the repository root: doxygen doc/Doxyfile
+# This profile documents the default native FAT configuration.
+PROJECT_NAME           = AsyncFatFS
+OUTPUT_DIRECTORY       = tests/build/doxygen
+INPUT                  = lib/asyncfatfs.c
+FILE_PATTERNS          = *.c
+RECURSIVE              = NO
+OPTIMIZE_OUTPUT_FOR_C  = YES
+EXTRACT_ALL            = NO
+EXTRACT_STATIC         = YES
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = NO
+REFERENCED_BY_RELATION = YES
+REFERENCES_RELATION    = YES
+GENERATE_HTML          = YES
+GENERATE_TREEVIEW      = YES
+GENERATE_LATEX         = NO
+HAVE_DOT               = NO
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED             = "__attribute__(x)=" "__declspec(x)=" "__forceinline=inline" "AFATFS_INLINE=inline" "AFATFS_WEAK=" "ONLY_EXPOSE_FOR_TESTING=static"
+WARN_IF_UNDOCUMENTED   = NO
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = YES
+QUIET                  = YES

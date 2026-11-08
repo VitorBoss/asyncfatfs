@@ -3,13 +3,41 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+static afatfsFilePtr_t closingFile;
+static bool closeComplete;
+
+static void closeDone(void *user)
+{
+    (void)user;
+    closeComplete = true;
+}
+
+bool closeFileAndWait(afatfsFilePtr_t file)
+{
+    if (!closingFile) {
+        closeComplete = false;
+        closingFile = file;
+        if (!afatfs_fclose(file, closeDone, NULL)) {
+            closingFile = NULL;
+            return false;
+        }
+    }
+    testAssert(file == closingFile, "Only one test close may be awaited at a time");
+    if (!closeComplete) {
+        return false;
+    }
+    closingFile = NULL;
+    return true;
+}
+
 /**
  * Write test log entries to the given file, starting from *entryIndex. Increments *entryIndex to keep track of the
  * progress so far until it reaches targetEntries.
  *
  * Keep calling until it returns true.
  */
-bool writeLogTestEntries(afatfsFilePtr_t file, uint32_t *entryIndex, uint32_t targetEntries) {
+bool writeLogTestEntries(afatfsFilePtr_t file, uint32_t *entryIndex, uint32_t targetEntries)
+{
     uint8_t testBuffer[TEST_LOG_ENTRY_SIZE];
 
     while (*entryIndex < targetEntries) {
@@ -17,13 +45,14 @@ bool writeLogTestEntries(afatfsFilePtr_t file, uint32_t *entryIndex, uint32_t ta
             testBuffer[i] = *entryIndex;
         }
 
-        uint32_t writtenBytes = afatfs_fwrite(file, (uint8_t*) testBuffer, TEST_LOG_ENTRY_SIZE);
+        uint32_t writtenBytes = afatfs_fwrite(file, (uint8_t *)testBuffer, TEST_LOG_ENTRY_SIZE);
 
         if (writtenBytes == 0) {
             testAssert(!afatfs_isFull(), "Device filled up unexpectedly");
             return false;
         } else {
-            testAssert(writtenBytes == TEST_LOG_ENTRY_SIZE, "Power-of-two sized fwrites not expected to be truncated during writing");
+            testAssert(writtenBytes == TEST_LOG_ENTRY_SIZE,
+                "Power-of-two sized fwrites not expected to be truncated during writing");
             (*entryIndex)++;
         }
     }
@@ -36,16 +65,18 @@ bool writeLogTestEntries(afatfsFilePtr_t file, uint32_t *entryIndex, uint32_t ta
  *
  * Keep calling until it returns true.
  */
-bool validateLogTestEntries(afatfsFilePtr_t file, uint32_t *entryIndex, uint32_t targetEntries) {
+bool validateLogTestEntries(afatfsFilePtr_t file, uint32_t *entryIndex, uint32_t targetEntries)
+{
     uint8_t testBuffer[TEST_LOG_ENTRY_SIZE];
 
     while (*entryIndex < targetEntries) {
-        uint32_t readBytes = afatfs_fread(file, (uint8_t*) testBuffer, TEST_LOG_ENTRY_SIZE);
+        uint32_t readBytes = afatfs_fread(file, (uint8_t *)testBuffer, TEST_LOG_ENTRY_SIZE);
 
         if (readBytes == 0) {
             return false;
         } else {
-            testAssert(readBytes == TEST_LOG_ENTRY_SIZE, "Power-of-two sized freads not expected to be truncated during reading");
+            testAssert(readBytes == TEST_LOG_ENTRY_SIZE,
+                "Power-of-two sized freads not expected to be truncated during reading");
 
             for (int i = 0; i < TEST_LOG_ENTRY_SIZE; i++) {
                 testAssert(testBuffer[i] == (uint8_t)(*entryIndex), "Log file content validation failed");

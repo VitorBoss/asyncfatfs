@@ -16,11 +16,25 @@ does not use 512-byte blocks, this block size will need to be emulated by your b
 backend drivers must support reads or writes to arbitrary block indexes in any order. AsyncFatFS is not
 suitable for directly interacting with raw flash chips; a flash translation layer of some sort is required.
 
-#### MBR and Partitions
+#### MBR, GPT and Partitions
 
-AsyncFatFS only knows how to read MBR-formatted disks. It only supports using partition 1, which must be
-pre-formatted as FAT16 or FAT32. It is unable to handle GPT-formatted partition tables, nor unpartitioned
-disks. This, along with the 512-byte sector requirement, limits the maximum disk size to 2 TiB.
+AsyncFatFS selects the first supported MBR partition, pre-formatted as FAT16, FAT32 or (when enabled) exFAT.
+With exFAT enabled, a protective MBR also enables GPT discovery. GPT selects the first Microsoft Basic Data
+partition containing an exFAT boot sector, skipping reserved partitions and other Basic Data filesystems.
+A protective MBR takes precedence over legacy entries in hybrid tables. GPT support does not enable
+FAT16/FAT32 on GPT or unpartitioned media, and does not widen the 32-bit backend address range (2 TiB).
+
+GPT discovery checks header and complete entry-array CRC32 values, geometry, partition bounds and overlap
+with the selected partition. Entry sizes of 128 times a power of two are supported, including entries larger
+than a sector. Invalid primary headers/arrays fall back to the backup copy without repairing the GPT.
+The backup location comes from the protective MBR; if its size is saturated (`0xFFFFFFFF`), a valid primary
+header is needed to establish the backup location because the backend has no capacity-query API.
+Both GPT metadata and the selected volume must fit the current 32-bit address range.
+
+The GPT Basic Data read-only attribute is respected: no journal provisioning/replay or boot-marker writes
+are performed on such a partition. Dirty volumes remain read-only without automatic recovery writes.
+Discovery reuses the existing cache and temporarily overlaps its state with the exFAT ASCII up-case table;
+there is no additional sector buffer or persistent RAM allocation.
 
 #### Paths and the Current Working Directory
 
@@ -33,27 +47,265 @@ have multiple files from different directories opened at the same time.
 
 #### File Creation and Modified Datetimes
 
-AsyncFatFS does not currently support setting or updating the creation or modified times of files within the
-filesystem. It uses a hard-coded fallback datetime of 2015-12-01 00:00:00 for all files.
+New files and metadata updates use `afatfs_fatTime()`, whose default implementation returns the build date
+and time. GCC-compatible builds may override this weak function to provide a clock.
 
 #### Freefile
 
-The freefile optimization only works with one file at a time. Additionally, the special FREESPAC.E file must
+The freefile optimization only applies to FAT16/FAT32 and works with one file at a time. Additionally, the special FREESPAC.E file must
 be created and remain on the volume.
 
-#### No Long Filename Support
+#### Filenames
 
-AsyncFatFS does not support reading or setting long filenames. All files and directories must be referred to
-by their "8.3" filenames.
+The default configuration uses the original callback API and FAT16/FAT32 short names (8.3).
+The compatibility API, LFN and exFAT are disabled by default.
+Define `ASYNCFS_ENABLE_LFN` in the build or configuration header to enable it;
+omitting it retains the smaller 8.3-only implementation.
 
-#### No Error Detection / Handling
+LFN supports leaf names up to 255 printable ASCII characters, with case-preserving enumeration and
+case-insensitive lookup by either the long name or its 8.3 alias. Spaces and multiple dots are accepted;
+`" * / : < > ? \\ |`, trailing dots/spaces and non-ASCII API names are rejected. Paths in filenames remain
+unsupported: use `afatfs_chdir` as before. Native UTF-16LE entries are streamed through the existing cache,
+including across fragmented directory chains, with ordinal, checksum, type, cluster and padding checks.
+Malformed chains fall back to their short entry. Non-ASCII on-disk names remain accessible by their short
+alias; Unicode API encoding is outside the current scope.
 
-AsyncFatFS does not have any ability for the backend storage driver to report errors or failures. The safest
-course of action if an error is produced in the backend driver is to not call the requested AsyncFatFS
-callbacks. This results in the file deadlocking, and may deadlock the entire AsyncFatFS library, but will
-prevent any further damage to the filesystem. Robust user code should include its own timeouts for any file
-operations conducted through AsyncFatFS. Alternatively, user code may communicate with the backend storage
-driver and treat any IO errors as fatal and discontinue any active file operations.
+Creation generates collision-checked numeric aliases when required, flushes LFN entries before publishing
+the short entry, and preserves the following directory end marker. Deletion makes the short entry durable
+before releasing its attached LFN slots. Rename uses the existing asynchronous copy/publish/delete flow.
+FAT32 with LFN now enables the metadata journal described below. FAT16 and builds with the FAT32
+journal disabled retain ordering barriers without atomic multi-sector recovery. Existing 8.3 names and the raw `afatfs_findNext` interface remain supported;
+use `afatfs_readdir`/`afatfs_findnext` for assembled long names.
+
+`afatfs_fstat` may yield while reading a long name. Retain the same output object until it completes;
+the caller's output supplies the assembly buffer, avoiding another 256-byte buffer per handle. The
+operation union retains the requested name only during creation/search. See
+[LFN validation and memory results](../tests/LFN_VALIDATION.md) for the measured alignment and RAM costs.
+The [native Windows FAT32 validation](../tests/WINDOWS_FAT32_LFN_VALIDATION.md) covers bidirectional VHD
+round trips, Windows-generated aliases and read-only CHKDSK checks. Request-based close/sync also accept
+directory handles returned by open, including root directories.
+exFAT names support 1 to 255 printable ASCII characters, excluding `" * / : < > ? \\ |`. The exFAT
+implementation uses the volume's up-case table for case-insensitive comparison and name hashes.
+
+#### Native FAT32 requested allocation batches
+
+The original 8.3 API batches up to eight clusters already covered by a write request on FAT32
+volumes with 512-byte clusters. `AFATFS_REQUESTED_BATCH_CLUSTERS` accepts values from 1 to 8
+and defaults to 8; set it to 1 to disable batches. Other geometries and optional API/journal
+profiles keep their existing allocation paths. A batch cannot cross a FAT sector or an occupied
+cluster. It does not add speculative reservations: the global speculative reservation remains unique.
+
+Both FAT copies must acknowledge the new end markers before links are published, and both
+copies must acknowledge links before directory publication. Before the first batch, both copies
+also acknowledge clearing the standard FAT32 clean-shutdown bit. Clean publication happens only
+after pending writes are durable and no other operation owns pending batch work. A session that
+used small-write collection stays conservatively dirty across fsync calls until close; fsync still
+confirms the data and exact logical size. A restart may therefore run recovery even after fsync.
+New batches wait while the clean marker is being published.
+
+Released FAT32 writer pages use the cache's existing discard preference once their writes have
+been acknowledged. This applies to `afatfs_fwrite()`, `afatfs_fputc()` and the native write,
+append and update opening modes. During a dirty batch session, the allocator temporarily keeps
+an acknowledged FAT page if flushing released data can make room instead. Cache pressure writes
+the oldest released data page first; dirty, retained, locked or in-flight pages cannot be reused.
+This preference adds no cache sectors and falls back to normal replacement when data cannot free
+space. Explicit synchronization and allocation barriers retain their existing completion checks.
+Small requests and byte writes do not reserve a multi-cluster run on the assumption that more
+data will arrive later: the speculative reservation remains a single cluster.
+
+For requests smaller than one sector, `AFATFS_SMALL_WRITE_WINDOW_CLUSTERS` defaults to 16
+(zero disables collection). Each additional cluster is allocated only when an arriving request
+actually needs it. Multiple writers can use interleaved positions within one FAT page; the gaps
+remain free for other allocations, and an occupied preferred position closes or redirects the
+window. The same cached FAT pages store these EOCs, without additional sector buffers.
+The existing operation union holds collection progress and queued sync/close callbacks.
+
+Continue supplying available data through fwrite/fputc and polling. The window closes at its
+limit, on sync/close, or after at most 64 idle internal operation passes; backend write periods
+do not count as application inactivity. EOC ACKs in both FATs still precede links, and link ACKs
+precede directory publication. Collection publishes an exact logical size after the accepted data
+is durable. A cached exact-image flag avoids rewriting it at an unchanged sync/close.
+Buffer-capacity queries include writable tails during collection. Other operations may still
+report busy until allocation finishes. Waiting for completion after every request, or syncing
+each request, prevents the same grouping benefit as a continuous stream.
+
+Already pending writers take priority over creating optional look-ahead reservations. For native
+FAT32 with 512-byte clusters, synchronization drains data and both FAT copies while keeping the
+file's previous directory image buffered. It then replaces that image with the final logical size
+and waits for its write completion. Early sync/close phases also participate in the existing bounded
+background deferral. This avoids writing an obsolete directory size immediately before its final
+replacement, especially when small writes are followed by frequent `afatfs_fsync()` calls.
+
+A dirty native volume with 512-byte clusters is recovered before the filesystem becomes ready,
+even when batches have subsequently been disabled. Recovery reconciles the secondary FAT from
+the primary and frees unreferenced allocation heads, acknowledging both copies before reclaiming
+their successors. Directory roots and references in both FAT copies protect live chains. It uses
+one existing cache sector as a temporary reference bitmap and traverses directories iteratively;
+there is no additional static buffer. Continue polling during this mount phase. Recovery may be
+slow on large or fragmented volumes because its bounded-memory passes revisit the FAT and
+directories. Clean volumes only require the header checks.
+
+This is recovery for interrupted allocation batches, not a general filesystem repair tool.
+Orphan cycles and arbitrary corruption are outside its scope; detected invalid structures stop
+mounting. Recovery discards ownerless allocations rather than creating recovered files. Linked
+preallocated space remains owned by its file. `afatfs_fwrite()` still reports bytes accepted into
+the asynchronous cache; use successful `afatfs_fsync()` or `afatfs_fclose()` completion for durable
+data and the exact logical size. An interrupted unsynchronized write may expose a preallocated
+tail through the existing physical-size directory update policy.
+
+#### FAT32 Metadata Journal
+
+`ASYNCFS_ENABLE_LFN` enables the FAT32 journal by default; define `AFATFS_DISABLE_FAT_JOURNAL` to
+retain the smaller implementation without persistent recovery. FAT16 remains unjournaled. exFAT
+remains disabled by default and retains its journal when explicitly enabled.
+
+The first clean FAT32 mount reserves a contiguous hidden/system/read-only `AFATFS.JNL` file. Its
+capacity is `2 * fatSectors + 64` distinct metadata sectors, stored as two alternating header sectors
+plus one descriptor and one before-image sector per record, rounded up to a cluster. This is about
+four times one FAT's size plus 65 KiB of disk space. Provisioning needs that much contiguous free
+space and zeroes it asynchronously before application operations are accepted. The journal name and
+allocation are reserved. Do not edit, delete, move or defragment it using another writer.
+
+FAT32 and exFAT share the same capture, CRC, I/O, checkpoint and recovery engine. It uses one aligned
+512-byte buffer and the retained original cache sector, with no heap or extra per-file state. The
+filesystem adapters handle discovery, extent allocation and dirty markers; their existing disk
+signatures remain distinct and the exFAT journal format remains compatible. FAT32 validates the
+entire contiguous journal chain in both FAT copies before reading or replaying its records.
+
+An interrupted metadata transaction is validated completely, then undone before the volume becomes
+writable. Recovery can itself be interrupted and restarted. A rename is recovered as its old or new
+name, without a duplicated entry or cross-linked chain in the tested fault model. `fsync`, close,
+rename and unlink wait for their metadata checkpoint. Open callbacks alone are not durability
+points. Concurrent handles may share a transaction, so keep polling all active work.
+Both FAT copies, cache writes, the empty checkpoint, clean markers and ownership release must be
+acknowledged before clean shutdown can authorize `afatfs_canPowerOff()`.
+
+Protection starts after the first successful journal provisioning. A cut during bootstrap can leave
+unclaimed allocations or divergent FATs; dirty volumes without a trustworthy owned log are mounted
+read-only with `AFATFS_ERROR_RECOVERY_REQUIRED`. Invalid headers, record/image CRCs or journal chains
+also block recovery writes. Preserve such media for external repair. After an interrupted library
+session, let this library recover before another driver writes to the volume. Use clean shutdown
+before handing it to Windows; Windows does not replay this private journal. Interrupted external
+writers are outside its recovery contract.
+
+This protects metadata, not in-place payload overwrites or unsynced data still in RAM. Backend write
+acknowledgments must represent durable, ordered writes. See the [FAT32 power-cut and shared-journal
+validation](../tests/FAT32_LFN_POWERCUT.md) for tested cuts, limits and measured RAM costs.
+
+#### Memory and Metadata I/O
+
+The journal shares provisioning, capture and recovery workspaces whose lifetimes do not overlap.
+Its initialization and shutdown selectors share one byte, reset to the initial shutdown step before
+`READY`. The runtime phase remains separate so pending commits and mount errors retain their state.
+exFAT temporarily borrows the first public handle during initialization and releases it before `READY`,
+including protected read-only mounts. There is no permanent journal handle, extra sector buffer or heap.
+The public handle limit and file/directory/request sizes remain unchanged.
+
+During the first journal reservation, FAT-chain and bitmap allocation updates stay in the existing
+cache until cache pressure requires I/O or the allocation reaches its final durability barrier. That
+barrier still acknowledges every allocation sector before publishing the journal file's extent.
+Zeroing of the reserved extent and all undo-record ordering remain unchanged.
+
+On writable journaled FAT32, regular-file allocation also combines changes to the new and previous
+FAT entries where the cache permits. Background flushing pauses only during those allocation phases;
+a cache miss that cannot find a reusable buffer starts a flush so fragmented chains, other writers
+and retained readers can make progress. The directory update, sync/close and transaction checkpoint
+continue to wait for the required writes. Directory initialization and unjournaled allocations retain
+their ordering barriers. exFAT's normal file-allocation barriers are retained.
+
+This reduces repeated media writes without promising that every workload needs fewer reads. See
+[memory and I/O measurements](../tests/MEMORY_IO_OPTIMIZATION.md) for before/after ABI sizes, transfer
+counts, interrupted-write checks and the measured tradeoff for a single FAT32 writer. The subsequent
+[journal lifetime layout report](../tests/JOURNAL_LIFETIME_MEMORY.md) describes the workspace unions,
+remaining simultaneous fields and the additional RAM savings.
+The [operation and mount lifetime report](../tests/OPERATION_LIFETIME_MEMORY.md) covers further
+workspace sharing during file creation, truncation, directory growth and exFAT initialization,
+with measured sizes for 16-, 32- and 64-bit targets.
+
+#### exFAT Development Support
+
+exFAT is disabled by default. With `AFATFS_EXTERNAL_CONFIG`, define `ASYNCFS_ENABLE_EXFAT` in
+your own `afatfs_config.h` to opt in. This feature is independent of FAT LFN support and can coexist
+with it. The exFAT regression/VHD/power-cut runners explicitly select their exFAT test configuration.
+
+Mounting verifies the boot checksum, header geometry, mandatory bitmap and up-case entries, and the
+up-case table checksum. Root directories, allocation bitmaps, and up-case tables can have fragmented FAT
+chains. Allocation and release use the bitmap. File creation, append, truncation, deletion and subdirectory
+growth update native entry sets and their checksums, including sets crossing sector/cluster boundaries.
+Existing contiguous `NoFatChain` streams are read directly; extending their allocation converts them to
+FAT chains. Bytes past `ValidDataLength` read as zero, and gaps are initialized before exposing later writes.
+`mkdir` allocates and zeroes the first directory cluster before its completion callback.
+
+The current scope is MBR or GPT media with 512-byte sectors, one FAT, and cluster sizes up to 32 MiB. TexFAT
+(two FATs), Unicode API names, and 64-bit sector/file interfaces are not implemented. File lengths,
+allocated lengths and cursor offsets remain 32-bit; files whose rounded allocation exceeds `UINT32_MAX`
+are rejected. Volumes exceeding the 32-bit backend address range are rejected. `ASYNCFS_ENABLE_LBA64`
+produces a compile-time error until the backend and public finder API are widened together.
+
+Entry sets may contain at most 19 entries; supported benign trailing entries are preserved. Walking a
+directory with a larger file entry set fails the open operation. Matching unsupported files (including
+oversized files) fail without creating a duplicate. Non-ASCII on-disk names are outside the supported API
+scope; a matching hash requiring Unicode comparison fails safely.
+
+The FAT reservation-file optimization is bypassed on exFAT, including when `AFATFS_USE_FREEFILE` is
+enabled for FAT16/FAT32. Each file handle (including the CWD) retains 608 bytes of entry data, 19 entry
+positions and a small amount of state when exFAT is enabled. No heap allocation or synchronous disk I/O
+is introduced. Enabling exFAT therefore increases static RAM use even while a FAT volume is mounted.
+
+Mount marks `VolumeDirty` and sets `PercentInUse` to unknown; `afatfs_destroy(false)` clears the dirty bit
+after file data and metadata have been flushed. `afatfs_destroy(true)` intentionally leaves it dirty.
+Clean shutdown retains ownership of the committed empty journal until the clean boot marker has been
+acknowledged, then releases the journal and waits for that acknowledgment before authorizing power-off.
+A removal during either write can therefore mount writable from a valid owned empty checkpoint, without
+replaying committed data. The journal header format is unchanged; the shared engine now uses one
+sector buffer, reducing static RAM by 1,024 bytes compared with the previous exFAT journal.
+exFAT reserves a contiguous hidden/system/read-only `AFATFS.JNL` file on the first clean mount. Metadata
+before-images reach this undo log before FAT, bitmap or directory sectors can be modified. An interrupted
+transaction is validated completely and replayed before the mount becomes writable. Recovery can itself
+be interrupted and restarted. This uses the existing polling machines and static buffers, without heap
+allocation. Reserve approximately twice the FAT and bitmap size plus 65 KiB, rounded to a cluster, in one
+contiguous free extent. Initialization can take longer while this extent is zeroed. The journal name is
+reserved; do not alter its contents or allocation through another driver.
+
+`afatfs_fsync(file, callback, user)` releases this file's data buffers, flushes them, publishes its valid
+length, and waits for the metadata transaction to commit before invoking the callback. exFAT close and
+truncate also wait for their metadata commit. `afatfs_flush()` waits for flushable cache pages and the
+journal; it does not unlock a file's partial data sector or publish its logical EOF. Use `fsync` or close
+for an application durability point. Transactions can cover concurrent handles; keep polling them all.
+
+The journal protects filesystem metadata, not overwritten user data. In-place data writes are not atomic.
+Before the first successful journal provisioning, power loss can still require external repair. A dirty
+volume with no usable owned journal mounts read-only (`afatfs_isReadOnly()` and error
+`AFATFS_ERROR_RECOVERY_REQUIRED`). This includes mount-ownership gaps and volumes left by the older
+shutdown ordering, where an unowned dirty volume cannot be distinguished from an interrupted external
+writer. Such existing images are not retroactively made trustworthy by the new ordering. Preserve the image and repair
+it externally before writing again. After a crash during library writes, let this library recover the
+volume before mounting it with another writer: Windows and exfatprogs do not replay this private journal.
+An interrupted external-driver session is not covered by the journal. Backend write completions must mean
+durable, ordered media writes; volatile device caches and unrelated media corruption are not covered.
+
+Backup boot-region recovery is not implemented. The [power-cut suite](../tests/EXFAT_POWERCUT.md)
+documents the fault model and recovery checks. The [external interoperability suite](../tests/EXFAT_INTEROP.md)
+validates exfatprogs/FATtools images and independent filesystem checks. The separate
+[native Windows VHD suite](../tests/WINDOWS_VHD_VALIDATION.md) validates Windows formatting, driver I/O
+and read-only CHKDSK checks. Physical hardware and native macOS driver validation remain outside the
+current test coverage.
+
+`afatfs_findNext` returns raw 32-byte entries: on exFAT inspect the first byte for the native entry type.
+`afatfs_fGetFileInfo` is FAT-only. `afatfs_fGetExFatFileInfo(file, &primary, &stream)` returns pointers to
+the handle's cached native metadata, or NULL pointers for the root directory; it returns false if busy
+or if the mounted filesystem is not exFAT. These pointers remain owned by the library and must not be modified.
+
+#### Errors and retries
+
+`afatfs_getLastError()` reports session diagnostics; `afatfs_ferror(file)` reports the last result for a
+handle, independently of other files. `afatfs_clearerr(file)` clears that handle's diagnostic. A busy
+nonblocking read/write is retryable. The request API below reports an explicit result in its callback.
+
+The backend must report a failed completion with a NULL buffer, not with a successful acknowledgment.
+Rejected submissions and failed completions retain pending work and retry through `afatfs_poll()`.
+Permanent hardware failures require an application timeout or media-removal handling; they never make
+pending data safe to discard. `afatfs_canPowerOff()` remains false until clean shutdown finishes.
 
 #### File Seeking Behavior
 
@@ -69,7 +321,8 @@ system, and they must not be called from within an interrupt service routine or 
 
 ### Compiling and Linking
 
-Simply copy the 5 files from the lib/ directory into your project. Make sure that the .h files are in a path
+Copy the files from the lib/ directory into your project (including the `.inc` files and
+`asyncfatfs_config.h`). Make sure that the .h files are in a path
 that is used by your build system for header files, or that they are in the same directory as the .c files.
 Compile and link against both `fat_standard.c` and `asyncfatfs.c`.
 
@@ -79,9 +332,53 @@ AsyncFatFS requires a C99-compatible compiler. In addition, the compiler must su
 ### Compile-Time Settings
 
 There are a number of `#define` compile-time settings that affect how AsyncFatFS operates. They can either be
-directly adjusted in `asyncfatfs.c`, or redefined in a user-supplied `afatfs_config.h` file by defining
+directly adjusted in `asyncfatfs_config.h`, or redefined in a user-supplied `afatfs_config.h` file by defining
 `AFATFS_EXTERNAL_CONFIG` in your build system. This is useful if you want to keep AsyncFatFS as a git
-submodule without modifying it. Available settings:
+submodule without modifying it. The configuration is included by the public header too, so use the
+same definitions and include paths for the library and every caller.
+
+`ASYNCFS_ENABLE_FATFS_API` controls the extended FatFS-style API (`afatfs_open`, requests,
+metadata, directory enumeration, formatting and stream helpers). Set it to `1` to enable or
+`0` to remove its declarations, implementation and global request/directory pointers. The
+built-in and external configurations both default to disabled unless explicitly enabled. It is independent of `ASYNCFS_ENABLE_LFN` and `ASYNCFS_ENABLE_EXFAT`.
+The original callback API, cache, poll loop and safe shutdown remain available.
+
+For the original FAT 8.3 API, define `AFATFS_EXTERNAL_CONFIG` for the whole project and use
+this `afatfs_config.h`:
+
+```c
+#define ASYNCFS_ENABLE_FATFS_API 0
+#define AFATFS_NUM_CACHE_SECTORS 4
+#define AFATFS_MAX_OPEN_FILES 3
+#define AFATFS_MIN_MULTIPLE_BLOCK_WRITE_COUNT 2
+#define AFATFS_FREEFILE_LEAVE_CLUSTERS 100
+#define AFATFS_FREESPACE_FILENAME "FREESPAC.E"
+#define AFATFS_INTROSPEC_LOG_FILENAME "ASYNCFAT.LOG"
+/* Leave ASYNCFS_ENABLE_LFN and ASYNCFS_ENABLE_EXFAT undefined. */
+```
+
+This supports FAT32 with short names; FAT16 support is retained as in the original library.
+To add the compatibility API to this configuration, change `ASYNCFS_ENABLE_FATFS_API` to `1`.
+
+In the minimal FAT 8.3 build (compatibility API, LFN, exFAT, freefile and introspective
+logging disabled), FAT32 allocation pipelines one unlinked look-ahead EOC using the existing
+cluster-search hint. It consumes that cluster only after both FAT copies acknowledge its EOC.
+Unused reservations are released on flush, sync, close, truncation or background inactivity.
+The single look-ahead can share either the current EOC write or the previous-link write when
+its record is in that cached FAT sector. This avoids a separate EOC write at the first cluster
+and FAT-sector boundaries; consumption still waits for confirmation of both FAT copies.
+The background writer may coalesce directory size updates for 512-byte clusters for up to
+64 cache-clock ticks without recent activity. Explicit barriers do not use this delay;
+`afatfs_flush` still only drains unlocked cache pages, while sync/close release the file tail.
+`AFATFS_DISABLE_ALLOCATION_PIPELINE` disables this optimization for diagnostic comparisons.
+A missing primary FAT cache page can be reconstructed from its matching clean, acknowledged
+secondary page, using the existing cache buffers. Dirty, locked or in-flight copies are never
+used for this purpose. Under FAT cache pressure, the existing background selection first tries
+to release an unlocked data page; it falls back to the full drain if necessary for progress.
+This adds no runtime fields or buffers. Unsynchronized work on a filesystem without a journal
+still has no atomic power-loss recovery; an abrupt loss can leave an unlinked allocated cluster.
+
+Available settings:
 
 ```
 #define AFATFS_DEBUG
@@ -114,6 +411,31 @@ duration of the listing operation. On 32-bit platforms, each file descriptor con
 certain elements of the block cache have a counter limited to 6 bits (max value of 63). Increasing the file
 descriptor limit beyond 62 runs the risk of overflowing this counter and causing unexpected behavior.
 
+`#define AFATFS_MIN_MULTIPLE_BLOCK_READ_COUNT 2` (optional, disabled by default)
+
+Enable only when the backend implements `sdcard_beginReadBlocks()` and `sdcard_endReadBlocks()`.
+Existing backends need no changes while this macro is undefined. The library currently announces
+bounded runs for one read-only FAT32 handle with 512-byte clusters, using contiguous links already
+present in a cached FAT page. It adds no file state, cache pages, heap allocation or speculative
+buffers. Two readable handles, read/write handles, other cluster sizes and other filesystems use
+ordinary reads. The backend may keep one read command open across consecutive `sdcard_readBlock()`
+calls; it must stop before nonconsecutive reads or writes, and must not pre-erase any read range.
+Each accepted block keeps its own buffer, callback and full media generation. Read failure ends the
+session. Flush, sync/close, clean teardown and a positive idle answer wait for read-session stop;
+reset must synchronously cancel read-session DMA. See the contract in `lib/sdcard.h` and the
+[multi-read validation](../tests/FAT32_MULTIREAD.md) for measurements and fault tests. A physical
+driver must implement the command/stop behavior; the shipped reference backend is the file simulator.
+
+`#define AFATFS_READ_SESSION_QUERY 1` (optional, disabled by default)
+
+Requires `AFATFS_MIN_MULTIPLE_BLOCK_READ_COUNT` and a backend implementation of
+`sdcard_isReadBlockInSequence(blockIndex)`. This pure query avoids rescanning the FAT for a block
+already covered by an accepted, bounded read session. Return true only when the backend is ready
+for that exact next block; never advance counters, acquire buffers or extend the accepted range.
+Return false while busy/stopping and after failure, reset or removal. The library then validates
+the range normally. No additional state or buffers are required. Existing drivers can leave this
+macro disabled. See the [read CPU measurements](../tests/FAT32_READ_CPU.md).
+
 `#define AFATFS_MIN_MULTIPLE_BLOCK_WRITE_COUNT 4`
 
 Sets the minimum number of SD card blocks to use a multi-block write command for. All other writes will use
@@ -143,6 +465,10 @@ never contains user data, only reserved blocks to be used when writing other fil
 the FAT "8.3" name limitation.
 
 ### User API
+
+The [extended API reference](Extended_API.md) documents caller-owned requests, unified metadata,
+directory iteration, rename/attributes, labels/free space, preallocation, text/streams and formatting.
+The original entry points below remain available, with the corrected truncation and putc behavior.
 
 This section describes the user-facing API of AsyncFatFS. The backend driver API that AsyncFatFS itself calls
 is described [in the next section](#backend-driver-api).
@@ -208,6 +534,73 @@ backend-specific media flushes are complete, the media may be safely ejected. Af
 
 With the `dirty` parameter set to `true`, AsyncFatFS will skip cleanly closing files and flushing dirty cache
 blocks to storage. THIS WILL CAUSE DATA LOSS!
+
+Clean shutdown enters `CLOSING` immediately and stays there while file/cache/journal writes are pending.
+Backend I/O failures preserve their buffers and operation phase for retry; they never grant power-off
+authorization. If shutdown is requested during initialization it advances mounting without discarding its
+pending work. A fatal state is preserved and cannot complete clean shutdown. An unrecoverable runtime
+journal validation error likewise blocks clean shutdown instead of discarding accepted writes.
+
+`bool afatfs_isIdle(void)`
+
+Observes the global library state without polling or performing I/O. Returns `false` during initialization,
+errors, shutdown, file/CWD/internal-file operations, cache reads (including prefetch), writes, dirty or
+locked cache pages, and pending FAT32/exFAT journal work. Clean retained read sectors alone do not make the
+system busy. A successfully stopped filesystem is idle. This uses existing state without additional fields.
+
+Idle is an activity snapshot, not permission to cut power: a mounted volume can still have open handles,
+deferred EOF metadata or an exFAT dirty marker. Do not submit new operations once shutdown is requested.
+
+`bool afatfs_canPowerOff(void)`
+
+Returns `true` only after `afatfs_destroy(false)` has successfully closed the files, drained cache/prefetch,
+committed the journal, completed clean volume marking, and confirmed backend readiness. Shutdown ends
+any multi-block write through `sdcard_endWriteBlocks()` when `AFATFS_MIN_MULTIPLE_BLOCK_WRITE_COUNT` is
+enabled; `BUSY` keeps the filesystem in `STOPPING` and the query remains false. Backends enabling that
+feature must implement the already-declared end-write function.
+
+The query is observational: keep calling `afatfs_destroy(false)` to progress shutdown. It returns `false`
+before initialization, during mount/shutdown, after a forced `afatfs_destroy(true)`, or after another
+`afatfs_init()`. Successful shutdown records `STOPPED` in the existing filesystem-state field, without
+adding RAM. Repeating `afatfs_destroy(false)` after success preserves that state.
+
+```c
+if (shutdownRequested) {
+    afatfs_destroy(false); // Non-blocking: repeat from the application's main loop.
+    if (afatfs_canPowerOff()) {
+        // Complete any platform-specific backend shutdown, then disable card power.
+    }
+}
+```
+
+This confirms library-owned work only; other users of the storage driver must be coordinated by the
+application. Backend write completion must mean durable storage, as required by the driver contract.
+
+`void afatfs_notifyMediaRemoved(void)`
+
+The application/driver must call this on a detected removal or replacement, serialized with other library
+calls and before permitting I/O to the inserted card. The boolean `sdcard_poll()` interface cannot
+distinguish absence from `BUSY`; removal detection is therefore the backend/application's responsibility.
+The notification cancels the old session through `sdcard_reset()`, invalidates all handles and queued
+application callbacks, clears volatile cached work and reports `REMOVED` / `AFATFS_ERROR_MEDIA_REMOVED`.
+Both `isIdle` and `canPowerOff` remain false. Merely reinserting a card does not resume old requests.
+
+After reinsertion, initialize the backend for that card, call `afatfs_init()`, and wait for `READY` before
+reopening handles. A new mount revalidates the volume and recovers a trustworthy owned FAT32/exFAT
+journal when enabled. Unsynced data lost at removal cannot be reconstructed; in-place overwrites and
+unjournaled FAT16/FAT32 metadata do not gain transactional recovery. Legacy unowned-dirty volumes and
+mount-ownership gaps can still require repair.
+After any unexpected removal, recover and cleanly unmount with this library before any external writer,
+even if the boot dirty bit was already cleared: journal ownership may still belong to the interrupted
+session. Normal completed clean shutdown leaves both a clean boot marker and an unowned empty journal.
+
+`sdcard_reset()` must synchronously cancel DMA/queued transfers and stop all access to the old buffers
+and medium before returning, without starting new I/O. This applies to init and forced/clean teardown
+as well as removal. Old software completion notifications may arrive later, but must preserve their
+original `callbackData` and must not touch retired buffers. A single 32-bit session counter rejects those
+notifications for both the cache and journal; no handle layout, heap allocation or on-disk format changes
+are introduced. This counter is separate from the mount state so resetting that state cannot revive old
+callbacks. The [removal validation](../tests/MEDIA_REMOVAL_VALIDATION.md) documents the tested cases.
 
 #### Directory Operations
 
@@ -294,13 +687,29 @@ there are no further valid entities after this one.
 
 #### File Operations
 
+`void afatfs_fprefetch(afatfsFilePtr_t file)`
+
+Requests a best-effort asynchronous read of the cursor's sector when aligned, or the following sector
+when the cursor is partway through a sector. The cursor and file operation state remain unchanged.
+The hint does nothing for a handle without read access, a busy file, EOF, or a target outside the current
+cluster. `afatfs_fread()` invokes it automatically after consuming and releasing a complete sector.
+Continue calling `afatfs_poll()` to complete the speculative read.
+
+For read-only FAT32 files with 512-byte clusters, releasing a retained data page
+marks it as a preferred replacement candidate. This lets another reader's untouched
+prefetch survive while completed pages are reused. Retaining a page again clears
+that hint. Dirty, locked, retained and in-flight pages remain protected by the
+existing allocator; the hint never authorizes dropping a pending write. The policy
+uses the existing descriptor bit and does not enlarge the cache or file handles.
+
 `bool afatfs_fopen(const char *filename, const char *mode, afatfsFileCallback_t complete, void *user)`
 
 Begin creating or opening a file or directory within the CWD. Note that path separator characters (`/` or `\`)
 are NOT supported. Only files or directories immediately within the CWD may be opened. To access files within
 a subdirectory, use the `afatfs_chdir` or `afatfs_mkdir` commands to change the CWD.
 
-The `filename` argument must be an ASCII string that follows the FAT 8.3 filename convention. If the special
+The `filename` argument must be an ASCII string. FAT16/FAT32 accept up to 255 characters with LFN
+enabled and otherwise use 8.3 names; exFAT accepts up to 255 characters. If the special
 filename string `"."` is passed, the CWD is opened. This is useful for the `afatfs_findFirst` directory
 listing command.
 
@@ -311,6 +720,7 @@ supported:
 - `a` - create or open a file for write access, setting the file cursor to the end of the existing file (append mode)
 - `r+` - open an existing file for read and write access
 - `w+` - create or open an existing file for read and write access
+- `x` / `x+` - create exclusively, failing if the name already exists; `x+` also permits reads
 - `a+` - create or open an existing file for read and write access, setting the file cursor to the end of the existing file (append mode)
 - `as` - same as `a`, but uses the freefile optimization if available
 - `ws` - same as `w`, but uses the freefile optimization if available
@@ -330,19 +740,29 @@ The fopen command itself returns a `false` if the fopen could not be queued, usu
 handles. The fopen command returns a `true` if the command has been successfully queued for processing. At
 this point, the user application must wait for the callback in order to proceed.
 
+Multiple read-only handles may refer to the same file. If either handle requests write or append access,
+another open of that file fails through the callback with `NULL`, including while the first handle is
+closing. Files with the on-disk read-only attribute cannot be opened for writing or appending. These
+checks use the existing open-file table and add no persistent RAM. They do not provide thread synchronization.
+
 `bool afatfs_ftruncate(afatfsFilePtr_t file, afatfsFileCallback_t callback, void *user)`
 
-This function truncates an existing, open file to zero length. `file` must be an open file handle with write
+This function truncates an existing, open file at its current cursor, preserving the prefix and cursor
+position. At EOF it leaves the length unchanged. Seek to zero first to empty the file. Clusters beyond
+the new end are released; a partially used final cluster is retained. `file` must have write
 permissions. `callback` is a user-supplied callback function that will fire once the truncation operation has
 completed. The callback uses the following signature:
 `void fopen_callback(afatfsFilePtr_t file, void *user)`
-The `file` argument to the callback always contains the file handle of the file that was truncated. The `user`
+The `file` argument contains the file handle on success, or NULL on a structural filesystem error. The `user`
 argument is an opaque pointer that the user can supply to differentiate the source of the callback. `user` may
 be `NULL` if not needed. The file itself will remain in a busy state from the successful calling of ftruncate
 until the firing of the callback; any reads or writes to the file will fail until the callback is fired.
 
 The return value is `true` when the operation has been queued, or `false` when the operation could not be
 queued due to the file being busy.
+
+Truncation and unlink also return `false` without invoking the callback when the handle lacks write/append
+permission or the file has the read-only attribute.
 
 `bool afatfs_funlink(afatfsFilePtr_t file, afatfsCallback_t callback, void *user)`
 
@@ -352,6 +772,10 @@ Note that the callback does not include a file handle, since after unlinking the
 therefore have no valid file handle. The `user` pointer is still available to differentiate the source of the
 callback if needed.
 
+Deletion removes the entire file regardless of cursor position. Directories must be empty; the root,
+current directory and directories with active directory readers cannot be deleted. Use the request-based
+`afatfs_unlink`/`afatfs_rmdir` alternatives when an explicit completion result is needed.
+
 `bool afatfs_fclose(afatfsFilePtr_t file, afatfsCallback_t callback, void *user)`
 
 This function closes an open file or directory handle `file`. It calls a callback with the following signature
@@ -359,6 +783,12 @@ once the close is complete:
 `void funlink_callback(void *user)`
 The fclose operation returns `true` if the close has been successfully queued, or `false` if the close could
 not be queued due to the file being busy.
+
+For FAT16, FAT32 and exFAT, the close callback waits for the file's buffered data and directory metadata
+to be written and acknowledged by the backend. FAT32/exFAT also wait for their enabled journal checkpoint. Failed writes
+remain pending and are retried; the callback is not issued until synchronization succeeds. Other open
+writers may still have partially filled buffers, so closing one file does not authorize powering off the
+card. Use clean destruction and `afatfs_canPowerOff()` for that decision.
 
 `uint32_t afatfs_fread(afatfsFilePtr_t file, uint8_t *buffer, uint32_t len)`
 
@@ -392,18 +822,16 @@ opened in a writable mode, or the filesystem has run out of space. To check if t
 `afatfs_isFull` function. If the filesystem is not full, writes may be periodically retried until they
 succeed.
 
-`void afatfs_fputc(afatfsFilePtr_t file, uint8_t c)`
+`int afatfs_fputc(afatfsFilePtr_t file, uint8_t character)`
 
-> [!CAUTION]
-> This function does not check or return errors. Characters will be silently
-> dropped if the file is busy when this function is called!
+Returns 1 if the byte was accepted, or -1 if rejected. On BUSY, poll and retry the same byte. Consult
+`afatfs_ferror(file)` for denial or lack of space. Existing code that ignored the former void return
+continues to compile, but must inspect the result to avoid losing bytes under backpressure.
 
-Quick and dirty shortcut to write a single character into an open file. Will always succeed if the file cursor
-is within a single 512-byte block. The first write to the next block when a block boundary will also succeed
-if the file is not busy, but this operation may put the file into a busy state, causing subsequent fputc
-operations to silently fail until the file is no longer busy. Use this function with caution.
+`afatfsOperationStatus_e afatfs_fseek(afatfsFilePtr_t file, int32_t offset, afatfsSeek_e whence, afatfsFileCallback_t callback, void *user)`
 
-`afatfsOperationStatus_e afatfs_fseek(afatfsFilePtr_t file, int32_t offset, afatfsSeek_e whence)`
+Pass NULL for `callback` and `user` when no completion notification is needed. If supplied, the callback
+receives `(file, user)` after a successful seek and may run immediately when no I/O is required.
 
 Seek the file cursor to a given location. The `file` handle must be an open file. `offset` is a signed integer
 value whose meaning is determined by the setting of `whence`:
@@ -463,11 +891,27 @@ cluster to a file may still succeed.
 
 `uint32_t afatfs_getFreeBufferSpace(void)`
 
-This function returns a pessimistic estimate of the amount of free buffer space (in bytes) available for file
-writes. The estimate is pessimistic because it does not account for any partially-filled sectors of
-currently-open files. Note that it is not guaranteed that a single fwrite call will be able to consume this
-many bytes. If the file is being appended to, or if the needed cluster maps are not currently in cache, writes
-may be split up with block reads to find or allocate clusters to the target file.
+Returns reusable cache capacity in bytes plus the remaining bytes from the cursor to the end of each
+sector locked for writing by an idle public file handle. Clean sectors retained by readers or metadata
+operations, dirty sectors awaiting flush, and buffers involved in I/O are excluded. Each cache sector is
+counted once. Returns zero unless the filesystem is ready and writable. This scans existing descriptors
+and handles; it adds no persistent RAM, allocation or I/O.
+
+The total covers all open files: a partially used sector belongs to its current writer and cannot be
+transferred to another file. It is not a guarantee that one `fwrite` can consume the whole total. Allocation,
+metadata journaling and reads needed to locate or merge sectors may still make the write yield.
+
+`uint32_t afatfs_getFileFreeBufferSpace(afatfsFilePtr_t file)`
+
+Returns the reusable shared cache capacity plus the remaining bytes in this file's locked write sector.
+Partially filled sectors belonging to other files are excluded. Returns zero for `NULL`, a closed handle,
+a directory, a handle without write access, a busy file, or a filesystem that is not ready and writable.
+Pass a valid library handle or `NULL`; arbitrary or dangling pointers are not supported.
+
+This query uses the existing cache descriptors and file state, without additional persistent memory,
+allocation, I/O or cursor changes. The shared capacity is not reserved by the query, and allocation,
+journaling or required reads may still cause `fwrite` to accept fewer bytes. Results for different files
+overlap in their shared capacity and must not be summed.
 
 `uint32_t afatfs_getContiguousFreeSpace(void)`
 
@@ -485,15 +929,32 @@ Returns the global state of the filesystem:
 sanity checks
 - `AFATFS_FILESYSTEM_STATE_READY` - Initialization is complete and the filesystem may be used
 - `AFATFS_FILESYSTEM_STATE_FATAL` - Initialization failed; see the `afatfs_getLastError` function for details
+- `AFATFS_FILESYSTEM_STATE_STOPPING` - Clean filesystem writes are complete; backend shutdown is pending
+- `AFATFS_FILESYSTEM_STATE_STOPPED` - `afatfs_destroy(false)` completed; `afatfs_canPowerOff()` is true
+- `AFATFS_FILESYSTEM_STATE_CLOSING` - File, cache, journal or clean-volume writes are still being drained
+- `AFATFS_FILESYSTEM_STATE_REMOVED` - Media was removed; reinitialize after insertion and reopen handles
 
 `afatfsError_e afatfs_getLastError(void)`
 
-If the filesystem state is `AFATFS_FILESYSTEM_STATE_FATAL`, this function may be called to get a more detailed
-error code. The available errors are:
+Returns the last reported error, including retryable I/O errors while mounted or closing. It does not
+clear the error. A later successful retry can leave the diagnostic recorded until another error or a
+mount/reset/shutdown clears it; the pending-operation state determines whether work is complete.
+The available errors are:
 - `AFATFS_ERROR_NONE` - No error has occurred
 - `AFATFS_ERROR_GENERIC` - An unknown error has occurred (most often caused by a full filesystem)
-- `AFATFS_ERROR_BAD_MBR` - A valid MBR sector could not be detected
+- `AFATFS_ERROR_BAD_MBR` - No supported MBR partition or usable GPT layout could be detected
 - `AFATFS_ERROR_BAD_FILESYSTEM_HEADER` - A valid FAT16 or FAT32 volume could not be detected
+- `AFATFS_ERROR_RECOVERY_REQUIRED` - The journal/volume cannot be trusted for normal writes
+- `AFATFS_ERROR_BACKEND_IO` - A backend read/write callback failed, a write was rejected with
+  `SDCARD_OPERATION_FAILURE`, or backend stop failed. The pending operation is retained for retry.
+- `AFATFS_ERROR_MEDIA_REMOVED` - The old media session was cancelled after a removal/replacement event
+
+The boolean read-submission API cannot distinguish a rejected read from `BUSY`; both are retried without
+advancing the operation. Normal `BUSY` does not report an I/O error. A journal I/O failure retries the
+same prepared header, descriptor, before-image or recovery sector until acknowledged successfully.
+A journal CRC/structure failure is different: it reports recovery required, freezes runtime journal work,
+and does not authorize shutdown. `afatfs_destroy(true)` is an explicit lossy discard, not confirmation
+that power can be removed safely.
 
 ### Backend Driver API
 
@@ -567,8 +1028,30 @@ cannot be accepted right now, return `false`.
 
 This function is used by AsyncFatFS to indicate the beginning of a multi-block write operation. The size of
 potential multi-block writes (in number of blocks) will never be less than the value of
-`AFATFS_MIN_MULTIPLE_BLOCK_WRITE_COUNT`, and will never be more than the value of `AFATFS_NUM_CACHE_SECTORS`.
-Currently, the only way multi-block writes can trigger is when `AFATFS_USE_FREEFILE` is enabled. This function must return either `SDCARD_OPERATION_SUCCESS` or `SDCARD_OPERATION_BUSY`.
+`AFATFS_MIN_MULTIPLE_BLOCK_WRITE_COUNT`.
+The cache also uses this feature without `AFATFS_USE_FREEFILE` when dirty, unlocked sectors are physically
+consecutive in their existing write order and meet `AFATFS_MIN_MULTIPLE_BLOCK_WRITE_COUNT`. These runs
+contain at most `AFATFS_NUM_CACHE_SECTORS` blocks. Contiguous append through freefile may announce a
+longer range of future data sectors, up to 65535 blocks. Metadata never announces uncached future sectors:
+pre-erasing them could destroy contents before their undo records are durable.
+
+The library retries `SDCARD_OPERATION_BUSY` and `SDCARD_OPERATION_FAILURE` without submitting the data
+block, retaining the pending buffers. Failure also records `AFATFS_ERROR_BACKEND_IO`. Sync, close and
+shutdown continue to wait for completion and the end of the multi-block operation.
+
+Background flushing is deferred only during selected journal-protected metadata production phases:
+LFN/exFAT entry publication, FAT32 allocation, chain conversion and chain release. Cache pressure and
+explicit durability barriers override this deferral; allocation blocked on a journal checkpoint allows
+background flushing to continue. An open but inactive file does not defer flushing.
+During LFN free-slot search/publication, fewer than two reusable cache pages also resumes flushing:
+the FAT walk and target entry must not continually evict each other's scratch page.
+
+See the [I/O batching measurements](../tests/IO_BATCHING.md) for operation counts, multi-block coverage,
+unchanged RAM measurements and interrupted-write validation. Multi-block writes reduce the number
+of write-sequence starts, not the number of payload sectors. Actual time saved depends on the card
+and backend; the simulated backend does not measure physical SD timing.
+The [native Windows FAT32 validation](../tests/WINDOWS_FAT32_IO_BATCHING.md) covers concurrent LFN
+operations, native parallel writes, multi-block instrumentation and CHKDSK on isolated test VHDs.
 
 `void sdcard_setProfilerCallback(sdcard_profilerCallback_c callback)`
 
@@ -586,3 +1069,89 @@ Note that because the logging writes to a file on the storage backend itself, ha
 sort of "write amplification". Every 32 operations logged will cause at least one write operation and possibly
 multiple read operations (around a 3-10% overhead). If this is a concern, it may be necessary to do
 proportional logging, where only a certain percentage of operations are logged.
+
+## Implementation and Doxygen reference
+
+The filesystem implementation is contained in `lib/asyncfatfs.c`. Optional VFAT names,
+the common undo journal, FAT32/exFAT journal adapters, the compatibility API and formatting
+remain inside their respective compile-time feature conditions in that file. The public
+headers and `lib/fat_standard.c` retain their existing roles. Implementation `.inc` files
+are no longer required; `.inc` files under `tests/` are test fixtures.
+
+After the common types, runtime state and forward declarations, implementations are
+grouped in this order: AsyncFS core (including the optional compatibility API and
+formatting), LFN, exFAT, then the persistence journal and its FAT/exFAT adapters.
+Feature-specific helpers are kept together under their feature guards. Conditional
+fields and calls inside shared state machines remain at their integration points so
+the same layouts, asynchronous progress and durability ordering are preserved.
+
+Pending LFN/exFAT work and journal lifecycle checks use private `AFATFS_INLINE`
+helpers in their feature sections. These helpers expand at their original call sites;
+disabled features use constant results or a no-op. They add no runtime state, and
+journal shutdown still waits for the clean marker's acknowledgement before releasing
+ownership.
+
+Compatibility request cancellation, idle detection, shutdown draining and exclusive
+format polling are grouped in the optional API section of the AsyncFS core. exFAT
+truncation ownership is checked in its section. Journal buffering eligibility, cache
+capture-epoch reset and FAT32 journal-extent write protection live with the journal.
+The shared state machines invoke these hooks in their original order.
+
+LFN deletion checks are grouped with long-name cleanup: an unfinished sequence is
+resumed before touching its short entry again, and new cleanup starts only after
+that entry is marked deleted. exFAT entry-set publication, written-data accounting,
+post-checkpoint synchronization bookkeeping and stat adjustments are grouped in the
+exFAT section. Their inline hooks remain at the same persistence boundaries in the
+shared operations.
+
+Protective/legacy partition recognition, exFAT boot validation, GPT initialization
+dispatch and root-mount progress are also grouped in the exFAT section. The common
+MBR scan retains its candidate order. GPT progress still consumes the same polling
+pass, including transitions reached through the initialization retry label. Invalid
+geometry, dirty volumes and GPT read-only protections keep their original checks.
+
+The exFAT section also owns truncate-range setup, NoFatChain classification and
+the data-length bookkeeping that precedes directory publication after truncation.
+These hooks preserve their existing filesystem guards, including bookkeeping that
+runs for FAT volumes when exFAT support is compiled in.
+
+Directory growth is queued before its allocation state machine runs. The existing
+poller resumes the directory operation, so create/rename/mount frames are released
+before allocation, cache flushing and journal work. The allocation dispatcher is
+inlined to avoid another wrapper frame. Neither change adds static storage or removes
+a persistence barrier.
+
+Verify the PIC24 internal stack and static RAM matrix (XC16 2.10, `24FJ256GA702`, `-Os`):
+
+```text
+python tests/optional_stack_budget.py --output tests/build/optional-stack-check
+```
+
+The check covers normal/short enums and single-block, multiblock and session-query
+reads, requiring an internal bound strictly below 400 bytes. Use `--baseline <lib-directory>`
+to compare writable section sizes as well. Backend routines, application callbacks,
+and compiler/libc helpers remain outside this internal-library budget.
+
+Function definitions include Doxygen briefs, named parameters and return contracts.
+Existing explanations of state transitions, cache ownership and persistence ordering
+are retained as details. Acceptance of an asynchronous request is distinguished from
+completion and durable storage; caller-owned request data must remain valid until completion.
+
+With Doxygen installed, run either command from the repository root:
+
+```text
+doxygen doc/Doxyfile
+doxygen doc/Doxyfile.extended
+```
+
+The default profile includes the native FAT implementation and its internal pipeline
+helpers. The extended profile includes the compatibility API, LFN, exFAT, journal,
+freefile, logging and multiblock-read functions. They generate separate references under
+`tests/build/doxygen/` and `tests/build/doxygen-extended/`. These documentation settings
+do not change the library's build configuration.
+
+Check source-level documentation coverage with:
+
+```text
+python tests/check_monolith_docs.py
+```

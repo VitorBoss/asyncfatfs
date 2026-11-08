@@ -1,0 +1,6 @@
+# Run from the repository root: doxygen doc/Doxyfile.extended
+# Documentation profile only; this does not modify the firmware configuration.
+@INCLUDE               = doc/Doxyfile
+PROJECT_NAME           = "AsyncFatFS extended API"
+OUTPUT_DIRECTORY       = tests/build/doxygen-extended
+PREDEFINED            += ASYNCFS_ENABLE_FATFS_API=1 ASYNCFS_ENABLE_LFN=1 ASYNCFS_ENABLE_EXFAT=1 AFATFS_USE_FREEFILE=1 AFATFS_USE_INTROSPECTIVE_LOGGING=1 AFATFS_MIN_MULTIPLE_BLOCK_READ_COUNT=2 AFATFS_READ_SESSION_QUERY=1

@@ -1,0 +1,4060 @@
+{
+  "repetitions": 21,
+  "cache_sectors": 8,
+  "experiments": {
+    "serial": {
+      "cpu": {
+        "current": {
+          "write/0/1/257/1": {
+            "cycles_per_byte": 6.896696090698242,
+            "samples": [
+              7.4836626052856445,
+              7.526453971862793,
+              6.801998138427734,
+              7.575875282287598,
+              7.658424377441406,
+              6.968477249145508,
+              10.104293823242188,
+              7.248708724975586,
+              6.823809623718262,
+              8.300884246826172,
+              6.828500747680664,
+              6.847275733947754,
+              6.908568382263184,
+              6.826017379760742,
+              6.728557586669922,
+              6.9060821533203125,
+              6.795372009277344,
+              6.886482238769531,
+              6.848932266235352,
+              6.896696090698242,
+              6.866878509521484
+            ],
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 6181,
+            "metadata_reads": 18,
+            "metadata_writes": 4133,
+            "polls": 10282,
+            "virtual_us": 102820,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/257/1": {
+            "cycles_per_byte": 3.7882217466831207,
+            "samples": [
+              3.7395784854888916,
+              3.7217707335948944,
+              3.7409935295581818,
+              4.352581679821014,
+              3.838349163532257,
+              3.7539867758750916,
+              3.8794262409210205,
+              3.9408731162548065,
+              3.801413744688034,
+              3.7506911158561707,
+              3.735057681798935,
+              3.8329913318157196,
+              3.7939936816692352,
+              3.723211497068405,
+              3.7500095069408417,
+              3.8930924236774445,
+              3.7570584416389465,
+              3.719924569129944,
+              3.8584950864315033,
+              3.852257162332535,
+              3.7882217466831207
+            ],
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 196451,
+            "virtual_us": 1964510,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/257/2": {
+            "cycles_per_byte": 7.174717903137207,
+            "samples": [
+              7.657044410705566,
+              7.21682071685791,
+              7.139930248260498,
+              9.6676607131958,
+              7.608177185058594,
+              7.231867790222168,
+              7.174717903137207,
+              7.163950443267822,
+              7.204672813415527,
+              7.1642255783081055,
+              7.115220546722412,
+              7.129714488983154,
+              7.166572093963623,
+              7.146003723144531,
+              7.133579730987549,
+              7.220271587371826,
+              7.179134368896484,
+              7.040539264678955,
+              6.991118431091309,
+              7.231452465057373,
+              7.1856231689453125
+            ],
+            "payload_bytes": 2097152,
+            "reads": 34,
+            "writes": 12422,
+            "metadata_reads": 34,
+            "metadata_writes": 8326,
+            "polls": 20614,
+            "virtual_us": 206140,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/257/2": {
+            "cycles_per_byte": 3.834466814994812,
+            "samples": [
+              3.9512221962213516,
+              3.834466814994812,
+              3.82465697824955,
+              3.8220946341753006,
+              4.111133620142937,
+              3.8149033039808273,
+              3.87734255194664,
+              3.8526626229286194,
+              3.8382801711559296,
+              3.809985473752022,
+              3.8862808495759964,
+              3.8015216290950775,
+              3.8159472197294235,
+              3.8413561433553696,
+              3.8769585490226746,
+              3.788795694708824,
+              3.8130051642656326,
+              3.8098777383565903,
+              3.7847404181957245,
+              3.9842664003372192,
+              3.9921391755342484
+            ],
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 392869,
+            "virtual_us": 3928690,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/4096/1": {
+            "cycles_per_byte": 5.896978378295898,
+            "samples": [
+              5.915752410888672,
+              5.951920509338379,
+              5.896978378295898,
+              6.114261627197266,
+              6.136348724365234,
+              6.02204704284668,
+              5.900843620300293,
+              5.871854782104492,
+              5.9461212158203125,
+              5.924311637878418,
+              5.870199203491211,
+              5.875168800354004,
+              5.8751678466796875,
+              5.86357307434082,
+              5.866886138916016,
+              5.878481864929199,
+              7.203706741333008,
+              5.86495304107666,
+              5.912715911865234,
+              5.852252006530762,
+              5.879308700561523
+            ],
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 6181,
+            "metadata_reads": 18,
+            "metadata_writes": 4133,
+            "polls": 6457,
+            "virtual_us": 64570,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/4096/1": {
+            "cycles_per_byte": 3.0891135931015015,
+            "samples": [
+              3.0682601928710938,
+              3.07037416100502,
+              3.0891135931015015,
+              3.1016495525836945,
+              3.1460134983062744,
+              3.0620739459991455,
+              3.0950406789779663,
+              3.115022838115692,
+              3.3597062528133392,
+              3.066603660583496,
+              3.126290649175644,
+              3.055974155664444,
+              3.065110981464386,
+              3.062747001647949,
+              3.1179304122924805,
+              3.0674405694007874,
+              3.0933411717414856,
+              3.0422387421131134,
+              3.0737991631031036,
+              3.0951874256134033,
+              3.1759001910686493
+            ],
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 66115,
+            "virtual_us": 661150,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/4096/2": {
+            "cycles_per_byte": 6.1613335609436035,
+            "samples": [
+              6.102664947509766,
+              6.186734199523926,
+              6.116055011749268,
+              8.187963008880615,
+              6.710197925567627,
+              6.445703983306885,
+              6.192945957183838,
+              6.275496482849121,
+              6.28281307220459,
+              6.289024829864502,
+              6.1613335609436035,
+              6.114537239074707,
+              6.092863082885742,
+              6.132757663726807,
+              6.088170528411865,
+              6.114675521850586,
+              6.067463397979736,
+              6.107220649719238,
+              6.1751389503479,
+              6.1783127784729,
+              6.1373138427734375
+            ],
+            "payload_bytes": 2097152,
+            "reads": 34,
+            "writes": 12420,
+            "metadata_reads": 34,
+            "metadata_writes": 8324,
+            "polls": 12970,
+            "virtual_us": 129700,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/4096/2": {
+            "cycles_per_byte": 3.2672036588191986,
+            "samples": [
+              3.214375838637352,
+              3.35644493997097,
+              3.362950384616852,
+              3.4809092581272125,
+              3.2672036588191986,
+              3.2510223388671875,
+              3.310791105031967,
+              3.2350047677755356,
+              3.3501855581998825,
+              3.2551679611206055,
+              3.268506333231926,
+              3.3813921958208084,
+              3.2219035029411316,
+              3.526097223162651,
+              3.255819320678711,
+              3.264166608452797,
+              3.199117660522461,
+              3.1595852971076965,
+              3.1367732137441635,
+              3.3048467487096786,
+              3.401913434267044
+            ],
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 132197,
+            "virtual_us": 1321970,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          }
+        },
+        "upstream": {
+          "write/0/1/257/1": {
+            "cycles_per_byte": 3.886776924133301,
+            "samples": [
+              3.851161003112793,
+              4.400026321411133,
+              3.8660707473754883,
+              4.6982011795043945,
+              4.176393508911133,
+              3.8246564865112305,
+              4.036417007446289,
+              3.854198455810547,
+              3.8953351974487305,
+              3.8572349548339844,
+              5.421553611755371,
+              3.8517141342163086,
+              3.869659423828125,
+              3.9389591217041016,
+              3.886776924133301,
+              3.876009941101074,
+              5.617025375366211,
+              3.8301782608032227,
+              3.892298698425293,
+              3.8426027297973633,
+              3.913005828857422
+            ],
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 4131,
+            "metadata_reads": 18,
+            "metadata_writes": 2083,
+            "polls": 4165,
+            "virtual_us": 41650,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/257/1": {
+            "cycles_per_byte": 4.716483861207962,
+            "samples": [
+              4.674026608467102,
+              4.681187748908997,
+              4.766930431127548,
+              4.6797986924648285,
+              6.019139528274536,
+              4.717855721712112,
+              4.713257223367691,
+              4.6845870316028595,
+              4.712998151779175,
+              4.713792026042938,
+              4.769674062728882,
+              4.809310227632523,
+              4.71442186832428,
+              4.67936709523201,
+              4.911126643419266,
+              4.954248011112213,
+              4.968535631895065,
+              4.676036983728409,
+              4.716483861207962,
+              4.968733966350555,
+              5.086537837982178
+            ],
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 196673,
+            "virtual_us": 1966730,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/257/2": {
+            "cycles_per_byte": 3.8611011505126953,
+            "samples": [
+              3.808091640472412,
+              3.8196868896484375,
+              3.88870906829834,
+              4.377800941467285,
+              5.017360687255859,
+              3.8220338821411133,
+              3.9172849655151367,
+              3.866898536682129,
+              3.787108898162842,
+              3.8093342781066895,
+              3.8757338523864746,
+              3.953176975250244,
+              3.9232211112976074,
+              3.820101737976074,
+              3.8554415702819824,
+              4.452620029449463,
+              3.8136138916015625,
+              3.8069863319396973,
+              3.8114051818847656,
+              4.216844081878662,
+              3.8611011505126953
+            ],
+            "payload_bytes": 2097152,
+            "reads": 34,
+            "writes": 8261,
+            "metadata_reads": 34,
+            "metadata_writes": 4165,
+            "polls": 8327,
+            "virtual_us": 83270,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/257/2": {
+            "cycles_per_byte": 4.773418545722961,
+            "samples": [
+              4.961887910962105,
+              4.7158497124910355,
+              4.726699247956276,
+              4.7407236546278,
+              5.105466917157173,
+              4.718317210674286,
+              4.776835218071938,
+              4.761533811688423,
+              4.740003257989883,
+              4.795639470219612,
+              4.859562560915947,
+              4.795583337545395,
+              4.767625093460083,
+              4.805669203400612,
+              4.840473860502243,
+              4.705884665250778,
+              4.786407679319382,
+              4.732924148440361,
+              4.773418545722961,
+              4.766839906573296,
+              5.074683040380478
+            ],
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 393313,
+            "virtual_us": 3933130,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/4096/1": {
+            "cycles_per_byte": 3.47043514251709,
+            "samples": [
+              3.435647964477539,
+              3.4370288848876953,
+              3.47043514251709,
+              3.977886199951172,
+              3.449176788330078,
+              3.5184736251831055,
+              3.4635324478149414,
+              3.4566307067871094,
+              3.8345956802368164,
+              3.4977684020996094,
+              3.446967124938965,
+              3.4842395782470703,
+              3.4599437713623047,
+              3.4682254791259766,
+              3.5527095794677734,
+              3.453594207763672,
+              3.4897613525390625,
+              3.5438756942749023,
+              3.4767847061157227,
+              3.450833320617676,
+              3.6728076934814453
+            ],
+            "payload_bytes": 1048576,
+            "reads": 34,
+            "writes": 2789,
+            "metadata_reads": 34,
+            "metadata_writes": 741,
+            "polls": 2853,
+            "virtual_us": 28530,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/4096/1": {
+            "cycles_per_byte": 4.045148491859436,
+            "samples": [
+              4.01088747382164,
+              3.9861687421798706,
+              4.042111277580261,
+              4.189378798007965,
+              4.101099520921707,
+              4.039583444595337,
+              4.119907796382904,
+              4.013769239187241,
+              3.9849610328674316,
+              4.045148491859436,
+              4.0504715740680695,
+              4.123945862054825,
+              4.103799730539322,
+              4.168732643127441,
+              4.010602921247482,
+              4.061946511268616,
+              4.218419760465622,
+              4.020222723484039,
+              4.033440321683884,
+              4.034372240304947,
+              4.639739781618118
+            ],
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 74273,
+            "virtual_us": 742730,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/4096/2": {
+            "cycles_per_byte": 3.4040355682373047,
+            "samples": [
+              3.367177963256836,
+              3.35792875289917,
+              3.4552502632141113,
+              5.05242395401001,
+              3.392577648162842,
+              3.4040355682373047,
+              3.571897029876709,
+              3.636502742767334,
+              3.6511354446411133,
+              3.46256685256958,
+              3.368420124053955,
+              3.4784417152404785,
+              3.427365779876709,
+              3.687854766845703,
+              3.3634510040283203,
+              3.3243842124938965,
+              3.345228672027588,
+              3.3554439544677734,
+              3.3895411491394043,
+              3.3866424560546875,
+              3.677502155303955
+            ],
+            "payload_bytes": 2097152,
+            "reads": 50,
+            "writes": 5557,
+            "metadata_reads": 50,
+            "metadata_writes": 1461,
+            "polls": 5653,
+            "virtual_us": 56530,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/4096/2": {
+            "cycles_per_byte": 4.0495269149541855,
+            "samples": [
+              4.028069719672203,
+              4.075095310807228,
+              4.092156693339348,
+              4.195664182305336,
+              4.017349720001221,
+              4.054405957460403,
+              4.0236393213272095,
+              4.055984675884247,
+              4.028298169374466,
+              4.033030658960342,
+              4.020783483982086,
+              4.371239319443703,
+              4.001927509903908,
+              3.9996368288993835,
+              4.0836713165044785,
+              4.091958224773407,
+              4.0495269149541855,
+              3.982122391462326,
+              4.0476847887039185,
+              4.1314346343278885,
+              4.176048934459686
+            ],
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 148513,
+            "virtual_us": 1485130,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          }
+        }
+      },
+      "audit": {
+        "current": {
+          "write/0/1/257/1": {
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 6181,
+            "metadata_reads": 18,
+            "metadata_writes": 4133,
+            "polls": 10282,
+            "virtual_us": 102820,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 2065,
+            "mirror_writes": 2065,
+            "directory_writes": 3,
+            "primary_reads": 17,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 1048576,
+            "write_attempts": 10274,
+            "pump_calls": 10280
+          },
+          "read/0/1/257/1": {
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 196451,
+            "virtual_us": 1964510,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 544,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 196449
+          },
+          "write/0/1/257/2": {
+            "payload_bytes": 2097152,
+            "reads": 34,
+            "writes": 12422,
+            "metadata_reads": 34,
+            "metadata_writes": 8326,
+            "polls": 20614,
+            "virtual_us": 206140,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 4161,
+            "mirror_writes": 4161,
+            "directory_writes": 4,
+            "primary_reads": 33,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 2097152,
+            "write_attempts": 20603,
+            "pump_calls": 20610
+          },
+          "read/0/1/257/2": {
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 392869,
+            "virtual_us": 3928690,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 1056,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 392865
+          },
+          "write/0/1/4096/1": {
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 6181,
+            "metadata_reads": 18,
+            "metadata_writes": 4133,
+            "polls": 6457,
+            "virtual_us": 64570,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 2065,
+            "mirror_writes": 2065,
+            "directory_writes": 3,
+            "primary_reads": 17,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 1048576,
+            "write_attempts": 6449,
+            "pump_calls": 6455
+          },
+          "read/0/1/4096/1": {
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 66115,
+            "virtual_us": 661150,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 544,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 66113
+          },
+          "write/0/1/4096/2": {
+            "payload_bytes": 2097152,
+            "reads": 34,
+            "writes": 12420,
+            "metadata_reads": 34,
+            "metadata_writes": 8324,
+            "polls": 12970,
+            "virtual_us": 129700,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 4160,
+            "mirror_writes": 4160,
+            "directory_writes": 4,
+            "primary_reads": 33,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 2097152,
+            "write_attempts": 12959,
+            "pump_calls": 12966
+          },
+          "read/0/1/4096/2": {
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 132197,
+            "virtual_us": 1321970,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 1056,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 132193
+          }
+        },
+        "upstream": {
+          "write/0/1/257/1": {
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 4131,
+            "metadata_reads": 18,
+            "metadata_writes": 2083,
+            "polls": 4165,
+            "virtual_us": 41650,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 1056,
+            "mirror_writes": 0,
+            "directory_writes": 1027,
+            "primary_reads": 17,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 15,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 1048576,
+            "write_attempts": 4161,
+            "pump_calls": 4165
+          },
+          "read/0/1/257/1": {
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 196673,
+            "virtual_us": 1966730,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 544,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 196673
+          },
+          "write/0/1/257/2": {
+            "payload_bytes": 2097152,
+            "reads": 34,
+            "writes": 8261,
+            "metadata_reads": 34,
+            "metadata_writes": 4165,
+            "polls": 8327,
+            "virtual_us": 83270,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 2129,
+            "mirror_writes": 0,
+            "directory_writes": 2036,
+            "primary_reads": 33,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 2097152,
+            "write_attempts": 8323,
+            "pump_calls": 8327
+          },
+          "read/0/1/257/2": {
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 393313,
+            "virtual_us": 3933130,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 1056,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 393313
+          },
+          "write/0/1/4096/1": {
+            "payload_bytes": 1048576,
+            "reads": 34,
+            "writes": 2789,
+            "metadata_reads": 34,
+            "metadata_writes": 741,
+            "polls": 2853,
+            "virtual_us": 28530,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 378,
+            "mirror_writes": 0,
+            "directory_writes": 363,
+            "primary_reads": 18,
+            "mirror_reads": 0,
+            "directory_reads": 16,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 1048576,
+            "write_attempts": 2846,
+            "pump_calls": 2853
+          },
+          "read/0/1/4096/1": {
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 74273,
+            "virtual_us": 742730,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 544,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 74273
+          },
+          "write/0/1/4096/2": {
+            "payload_bytes": 2097152,
+            "reads": 50,
+            "writes": 5557,
+            "metadata_reads": 50,
+            "metadata_writes": 1461,
+            "polls": 5653,
+            "virtual_us": 56530,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 746,
+            "mirror_writes": 0,
+            "directory_writes": 715,
+            "primary_reads": 34,
+            "mirror_reads": 0,
+            "directory_reads": 16,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 2097152,
+            "write_attempts": 5646,
+            "pump_calls": 5653
+          },
+          "read/0/1/4096/2": {
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 148513,
+            "virtual_us": 1485130,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 1056,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 148513
+          }
+        }
+      }
+    },
+    "interleaved": {
+      "cpu": {
+        "current": {
+          "write/0/1/257/1": {
+            "cycles_per_byte": 8.407730102539062,
+            "samples": [
+              8.604305267333984,
+              8.400827407836914,
+              8.378740310668945,
+              8.846434593200684,
+              9.965147972106934,
+              9.42263126373291,
+              8.407730102539062,
+              8.70921802520752,
+              8.541356086730957,
+              8.370182037353516,
+              8.381776809692383,
+              8.40938663482666,
+              8.370458602905273,
+              8.359689712524414,
+              11.42261791229248,
+              8.379568099975586,
+              8.435062408447266,
+              8.331528663635254,
+              8.395029067993164,
+              8.688237190246582,
+              8.349750518798828
+            ],
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 6181,
+            "metadata_reads": 18,
+            "metadata_writes": 4133,
+            "polls": 10282,
+            "virtual_us": 102820,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/257/1": {
+            "cycles_per_byte": 4.728122800588608,
+            "samples": [
+              4.747207522392273,
+              4.692740380764008,
+              4.702265202999115,
+              4.721022039651871,
+              4.76571398973465,
+              4.741202563047409,
+              4.6914805471897125,
+              4.728122800588608,
+              4.761658787727356,
+              4.77922523021698,
+              5.38094300031662,
+              4.814124554395676,
+              4.716483891010284,
+              4.676623493432999,
+              4.681748330593109,
+              4.7923824191093445,
+              4.656848818063736,
+              4.693223536014557,
+              4.6538892686367035,
+              4.74203085899353,
+              4.752548038959503
+            ],
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 196451,
+            "virtual_us": 1964510,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/257/2": {
+            "cycles_per_byte": 9.258772850036621,
+            "samples": [
+              9.163660049438477,
+              9.255044937133789,
+              9.124594688415527,
+              9.395712852478027,
+              9.569649696350098,
+              9.453001976013184,
+              9.559158325195312,
+              9.725639820098877,
+              9.229783058166504,
+              9.291765689849854,
+              9.199828147888184,
+              9.411036014556885,
+              9.202451229095459,
+              9.206178188323975,
+              9.129287719726562,
+              9.127078533172607,
+              9.333455562591553,
+              9.535274982452393,
+              9.100850105285645,
+              9.258772850036621,
+              9.510842323303223
+            ],
+            "payload_bytes": 2097152,
+            "reads": 34,
+            "writes": 12420,
+            "metadata_reads": 34,
+            "metadata_writes": 8324,
+            "polls": 16539,
+            "virtual_us": 165390,
+            "multi_sessions": 8,
+            "multi_blocks": 16,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/257/2": {
+            "cycles_per_byte": 4.772538408637047,
+            "samples": [
+              5.3146603256464005,
+              4.776377752423286,
+              4.750943288207054,
+              4.810815662145615,
+              4.772538408637047,
+              4.763147249817848,
+              4.721457809209824,
+              4.801221534609795,
+              4.761093869805336,
+              4.76501952111721,
+              4.906402692198753,
+              4.8029903173446655,
+              4.750002786517143,
+              4.802425056695938,
+              4.768556788563728,
+              4.750162377953529,
+              4.74187108874321,
+              4.702386125922203,
+              4.786558523774147,
+              4.829542189836502,
+              4.902990534901619
+            ],
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 392869,
+            "virtual_us": 3928690,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/4096/1": {
+            "cycles_per_byte": 23.499292373657227,
+            "samples": [
+              30.547558784484863,
+              23.390236854553223,
+              24.1536226272583,
+              23.677091598510742,
+              24.310440063476562,
+              23.363179206848145,
+              23.263511657714844,
+              23.304372787475586,
+              23.89023208618164,
+              23.499292373657227,
+              23.609725952148438,
+              25.707449913024902,
+              23.544291496276855,
+              23.497082710266113,
+              23.371183395385742,
+              23.429993629455566,
+              23.884987831115723,
+              23.31624412536621,
+              23.343852996826172,
+              23.34026336669922,
+              23.873114585876465
+            ],
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 6181,
+            "metadata_reads": 18,
+            "metadata_writes": 4133,
+            "polls": 6457,
+            "virtual_us": 64570,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/4096/1": {
+            "cycles_per_byte": 4.113437235355377,
+            "samples": [
+              4.651171654462814,
+              4.073568135499954,
+              4.086553007364273,
+              4.626478999853134,
+              4.113437235355377,
+              4.346473306417465,
+              4.054863303899765,
+              4.120805114507675,
+              4.137362122535706,
+              4.063568472862244,
+              4.139967501163483,
+              4.115706294775009,
+              4.147508263587952,
+              4.0435435473918915,
+              4.040998309850693,
+              4.236469358205795,
+              4.112824738025665,
+              4.068891793489456,
+              4.049962550401688,
+              4.061377048492432,
+              4.132538884878159
+            ],
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 66115,
+            "virtual_us": 661150,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/4096/2": {
+            "cycles_per_byte": 40.84456253051758,
+            "samples": [
+              44.46878147125244,
+              41.73688316345215,
+              40.58379888534546,
+              41.58365201950073,
+              41.12727880477905,
+              40.62259006500244,
+              40.70141077041626,
+              42.34027671813965,
+              40.779683113098145,
+              40.80411672592163,
+              40.966182231903076,
+              40.70803880691528,
+              40.97225618362427,
+              40.66510772705078,
+              41.01725769042969,
+              40.58048677444458,
+              43.79167556762695,
+              40.41718053817749,
+              40.527610778808594,
+              40.89950704574585,
+              40.84456253051758
+            ],
+            "payload_bytes": 2097152,
+            "reads": 34,
+            "writes": 12643,
+            "metadata_reads": 34,
+            "metadata_writes": 8547,
+            "polls": 12937,
+            "virtual_us": 129370,
+            "multi_sessions": 288,
+            "multi_blocks": 576,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/4096/2": {
+            "cycles_per_byte": 4.286799281835556,
+            "samples": [
+              4.251304596662521,
+              4.3742891401052475,
+              4.358552187681198,
+              4.413053870201111,
+              4.249220997095108,
+              4.296298414468765,
+              4.322082594037056,
+              4.3233466148376465,
+              4.288352310657501,
+              4.232254520058632,
+              4.2951595932245255,
+              4.277947247028351,
+              4.286799281835556,
+              4.249618023633957,
+              4.192739263176918,
+              4.2726496905088425,
+              4.224209055304527,
+              4.249475494027138,
+              4.179452627897263,
+              4.437047511339188,
+              4.368845134973526
+            ],
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 132165,
+            "virtual_us": 1321650,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          }
+        },
+        "upstream": {
+          "write/0/1/257/1": {
+            "cycles_per_byte": 4.028134346008301,
+            "samples": [
+              3.927361488342285,
+              3.8884334564208984,
+              5.162306785583496,
+              4.0974321365356445,
+              4.028134346008301,
+              3.895888328552246,
+              5.4502668380737305,
+              4.190474510192871,
+              4.058503150939941,
+              3.8997535705566406,
+              3.9414424896240234,
+              5.677212715148926,
+              5.094664573669434,
+              4.148233413696289,
+              3.9152145385742188,
+              4.249005317687988,
+              3.9557981491088867,
+              3.927361488342285,
+              3.9160423278808594,
+              3.888157844543457,
+              5.4856061935424805
+            ],
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 4131,
+            "metadata_reads": 18,
+            "metadata_writes": 2083,
+            "polls": 4165,
+            "virtual_us": 41650,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/257/1": {
+            "cycles_per_byte": 3.7193117439746857,
+            "samples": [
+              3.709424525499344,
+              3.705800861120224,
+              3.7421843111515045,
+              3.705869823694229,
+              3.708406388759613,
+              3.700330764055252,
+              3.695093721151352,
+              3.759068548679352,
+              3.722115784883499,
+              3.7193117439746857,
+              3.744970977306366,
+              3.8104643523693085,
+              3.773994594812393,
+              3.7034108638763428,
+              3.70206481218338,
+              3.735799551010132,
+              3.74599751830101,
+              3.6865608394145966,
+              3.744496315717697,
+              3.7074831426143646,
+              3.7566614151000977
+            ],
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 196673,
+            "virtual_us": 1966730,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/257/2": {
+            "cycles_per_byte": 4.103507041931152,
+            "samples": [
+              4.072446823120117,
+              4.040972709655762,
+              4.20565938949585,
+              4.569406986236572,
+              4.195444107055664,
+              4.103507041931152,
+              4.049807071685791,
+              4.1867475509643555,
+              4.135395050048828,
+              4.212562084197998,
+              4.143953800201416,
+              4.262396335601807,
+              4.488373756408691,
+              4.086804389953613,
+              4.0549139976501465,
+              4.033517837524414,
+              4.354885101318359,
+              4.0418009757995605,
+              4.086112976074219,
+              4.045528411865234,
+              4.081557750701904
+            ],
+            "payload_bytes": 2097152,
+            "reads": 35,
+            "writes": 5792,
+            "metadata_reads": 35,
+            "metadata_writes": 1696,
+            "polls": 5860,
+            "virtual_us": 58600,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/257/2": {
+            "cycles_per_byte": 3.8025956451892853,
+            "samples": [
+              3.8025956451892853,
+              3.8027984648942947,
+              3.7646379321813583,
+              3.7974060773849487,
+              3.7726875245571136,
+              3.782553404569626,
+              3.9945377111434937,
+              3.8091398924589157,
+              3.8097653836011887,
+              3.7800211906433105,
+              3.831580728292465,
+              3.8160765916109085,
+              3.9967119842767715,
+              3.7630373537540436,
+              3.7595863193273544,
+              3.818962723016739,
+              3.859776258468628,
+              3.8383017480373383,
+              3.801340341567993,
+              3.7935063540935516,
+              3.795779675245285
+            ],
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 393313,
+            "virtual_us": 3933130,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/4096/1": {
+            "cycles_per_byte": 10.142395973205566,
+            "samples": [
+              10.062328338623047,
+              10.061501502990723,
+              10.054876327514648,
+              10.389494895935059,
+              10.055427551269531,
+              10.205620765686035,
+              10.089661598205566,
+              10.09904956817627,
+              10.216938018798828,
+              10.12803840637207,
+              10.599323272705078,
+              10.218042373657227,
+              10.173870086669922,
+              10.026161193847656,
+              10.142395973205566,
+              11.359670639038086,
+              10.687392234802246,
+              10.10567569732666,
+              10.096840858459473,
+              10.415170669555664,
+              10.207275390625
+            ],
+            "payload_bytes": 1048576,
+            "reads": 34,
+            "writes": 2789,
+            "metadata_reads": 34,
+            "metadata_writes": 741,
+            "polls": 2853,
+            "virtual_us": 28530,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/4096/1": {
+            "cycles_per_byte": 3.039546936750412,
+            "samples": [
+              3.035414069890976,
+              3.0077449083328247,
+              2.989410936832428,
+              3.034758508205414,
+              3.0075983107089996,
+              3.011989861726761,
+              3.0588300228118896,
+              3.178272843360901,
+              3.0013172030448914,
+              3.0630059242248535,
+              3.085791766643524,
+              3.039546936750412,
+              3.051798403263092,
+              3.078052520751953,
+              3.0015848875045776,
+              3.053282290697098,
+              3.0059934258461,
+              3.0658702850341797,
+              2.9975210428237915,
+              3.107438951730728,
+              3.202292650938034
+            ],
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 74273,
+            "virtual_us": 742730,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/4096/2": {
+            "cycles_per_byte": 18.363351345062256,
+            "samples": [
+              18.527623176574707,
+              19.0099515914917,
+              19.236756801605225,
+              18.46923065185547,
+              18.204601764678955,
+              18.19755983352661,
+              18.46122169494629,
+              18.32994270324707,
+              18.373428344726562,
+              18.224339962005615,
+              18.338363647460938,
+              18.363351345062256,
+              18.316415309906006,
+              19.050398349761963,
+              18.22185516357422,
+              18.272793769836426,
+              18.439274311065674,
+              18.193417072296143,
+              18.196317195892334,
+              18.380467891693115,
+              20.808114528656006
+            ],
+            "payload_bytes": 2097152,
+            "reads": 453,
+            "writes": 5634,
+            "metadata_reads": 453,
+            "metadata_writes": 1538,
+            "polls": 6410,
+            "virtual_us": 64100,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/4096/2": {
+            "cycles_per_byte": 3.0970640927553177,
+            "samples": [
+              3.2407767176628113,
+              3.1278263330459595,
+              3.1001440435647964,
+              3.129909873008728,
+              3.0428771376609802,
+              3.010501518845558,
+              3.026186764240265,
+              3.003198117017746,
+              3.0346807688474655,
+              3.1094275563955307,
+              3.1420276165008545,
+              3.3644558638334274,
+              3.1190907061100006,
+              3.085498407483101,
+              3.050409272313118,
+              3.1090047955513,
+              3.0426658391952515,
+              2.99233141541481,
+              3.0970640927553177,
+              3.1971504241228104,
+              3.0187626034021378
+            ],
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 148513,
+            "virtual_us": 1485130,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          }
+        }
+      },
+      "audit": {
+        "current": {
+          "write/0/1/257/1": {
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 6181,
+            "metadata_reads": 18,
+            "metadata_writes": 4133,
+            "polls": 10282,
+            "virtual_us": 102820,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 2065,
+            "mirror_writes": 2065,
+            "directory_writes": 3,
+            "primary_reads": 17,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 1850193,
+            "write_attempts": 10274,
+            "pump_calls": 10280
+          },
+          "read/0/1/257/1": {
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 196451,
+            "virtual_us": 1964510,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 544,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 196449
+          },
+          "write/0/1/257/2": {
+            "payload_bytes": 2097152,
+            "reads": 34,
+            "writes": 12420,
+            "metadata_reads": 34,
+            "metadata_writes": 8324,
+            "polls": 16539,
+            "virtual_us": 165390,
+            "multi_sessions": 8,
+            "multi_blocks": 16,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 4160,
+            "mirror_writes": 4160,
+            "directory_writes": 4,
+            "primary_reads": 33,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 4769730,
+            "write_attempts": 28866,
+            "pump_calls": 16535
+          },
+          "read/0/1/257/2": {
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 392869,
+            "virtual_us": 3928690,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 1056,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 392865
+          },
+          "write/0/1/4096/1": {
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 6181,
+            "metadata_reads": 18,
+            "metadata_writes": 4133,
+            "polls": 6457,
+            "virtual_us": 64570,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 2065,
+            "mirror_writes": 2065,
+            "directory_writes": 3,
+            "primary_reads": 17,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 15282176,
+            "write_attempts": 6449,
+            "pump_calls": 6455
+          },
+          "read/0/1/4096/1": {
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 66115,
+            "virtual_us": 661150,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 544,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 66113
+          },
+          "write/0/1/4096/2": {
+            "payload_bytes": 2097152,
+            "reads": 34,
+            "writes": 12643,
+            "metadata_reads": 34,
+            "metadata_writes": 8547,
+            "polls": 12937,
+            "virtual_us": 129370,
+            "multi_sessions": 288,
+            "multi_blocks": 576,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 4128,
+            "mirror_writes": 4128,
+            "directory_writes": 291,
+            "primary_reads": 33,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 58582016,
+            "write_attempts": 24768,
+            "pump_calls": 12933
+          },
+          "read/0/1/4096/2": {
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 132165,
+            "virtual_us": 1321650,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 1056,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 132161
+          }
+        },
+        "upstream": {
+          "write/0/1/257/1": {
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 4131,
+            "metadata_reads": 18,
+            "metadata_writes": 2083,
+            "polls": 4165,
+            "virtual_us": 41650,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 1056,
+            "mirror_writes": 0,
+            "directory_writes": 1027,
+            "primary_reads": 17,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 15,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 1067983,
+            "write_attempts": 4161,
+            "pump_calls": 4165
+          },
+          "read/0/1/257/1": {
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 196673,
+            "virtual_us": 1966730,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 544,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 196673
+          },
+          "write/0/1/257/2": {
+            "payload_bytes": 2097152,
+            "reads": 35,
+            "writes": 5792,
+            "metadata_reads": 35,
+            "metadata_writes": 1696,
+            "polls": 5860,
+            "virtual_us": 58600,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 893,
+            "mirror_writes": 0,
+            "directory_writes": 803,
+            "primary_reads": 34,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 58,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 2334615,
+            "write_attempts": 9954,
+            "pump_calls": 5860
+          },
+          "read/0/1/257/2": {
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 393313,
+            "virtual_us": 3933130,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 1056,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 393313
+          },
+          "write/0/1/4096/1": {
+            "payload_bytes": 1048576,
+            "reads": 34,
+            "writes": 2789,
+            "metadata_reads": 34,
+            "metadata_writes": 741,
+            "polls": 2853,
+            "virtual_us": 28530,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 378,
+            "mirror_writes": 0,
+            "directory_writes": 363,
+            "primary_reads": 18,
+            "mirror_reads": 0,
+            "directory_reads": 16,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 6372352,
+            "write_attempts": 2846,
+            "pump_calls": 2853
+          },
+          "read/0/1/4096/1": {
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 74273,
+            "virtual_us": 742730,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 544,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 74273
+          },
+          "write/0/1/4096/2": {
+            "payload_bytes": 2097152,
+            "reads": 453,
+            "writes": 5634,
+            "metadata_reads": 453,
+            "metadata_writes": 1538,
+            "polls": 6410,
+            "virtual_us": 64100,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 831,
+            "mirror_writes": 0,
+            "directory_writes": 707,
+            "primary_reads": 65,
+            "mirror_reads": 0,
+            "directory_reads": 388,
+            "unchanged_primary_writes": 62,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 24621568,
+            "write_attempts": 10397,
+            "pump_calls": 6410
+          },
+          "read/0/1/4096/2": {
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 148513,
+            "virtual_us": 1485130,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 1056,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 148513
+          }
+        }
+      }
+    },
+    "prepared": {
+      "cpu": {
+        "current": {
+          "write/0/1/257/1": {
+            "cycles_per_byte": 6.984767913818359,
+            "samples": [
+              6.855007171630859,
+              8.396133422851562,
+              7.036120414733887,
+              6.944735527038574,
+              6.926790237426758,
+              6.8232574462890625,
+              7.099623680114746,
+              7.103763580322266,
+              7.498018264770508,
+              6.861908912658691,
+              6.932311058044434,
+              8.602648735046387,
+              7.077811241149902,
+              6.867155075073242,
+              8.138267517089844,
+              6.887860298156738,
+              7.871565818786621,
+              6.864946365356445,
+              6.947772979736328,
+              6.984767913818359,
+              8.604028701782227
+            ],
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 6181,
+            "metadata_reads": 18,
+            "metadata_writes": 4133,
+            "polls": 10282,
+            "virtual_us": 102820,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/257/1": {
+            "cycles_per_byte": 4.756982624530792,
+            "samples": [
+              4.756982624530792,
+              4.709141701459885,
+              4.734679788351059,
+              4.722005665302277,
+              4.7568705677986145,
+              4.705207467079163,
+              4.766214489936829,
+              4.983858495950699,
+              4.757241666316986,
+              4.764600843191147,
+              4.778698652982712,
+              4.823226749897003,
+              4.850706040859222,
+              4.770657598972321,
+              4.728856116533279,
+              4.746776074171066,
+              4.978035002946854,
+              4.727121949195862,
+              4.708572298288345,
+              4.806109219789505,
+              4.749700725078583
+            ],
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 196451,
+            "virtual_us": 1964510,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/257/2": {
+            "cycles_per_byte": 6.902907371520996,
+            "samples": [
+              7.130405426025391,
+              6.88399600982666,
+              6.925133228302002,
+              7.182586669921875,
+              7.305169105529785,
+              6.963647365570068,
+              7.0630388259887695,
+              7.001748085021973,
+              6.854315280914307,
+              6.800203323364258,
+              6.978555679321289,
+              6.943492889404297,
+              7.023834228515625,
+              6.902907371520996,
+              6.747056007385254,
+              6.812351226806641,
+              6.818700790405273,
+              6.843548774719238,
+              6.805862903594971,
+              6.79785680770874,
+              6.8994574546813965
+            ],
+            "payload_bytes": 2097152,
+            "reads": 34,
+            "writes": 12420,
+            "metadata_reads": 34,
+            "metadata_writes": 8324,
+            "polls": 16539,
+            "virtual_us": 165390,
+            "multi_sessions": 8,
+            "multi_blocks": 16,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/257/2": {
+            "cycles_per_byte": 4.840175986289978,
+            "samples": [
+              4.948333695530891,
+              4.795337378978729,
+              4.963738650083542,
+              4.8146636337041855,
+              4.77648152410984,
+              4.793797492980957,
+              4.812903538346291,
+              4.800367504358292,
+              4.769061386585236,
+              4.996692478656769,
+              4.992697700858116,
+              4.981464400887489,
+              4.862983301281929,
+              4.7796823382377625,
+              4.792727380990982,
+              4.844632178544998,
+              4.859515070915222,
+              4.743980512022972,
+              4.840175986289978,
+              4.907308712601662,
+              4.870804473757744
+            ],
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 392869,
+            "virtual_us": 3928690,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/4096/1": {
+            "cycles_per_byte": 5.969866752624512,
+            "samples": [
+              8.888952255249023,
+              5.926244735717773,
+              7.826010704040527,
+              6.110394477844238,
+              5.961308479309082,
+              5.929006576538086,
+              5.954681396484375,
+              6.11094856262207,
+              6.39366340637207,
+              5.969866752624512,
+              6.156778335571289,
+              6.229666709899902,
+              5.919342041015625,
+              5.973179817199707,
+              5.967381477355957,
+              5.917685508728027,
+              5.885383605957031,
+              5.9643449783325195,
+              5.966001510620117,
+              5.97511100769043,
+              6.235186576843262
+            ],
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 6181,
+            "metadata_reads": 18,
+            "metadata_writes": 4133,
+            "polls": 6457,
+            "virtual_us": 64570,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/4096/1": {
+            "cycles_per_byte": 4.148431360721588,
+            "samples": [
+              4.682869970798492,
+              4.396453827619553,
+              4.173270642757416,
+              4.148431360721588,
+              4.118587911128998,
+              4.094930648803711,
+              4.084309935569763,
+              4.094387054443359,
+              4.069944530725479,
+              4.2017079293727875,
+              4.4424916207790375,
+              4.36278834939003,
+              4.1781542003154755,
+              4.088847905397415,
+              4.198489755392075,
+              4.148017257452011,
+              4.128380388021469,
+              4.242957383394241,
+              4.04861643910408,
+              4.249134540557861,
+              4.091807425022125
+            ],
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 66115,
+            "virtual_us": 661150,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/4096/2": {
+            "cycles_per_byte": 6.050760269165039,
+            "samples": [
+              6.124889850616455,
+              6.043720722198486,
+              6.292475700378418,
+              6.245403289794922,
+              6.015007495880127,
+              6.282536506652832,
+              6.0970048904418945,
+              5.946260452270508,
+              6.051036834716797,
+              6.657464981079102,
+              6.097557067871094,
+              6.040683269500732,
+              6.331266403198242,
+              6.0272932052612305,
+              5.969038009643555,
+              5.99940824508667,
+              6.318704128265381,
+              5.953714847564697,
+              6.035436153411865,
+              6.012521266937256,
+              6.050760269165039
+            ],
+            "payload_bytes": 2097152,
+            "reads": 34,
+            "writes": 12643,
+            "metadata_reads": 34,
+            "metadata_writes": 8547,
+            "polls": 12937,
+            "virtual_us": 129370,
+            "multi_sessions": 288,
+            "multi_blocks": 576,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/4096/2": {
+            "cycles_per_byte": 4.373961299657822,
+            "samples": [
+              4.542763814330101,
+              4.443777307868004,
+              4.450006529688835,
+              4.697149083018303,
+              4.289711177349091,
+              4.357029274106026,
+              4.370829463005066,
+              4.351731926202774,
+              4.403373375535011,
+              4.313924998044968,
+              4.4548424035310745,
+              4.471882209181786,
+              4.43094776570797,
+              4.373961299657822,
+              4.232841372489929,
+              4.2299336940050125,
+              4.422177627682686,
+              4.2172378450632095,
+              4.229446142911911,
+              4.256231069564819,
+              4.4781889617443085
+            ],
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 132165,
+            "virtual_us": 1321650,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          }
+        },
+        "upstream": {
+          "write/0/1/257/1": {
+            "cycles_per_byte": 4.053257942199707,
+            "samples": [
+              3.953038215637207,
+              5.049386024475098,
+              4.546904563903809,
+              4.053257942199707,
+              4.4486188888549805,
+              4.271920204162598,
+              4.021233558654785,
+              7.068975448608398,
+              4.989750862121582,
+              4.128078460693359,
+              4.067890167236328,
+              4.404166221618652,
+              3.950277328491211,
+              4.006599426269531,
+              6.829882621765137,
+              3.933987617492676,
+              3.960768699645996,
+              3.9419946670532227,
+              3.9823036193847656,
+              3.998868942260742,
+              4.0306196212768555
+            ],
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 4131,
+            "metadata_reads": 18,
+            "metadata_writes": 2083,
+            "polls": 4165,
+            "virtual_us": 41650,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/257/1": {
+            "cycles_per_byte": 4.768034726381302,
+            "samples": [
+              4.797049880027771,
+              4.7998369336128235,
+              4.755309045314789,
+              4.716017961502075,
+              4.888754636049271,
+              4.769820928573608,
+              4.768034726381302,
+              4.7087448835372925,
+              4.7318499982357025,
+              4.840421915054321,
+              4.824400097131729,
+              4.839904189109802,
+              4.766947776079178,
+              4.745844155550003,
+              4.681394815444946,
+              4.707631856203079,
+              4.7735739052295685,
+              4.694629639387131,
+              4.882456421852112,
+              4.7355340123176575,
+              4.9688980877399445
+            ],
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 196673,
+            "virtual_us": 1966730,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/257/2": {
+            "cycles_per_byte": 3.9661526679992676,
+            "samples": [
+              4.0114312171936035,
+              3.986583709716797,
+              3.9292945861816406,
+              3.986720561981201,
+              3.9251537322998047,
+              3.9661526679992676,
+              3.966428756713867,
+              3.999974250793457,
+              3.90858793258667,
+              3.9096922874450684,
+              3.936196804046631,
+              3.904170513153076,
+              4.047874927520752,
+              3.9548325538635254,
+              3.9421324729919434,
+              4.005771160125732,
+              3.929018497467041,
+              4.530753135681152,
+              4.081281661987305,
+              3.880289077758789,
+              4.082662105560303
+            ],
+            "payload_bytes": 2097152,
+            "reads": 35,
+            "writes": 5792,
+            "metadata_reads": 35,
+            "metadata_writes": 1696,
+            "polls": 5860,
+            "virtual_us": 58600,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/257/2": {
+            "cycles_per_byte": 4.793452173471451,
+            "samples": [
+              4.8067217618227005,
+              4.760869592428207,
+              4.766456052660942,
+              4.812472075223923,
+              4.8147111386060715,
+              4.824011966586113,
+              4.745814099907875,
+              4.777982711791992,
+              4.760839328169823,
+              4.778224229812622,
+              4.96208193898201,
+              4.866874620318413,
+              4.791696459054947,
+              4.784824445843697,
+              4.793452173471451,
+              4.729209929704666,
+              4.849597409367561,
+              4.784656271338463,
+              4.8100088983774185,
+              4.8213027864694595,
+              4.908382892608643
+            ],
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 393313,
+            "virtual_us": 3933130,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/4096/1": {
+            "cycles_per_byte": 3.612344741821289,
+            "samples": [
+              3.593569755554199,
+              3.590810775756836,
+              4.760598182678223,
+              4.8042192459106445,
+              3.593017578125,
+              3.48561954498291,
+              3.740727424621582,
+              3.657623291015625,
+              3.590808868408203,
+              3.633604049682617,
+              3.6606597900390625,
+              3.6140012741088867,
+              3.5833559036254883,
+              3.6421632766723633,
+              3.5916385650634766,
+              3.605166435241699,
+              3.5852890014648438,
+              3.5943994522094727,
+              3.612344741821289,
+              4.176669120788574,
+              3.722780227661133
+            ],
+            "payload_bytes": 1048576,
+            "reads": 34,
+            "writes": 2789,
+            "metadata_reads": 34,
+            "metadata_writes": 741,
+            "polls": 2853,
+            "virtual_us": 28530,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/4096/1": {
+            "cycles_per_byte": 4.094050496816635,
+            "samples": [
+              4.032612055540085,
+              4.094050496816635,
+              5.482440412044525,
+              4.29515528678894,
+              4.039013832807541,
+              4.59744668006897,
+              4.113454431295395,
+              4.043319016695023,
+              4.07449135184288,
+              4.0772004425525665,
+              4.1832790076732635,
+              4.342530369758606,
+              4.023285627365112,
+              4.075733870267868,
+              4.025649517774582,
+              4.130114674568176,
+              4.072895139455795,
+              4.271273553371429,
+              4.110693484544754,
+              4.100469619035721,
+              4.092298984527588
+            ],
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 74273,
+            "virtual_us": 742730,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "write/0/1/4096/2": {
+            "cycles_per_byte": 4.562089920043945,
+            "samples": [
+              5.125723838806152,
+              4.52481746673584,
+              4.865786552429199,
+              4.635115146636963,
+              4.729261875152588,
+              4.7345075607299805,
+              4.549389362335205,
+              4.537656307220459,
+              4.581278324127197,
+              4.606126308441162,
+              5.059326648712158,
+              4.516949653625488,
+              5.16148042678833,
+              4.505216121673584,
+              4.516396999359131,
+              4.691161632537842,
+              4.546076774597168,
+              4.562089920043945,
+              4.562089920043945,
+              4.546076774597168,
+              4.5542216300964355
+            ],
+            "payload_bytes": 2097152,
+            "reads": 453,
+            "writes": 5634,
+            "metadata_reads": 453,
+            "metadata_writes": 1538,
+            "polls": 6410,
+            "virtual_us": 64100,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          },
+          "read/0/1/4096/2": {
+            "cycles_per_byte": 4.092057466506958,
+            "samples": [
+              4.079150348901749,
+              4.082183077931404,
+              4.133647680282593,
+              4.145657390356064,
+              4.042551413178444,
+              4.115102186799049,
+              4.053418040275574,
+              4.120123565196991,
+              4.069250091910362,
+              4.121637806296349,
+              4.187657386064529,
+              4.091466531157494,
+              4.061368435621262,
+              4.0809061378240585,
+              4.022103533148766,
+              4.010300785303116,
+              4.092057466506958,
+              4.12543411552906,
+              4.16447913646698,
+              4.110111102461815,
+              4.151187941431999
+            ],
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 148513,
+            "virtual_us": 1485130,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0
+          }
+        }
+      },
+      "audit": {
+        "current": {
+          "write/0/1/257/1": {
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 6181,
+            "metadata_reads": 18,
+            "metadata_writes": 4133,
+            "polls": 10282,
+            "virtual_us": 102820,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 2065,
+            "mirror_writes": 2065,
+            "directory_writes": 3,
+            "primary_reads": 17,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 1048576,
+            "write_attempts": 10274,
+            "pump_calls": 10280
+          },
+          "read/0/1/257/1": {
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 196451,
+            "virtual_us": 1964510,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 544,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 196449
+          },
+          "write/0/1/257/2": {
+            "payload_bytes": 2097152,
+            "reads": 34,
+            "writes": 12420,
+            "metadata_reads": 34,
+            "metadata_writes": 8324,
+            "polls": 16539,
+            "virtual_us": 165390,
+            "multi_sessions": 8,
+            "multi_blocks": 16,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 4160,
+            "mirror_writes": 4160,
+            "directory_writes": 4,
+            "primary_reads": 33,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 2097152,
+            "write_attempts": 28866,
+            "pump_calls": 16535
+          },
+          "read/0/1/257/2": {
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 392869,
+            "virtual_us": 3928690,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 1056,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 392865
+          },
+          "write/0/1/4096/1": {
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 6181,
+            "metadata_reads": 18,
+            "metadata_writes": 4133,
+            "polls": 6457,
+            "virtual_us": 64570,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 2065,
+            "mirror_writes": 2065,
+            "directory_writes": 3,
+            "primary_reads": 17,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 1048576,
+            "write_attempts": 6449,
+            "pump_calls": 6455
+          },
+          "read/0/1/4096/1": {
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 66115,
+            "virtual_us": 661150,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 544,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 66113
+          },
+          "write/0/1/4096/2": {
+            "payload_bytes": 2097152,
+            "reads": 34,
+            "writes": 12643,
+            "metadata_reads": 34,
+            "metadata_writes": 8547,
+            "polls": 12937,
+            "virtual_us": 129370,
+            "multi_sessions": 288,
+            "multi_blocks": 576,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 4128,
+            "mirror_writes": 4128,
+            "directory_writes": 291,
+            "primary_reads": 33,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 2097152,
+            "write_attempts": 24768,
+            "pump_calls": 12933
+          },
+          "read/0/1/4096/2": {
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 132165,
+            "virtual_us": 1321650,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 1056,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 132161
+          }
+        },
+        "upstream": {
+          "write/0/1/257/1": {
+            "payload_bytes": 1048576,
+            "reads": 18,
+            "writes": 4131,
+            "metadata_reads": 18,
+            "metadata_writes": 2083,
+            "polls": 4165,
+            "virtual_us": 41650,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 1056,
+            "mirror_writes": 0,
+            "directory_writes": 1027,
+            "primary_reads": 17,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 15,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 1048576,
+            "write_attempts": 4161,
+            "pump_calls": 4165
+          },
+          "read/0/1/257/1": {
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 196673,
+            "virtual_us": 1966730,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 544,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 196673
+          },
+          "write/0/1/257/2": {
+            "payload_bytes": 2097152,
+            "reads": 35,
+            "writes": 5792,
+            "metadata_reads": 35,
+            "metadata_writes": 1696,
+            "polls": 5860,
+            "virtual_us": 58600,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 893,
+            "mirror_writes": 0,
+            "directory_writes": 803,
+            "primary_reads": 34,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 58,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 2097152,
+            "write_attempts": 9954,
+            "pump_calls": 5860
+          },
+          "read/0/1/257/2": {
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 393313,
+            "virtual_us": 3933130,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 1056,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 393313
+          },
+          "write/0/1/4096/1": {
+            "payload_bytes": 1048576,
+            "reads": 34,
+            "writes": 2789,
+            "metadata_reads": 34,
+            "metadata_writes": 741,
+            "polls": 2853,
+            "virtual_us": 28530,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 378,
+            "mirror_writes": 0,
+            "directory_writes": 363,
+            "primary_reads": 18,
+            "mirror_reads": 0,
+            "directory_reads": 16,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 1048576,
+            "write_attempts": 2846,
+            "pump_calls": 2853
+          },
+          "read/0/1/4096/1": {
+            "payload_bytes": 33554432,
+            "reads": 66081,
+            "writes": 0,
+            "metadata_reads": 545,
+            "metadata_writes": 0,
+            "polls": 74273,
+            "virtual_us": 742730,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 544,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 74273
+          },
+          "write/0/1/4096/2": {
+            "payload_bytes": 2097152,
+            "reads": 453,
+            "writes": 5634,
+            "metadata_reads": 453,
+            "metadata_writes": 1538,
+            "polls": 6410,
+            "virtual_us": 64100,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 831,
+            "mirror_writes": 0,
+            "directory_writes": 707,
+            "primary_reads": 65,
+            "mirror_reads": 0,
+            "directory_reads": 388,
+            "unchanged_primary_writes": 62,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 2097152,
+            "write_attempts": 10397,
+            "pump_calls": 6410
+          },
+          "read/0/1/4096/2": {
+            "payload_bytes": 67108864,
+            "reads": 132129,
+            "writes": 0,
+            "metadata_reads": 1057,
+            "metadata_writes": 0,
+            "polls": 148513,
+            "virtual_us": 1485130,
+            "multi_sessions": 0,
+            "multi_blocks": 0,
+            "read_sessions": 0,
+            "batched_read_blocks": 0,
+            "read_stops": 0,
+            "primary_writes": 0,
+            "mirror_writes": 0,
+            "directory_writes": 0,
+            "primary_reads": 1056,
+            "mirror_reads": 0,
+            "directory_reads": 1,
+            "unchanged_primary_writes": 0,
+            "unchanged_mirror_writes": 0,
+            "generated_bytes": 0,
+            "write_attempts": 0,
+            "pump_calls": 148513
+          }
+        }
+      }
+    }
+  },
+  "code_identities": {
+    "current": {
+      "asyncfatfs": [
+        {
+          "size": 181,
+          "sha256": "8e6bcede09816103241c710a9b8ba64a3bd764773ca61c56531f3b9b6e725efc"
+        },
+        {
+          "size": 18,
+          "sha256": "207b1d4b679d0d9f5a576788dbe827945249624084910212eddf3a295aa35d92"
+        },
+        {
+          "size": 663,
+          "sha256": "d440cb6fc0ea965c4f5cd60dd9d22575b9996b466a958fa089a7c59f6c1171a3"
+        },
+        {
+          "size": 349,
+          "sha256": "f0de7620ed38140734f2996dfcfcd3b4878227035ed2422ad8b0834c6da8e1e3"
+        },
+        {
+          "size": 521,
+          "sha256": "0f424ea9b593d226fd02795fd2947aad70e539e34537aec3a2da22ccb8e5feeb"
+        },
+        {
+          "size": 299,
+          "sha256": "09ec41e652a939c3264a91f3fd5564e676258b63634b663e6520787d8cad4370"
+        },
+        {
+          "size": 56,
+          "sha256": "278b7d08e6b43c0d1be1415397ee8bb4285d0bcfdb43ef87c3fd24cd2d8a6478"
+        },
+        {
+          "size": 31,
+          "sha256": "4a3c4493b44f2e9b69b5039ccb7bcc7bbd9288c6eb536caec31d463890d68864"
+        },
+        {
+          "size": 103,
+          "sha256": "279e8ccb4043882689f69c05f291fb7579ed508ec8b2335f2b634ddb76a8e68a"
+        },
+        {
+          "size": 98,
+          "sha256": "8ab00e2c0d58dfe869b21efd9dca97332c7edd8d8fa620b17d66bebaa22b2823"
+        },
+        {
+          "size": 1652,
+          "sha256": "81d44d3b78371acad822186922d3447bfa307da8996c505478a97e673804ceb5"
+        },
+        {
+          "size": 28,
+          "sha256": "6b362ba3e692f896fe9172edc0ab5edb92143062da0000a91aacc1792c704da8"
+        },
+        {
+          "size": 37,
+          "sha256": "27a6951bf10d2751bc8ee6b5d94231929f118f6ed06021efa40900370a1a4df6"
+        },
+        {
+          "size": 50,
+          "sha256": "c9734b6b6f87e352c5226e7cd943ab5cb053947110a144a1ff5766409e719c34"
+        },
+        {
+          "size": 23,
+          "sha256": "f494519269b3ee89bc4754860e3f1d891ed2b38459e71d2942cc8388d185a615"
+        },
+        {
+          "size": 28,
+          "sha256": "ca286f7b374ddb7d3aac1a17784e8dffb4b3fbd7dfc644524b3224ecc65300d7"
+        },
+        {
+          "size": 9,
+          "sha256": "9944afa0ab624e53cc8686029189bc8bbcc7582a8c60a8ee10184ad6e623b386"
+        },
+        {
+          "size": 785,
+          "sha256": "dc39ec5af63184563812aed0fcdd42a074864d6da8115648034eaca7e635df6a"
+        },
+        {
+          "size": 1580,
+          "sha256": "9c133c124a2b5ca00c85b9d96e472021a73868c0dfcbd436d93b3a0791c1ea7a"
+        },
+        {
+          "size": 14,
+          "sha256": "e9905f3cbabf871aeab8f48db8a44959c747dc50a2ccae246144d6157762b410"
+        },
+        {
+          "size": 61,
+          "sha256": "bb75d160400c16b6fd99c57d6b4b7a27d1f050b58d70a0291037d5c608803339"
+        },
+        {
+          "size": 51,
+          "sha256": "e5f1c09e1cdafd65c0938786194e8d7c63c1d39ef5d5f3c1cbc5767887a6668e"
+        },
+        {
+          "size": 11,
+          "sha256": "a77a9c1dcf309b5dacb3448c94d6a74bab4ca598493c3357c6b7107e1d17a780"
+        },
+        {
+          "size": 308,
+          "sha256": "b25789624d70a667248c82509bbd26793ed9eff1e9e457681f39755225eb77cf"
+        },
+        {
+          "size": 279,
+          "sha256": "999863a069833dd3aa4c406fffd5ca95576ff1f4dbe628073ebd54318f2576bf"
+        },
+        {
+          "size": 16,
+          "sha256": "8d35783860681d7116a074ab5a89879306d01ba742190c543d6d305f61b90a88"
+        },
+        {
+          "size": 146,
+          "sha256": "5a935e56643653ada2e488250f83cdf8e7d0199b65fcbc49be899f58b3384b66"
+        },
+        {
+          "size": 10,
+          "sha256": "ad0960290c86d91a2d05da596c89670b4d1ec3fec7e9d50114f6d23efa5161c7"
+        },
+        {
+          "size": 565,
+          "sha256": "a89e3d8df1cd17d232b7ab435818d204363bb1be52ca5a087dbdc86edecdd86c"
+        },
+        {
+          "size": 3349,
+          "sha256": "9e16fbba4eb6cb4efc3e6c27025da836149dd96e4646223fc14a0c705f5b22fb"
+        },
+        {
+          "size": 116,
+          "sha256": "533f0e62b3f74a4e89af762d402de737550f0cb0b76c1bd385d1496860bfec4d"
+        },
+        {
+          "size": 836,
+          "sha256": "c05e3f767583c3aeb42383121c36768c96b6b04992cff370db1257985133d1e8"
+        },
+        {
+          "size": 91,
+          "sha256": "07e30d514b37725e4803852e83a1364396eec875f5c99416dd022c6bdcfcf597"
+        },
+        {
+          "size": 997,
+          "sha256": "623efd579bef22f63c6d0932da3b1016e5843ceedea38f17e04e30dc59f09d37"
+        },
+        {
+          "size": 3,
+          "sha256": "01cb47d078b4841b8408ec4fe278efa83115c6f6e101972987507d2b2b57dcf0"
+        },
+        {
+          "size": 185,
+          "sha256": "d2d27435834d590fc171b5dcfc880109c539ea1bc5bb1dd4a3db0a1c51999517"
+        },
+        {
+          "size": 77,
+          "sha256": "c15ca5ddbd6f3033169f43cf3f53f01067f1dddef9a59d3ecaa940165df40989"
+        },
+        {
+          "size": 21,
+          "sha256": "c724ac5bf160ca6bf1731c666bda84aefd115dfb8efec29a2e79a46acf0e0cb0"
+        },
+        {
+          "size": 20,
+          "sha256": "25272670a5e476099d046834079c735c3a0c74a1225757419f098eb7bdb4e89e"
+        },
+        {
+          "size": 6,
+          "sha256": "a4dddd89e02d186d81b4ba7a87feb27f844b230901132b26a53f8fc03308280e"
+        },
+        {
+          "size": 123,
+          "sha256": "8188222ef3bdea1ab882791a4d29fe02f55226d8816f845384463c965816cebf"
+        },
+        {
+          "size": 187,
+          "sha256": "49ca3254c4ff91d2a659ed816aa8e9807f45ca76dce28cf9ffec8fb100dd71d8"
+        },
+        {
+          "size": 10,
+          "sha256": "f970929dc4ad7329e5428fa36c6c5604596f11ede701eba0da7246a26968de55"
+        },
+        {
+          "size": 22,
+          "sha256": "57cc97c976ca99b58a281b9abb84486b4eb764c4bb6e168969b469c6f6d72f14"
+        },
+        {
+          "size": 19,
+          "sha256": "729ffa8b49de5349874146da10960a9352eb8ed9a30572a6ddffb49fc697fb86"
+        },
+        {
+          "size": 17,
+          "sha256": "2e1327a3af39b009389685c31e13ce66ee7b3259b7f8f6d7eace39cc4cacca38"
+        },
+        {
+          "size": 33,
+          "sha256": "a449d7d3664a6c5031ae39d8ce330b7ab42c7e114c65222864b565da5b95a129"
+        },
+        {
+          "size": 90,
+          "sha256": "b9a2f3a01171e9a887b01f4bbb5b8ede70d69c86453a7d18d6e19103e59763ff"
+        },
+        {
+          "size": 7,
+          "sha256": "0f0e03da4bef43f0f58721e7cb75a5b486d67630620c03654d8488ca0a5f318e"
+        },
+        {
+          "size": 7,
+          "sha256": "de10d879f972c106f535bcedb18af6100950d793a358b52f7b2f146235ff216c"
+        },
+        {
+          "size": 7,
+          "sha256": "de10d879f972c106f535bcedb18af6100950d793a358b52f7b2f146235ff216c"
+        },
+        {
+          "size": 96,
+          "sha256": "1ee4c2c4034145bda50a577d24ad82d319cf04ac2e736c98156df471f0a2986e"
+        },
+        {
+          "size": 457,
+          "sha256": "1c8cc67306067b468c8b0b5e069e5c8b33e98155c0a7002e4ef2aa13001c5b80"
+        },
+        {
+          "size": 234,
+          "sha256": "766e2b77157963dcc7355b84e0979c95e8a715bee00eabc7c67e30099af65ed7"
+        },
+        {
+          "size": 240,
+          "sha256": "a3764ea867ccd9abcfbe8cb2f52d62a8ddc2e20be273890f0be4eeb6f48972c2"
+        },
+        {
+          "size": 186,
+          "sha256": "ac569799048564b45aed2c1cfa1ee71cdd8c12773b10f6c97f3a2f2a5c8f1805"
+        },
+        {
+          "size": 31,
+          "sha256": "05ff23586c1e3d027e58bc9ff67fe5c9b00d869db6caf778d00e37d56a80ed0f"
+        },
+        {
+          "size": 382,
+          "sha256": "333116d15eb634f23d3ec3f970b4ed0cb8382a12b23ebf29bc79217842832c5e"
+        },
+        {
+          "size": 34,
+          "sha256": "fde6a2d599a747086cffdca2b3b4efb2917beaacfbe643cd16909dd42845405e"
+        },
+        {
+          "size": 150,
+          "sha256": "5a0e5e7a5ef838adf0e432c39cd6354cc55ed1a470c69fb9874f74d6b47e6294"
+        },
+        {
+          "size": 28,
+          "sha256": "ae3feb20b1e00674936e4b0cb2e924e02b7a1039375c7e798a1a809cbf8bb658"
+        },
+        {
+          "size": 120,
+          "sha256": "ee492b797d5e839ba2772dae49bb6c77be6e24a4116f1ada63eedc45a8d76d8f"
+        },
+        {
+          "size": 387,
+          "sha256": "f2f711a715079c6c409b9893639096440f39bfd08e49b5ddc8b399c78b8bbbb3"
+        },
+        {
+          "size": 52,
+          "sha256": "7bfed24a7570112329748481520439cc44182f69ea879e98932763436d7bad4e"
+        },
+        {
+          "size": 90,
+          "sha256": "b9df431263d1687775dad195478b82d97f8c6b102917bba3615ada503f32ed22"
+        },
+        {
+          "size": 5,
+          "sha256": "e8ebd827d1f36d7cfa5e5220610aa6370284d1589989363f48ac40166362d449"
+        },
+        {
+          "size": 16,
+          "sha256": "78fe43a2f33070becd2deb17b8c253e8a60ff5afbc75f0d3e7db57170270a850"
+        },
+        {
+          "size": 533,
+          "sha256": "023207ec7c111c6b5db52975761e816177bf787ebd8e67e8effd67876a1b32f9"
+        },
+        {
+          "size": 204,
+          "sha256": "a686eceb81011bc3ed681ffc5c94ccedb270578037f2b42172c715b832bd73fa"
+        },
+        {
+          "size": 73,
+          "sha256": "a607c11b1367dbd95c071475f22168e70d15705bd4cd1bcecc61b5bf5a214a96"
+        },
+        {
+          "size": 39,
+          "sha256": "fec29e6803ef579638079e36ee5ba4cc89397813a5d04789913f37c8cb1ddbe9"
+        },
+        {
+          "size": 494,
+          "sha256": "dd3e8806c903d6b642d910ee7f1a8a986a82b58ed1d6c77af47467b0f95731be"
+        },
+        {
+          "size": 1408,
+          "sha256": "e985adff81ebc6fcb20b49db5efcae73ffb870880569ea387466455443633be7"
+        },
+        {
+          "size": 459,
+          "sha256": "e8f81b4a4592080913056261ffe6b1e1eae01a0e2de74d6ade252214bbe01690"
+        },
+        {
+          "size": 240,
+          "sha256": "a0fae2c77a2e1d7e722154efd272166629b95b402a1e06675f91e74b9b33b519"
+        },
+        {
+          "size": 271,
+          "sha256": "c6438dd730ab896abbb9a7bf83016fd38f5eb33d704f43846f2f760c429ec04f"
+        },
+        {
+          "size": 1064,
+          "sha256": "363e8a5d9ad057f7923078eba11a3676046c54c440623f3c85d556cc30952b36"
+        },
+        {
+          "size": 353,
+          "sha256": "dc9a0c0df48b97fb52e6cc7d77c720b6762d9637470cb04d0f5bc9da642c8bac"
+        },
+        {
+          "size": 326,
+          "sha256": "c7e03bf7caab3193a627ef1158a8ae5eeb248d360179da9cd73ba4761d60414f"
+        },
+        {
+          "size": 103,
+          "sha256": "3e559bdc16293633c6c4c2bf28d26885158c366deb6028561c38df8a0d1f356f"
+        },
+        {
+          "size": 396,
+          "sha256": "9821dc2baa5837d54ec74ae8d48a498e5cdb81545bb29c2f30f9c021b71fc596"
+        },
+        {
+          "size": 123,
+          "sha256": "e77c5f30356f6313427ec19860c66d3f219695f8e5c1c0ab267ec2d79d2e2eed"
+        },
+        {
+          "size": 59,
+          "sha256": "af87cd4ad7cfda6907f95dfb4299bf625d6986acd089b2b9d3d63bca578385cf"
+        },
+        {
+          "size": 46,
+          "sha256": "098716edff3c28b8a357d4f0483fcdc7577d760484fe0007aecb145067488a9c"
+        },
+        {
+          "size": 237,
+          "sha256": "91704ce6574bd30cf7f7f3f2882c0d8b45e15649331488aba5665e775b51400a"
+        },
+        {
+          "size": 1276,
+          "sha256": "61bc6285cf66acca368350b3a9f3bf08e9298ba09354a365c10b5ac5c8ca3bda"
+        },
+        {
+          "size": 499,
+          "sha256": "5aa93fabb20755e864e893b105f7399bc88a1ba1b7cece651ab2672be1eb656d"
+        },
+        {
+          "size": 788,
+          "sha256": "c6031a63e726d8e6da07ce88c940033a6feb030688d30802ce5d3bae850a0d1f"
+        },
+        {
+          "size": 869,
+          "sha256": "e4cb04d3add32afe7497b7728c11fb5e2af451f813a9ba00c0ffd870b24b044c"
+        },
+        {
+          "size": 92,
+          "sha256": "fd0550c650eb6c69605dd25b58a79d5db3939498e140bab6d1c4d6994207790b"
+        },
+        {
+          "size": 58,
+          "sha256": "8c23c4c469a7df367c7f712e646060b89dd760a958d94373a5a954cc21e3eb2d"
+        },
+        {
+          "size": 3,
+          "sha256": "4bc724f3b1d0caf4fe369c18cba3102e6c4ea057f63fe1587e3973134a7f755e"
+        },
+        {
+          "size": 47,
+          "sha256": "39392fc75f3b9bf39bc5ade9167e5198cf21e534acd30242391e07f5b7273dc3"
+        },
+        {
+          "size": 545,
+          "sha256": "79094e4921a1273c9deeac9ade3d816e29afc7e3c0528b8c4a5646cb7608e3e8"
+        },
+        {
+          "size": 7,
+          "sha256": "5c23757c55b06fea020f596e81bdee4f9b161fafa135a7b64cc9d04a36c9f89a"
+        },
+        {
+          "size": 546,
+          "sha256": "6f013dcb1581eb7a96903fb4613fae43956a9aef37710d7376ec19fc0670cc12"
+        },
+        {
+          "size": 7,
+          "sha256": "013e8dbbeb5757674c7374c02620a2933ca4c1204c9c6ed7e83bff80b16ca48f"
+        },
+        {
+          "size": 258,
+          "sha256": "25d9720bb75d5f61182790a3e9921dc1b15421615728f8ef2198222eeb66a3aa"
+        },
+        {
+          "size": 35,
+          "sha256": "b13656f0b0425d25f620c4ffd8e0e628186d46cc795a50ec03ec226d3e49ea4c"
+        },
+        {
+          "size": 150,
+          "sha256": "7815cb91fecdb877c93581bc8453ea5fd5e214bb022e703a1e6b36e874337d05"
+        },
+        {
+          "size": 977,
+          "sha256": "25bec7e40bdd2f6b0f24e3b737c2298cd24ef38793748318a883cbc6a88419a2"
+        },
+        {
+          "size": 43,
+          "sha256": "413b54f75e467f3a36acebb98a392f46288e44e79665728faa81594a76a48128"
+        },
+        {
+          "size": 74,
+          "sha256": "aa8cdb50ef6d44b345e063d842ce8f5a82715f75702de7c0ac11742d5f9a6fbd"
+        },
+        {
+          "size": 12,
+          "sha256": "c0a9a619b8d25a59733a0d32d819ebe95d8cd66fe6d11d0ffca24707710b1a69"
+        },
+        {
+          "size": 290,
+          "sha256": "fb20f6877ee85feb547a054c26a0d9a20ae12beeb16514121348df0a9eb8081d"
+        },
+        {
+          "size": 13,
+          "sha256": "b9df53e5d883610bcc396c868c2c1d5e90e026a8887227fbbc5ab1a5f9bd75cd"
+        },
+        {
+          "size": 31,
+          "sha256": "c56590f5402b8c997776fa0b01e1adf8bea375d3efd6462d854df3ae173a9723"
+        },
+        {
+          "size": 156,
+          "sha256": "7f56cb1103eb0fe7799ee39325e8799d303e799d1b2d6e8e6256b7372de54130"
+        },
+        {
+          "size": 108,
+          "sha256": "68ecfd9b4aa694553070f572fc6bb517e722d25eb92a3bcb7c269d5c95b9a069"
+        },
+        {
+          "size": 220,
+          "sha256": "74c348b4e651e2d8a5d454e773673f931d18f8b8c42fb39d4fa0fc2fc9844e8e"
+        },
+        {
+          "size": 347,
+          "sha256": "1fc9a5cca0f759f93f96f794265eb4757cd90b892b1ce67f13ddd06aac0f33ee"
+        },
+        {
+          "size": 117,
+          "sha256": "14c59f402d8a6b5729dc92d1144a7adb07ebba977ecbcbaa63b31f748f5d8039"
+        },
+        {
+          "size": 109,
+          "sha256": "89fc965b5830c8478b0b5567a8d2246d7ee70d8dba015eae56cf5460d8c92d0b"
+        },
+        {
+          "size": 135,
+          "sha256": "566dc8457bbbeddfd4c486e4b5cb90daba3ad103d2edd10a59acb06279269bd6"
+        },
+        {
+          "size": 545,
+          "sha256": "db0ac02bc006097afccfe87640cc2fa13177f03035bd4aaf1706d203fa97f779"
+        },
+        {
+          "size": 337,
+          "sha256": "24c3343a6e128d7214193376935ac7f951557e0d6854d8e56d598a4e20204544"
+        },
+        {
+          "size": 66,
+          "sha256": "42b58c1767e6054c4ab8ece324271f6dba218ee861753830017d3488a661e578"
+        },
+        {
+          "size": 246,
+          "sha256": "30c09ca88bf0e09a7e7c9e2095e8cb021b58c137d3c7be939c71a5232d78f183"
+        },
+        {
+          "size": 92,
+          "sha256": "73f5d2bc4ed3c3832cd23c286022f4edd16374f3c77b33e924c03c2e1ff619d7"
+        },
+        {
+          "size": 273,
+          "sha256": "5490d4e39e75e6c6b5289a94385b1c0dfc8a90623c2c3d959edf70c4092516a0"
+        },
+        {
+          "size": 374,
+          "sha256": "e18eb772594f65d919c9aea08f00913317965a2b886f48826bf454549215f3c4"
+        },
+        {
+          "size": 377,
+          "sha256": "07803529c9e5a1260c6e36c4dfac7b5f99b0477405ec4eaddc296aa093348f73"
+        },
+        {
+          "size": 15,
+          "sha256": "57dd9947894f76c381522b3f3db4728234b07750cdc2290c4a2d2b385abbd7b0"
+        },
+        {
+          "size": 246,
+          "sha256": "6c1538a7a16d8e41aff5fd07a4016ee64223a33210114c4e98611660f2612f2d"
+        },
+        {
+          "size": 474,
+          "sha256": "a0bcc11f21f9a7c25993db72fdee1b5cbba16132be0068521b4d84a01e799587"
+        },
+        {
+          "size": 243,
+          "sha256": "ac46be864046d8223f38afe3faff190824db65018681b3ba99d21ecfd4c5a2cd"
+        },
+        {
+          "size": 20,
+          "sha256": "8c584ade30b5ea5eeed62020cbfa18094a622d524cc8526efbfec2c135a25eca"
+        },
+        {
+          "size": 25,
+          "sha256": "c38f8cfa7b842ab2be10daaa7e8d2b36c76560ea0581ef70d7b90971d3870b15"
+        }
+      ],
+      "fat_standard": [
+        {
+          "size": 51,
+          "sha256": "7c8599523e9102d22cea11926d60a17d98495fb6ada7bfff7b3306dd8c567f7e"
+        },
+        {
+          "size": 7,
+          "sha256": "5189d45bbfd737c7b5bc0ad025ed90ca8aaf2f9eb2cd06e3ab989e344828606d"
+        },
+        {
+          "size": 380,
+          "sha256": "e39d52426f7b692044241416d466c431bcf90aa54a55f33c9d089e0cf048147c"
+        },
+        {
+          "size": 34,
+          "sha256": "d84f10b533eee9fb9f5290f8e21b5ac75cbe691b77d615183d08433b9b2987ec"
+        },
+        {
+          "size": 12,
+          "sha256": "24abc48d04c267879995b3b89517ddd9d0d81f2ea4bedd59120bc0da00dd5375"
+        },
+        {
+          "size": 9,
+          "sha256": "5a726d6a209e092746fb6c499d3709e296ad7ebce12fe20c00e4a340015d767a"
+        },
+        {
+          "size": 10,
+          "sha256": "552197f2924d0030fb5800b1dc74891de59b542300c4a503c13beac216402174"
+        },
+        {
+          "size": 241,
+          "sha256": "0b86600b6d657ce9d00b97b8ccaed7e94f3b4751e324facc75fdf8f423192561"
+        },
+        {
+          "size": 356,
+          "sha256": "41ccc0c8b04f35908ae45d9f46feda08dc2c4129f75a5670e5bbbc3453e81579"
+        },
+        {
+          "size": 5,
+          "sha256": "e8ebd827d1f36d7cfa5e5220610aa6370284d1589989363f48ac40166362d449"
+        },
+        {
+          "size": 139,
+          "sha256": "b9361f677b71557197d0dc5379de2e815caf374a3f356f9a0306128a2d0b7c94"
+        },
+        {
+          "size": 54,
+          "sha256": "cdb53511290252d4ebdfe773e0a100eadfdcee614352eb933cb2620f5add5b7e"
+        },
+        {
+          "size": 30,
+          "sha256": "3ea80e376070754e8975f120810816d489c564d3cce141fc9fe61def8598d39e"
+        },
+        {
+          "size": 7,
+          "sha256": "36ea59c3685edc7a18ad68415f42ff77d61e64e77f1835f3c9ceef03f2cfa799"
+        },
+        {
+          "size": 7,
+          "sha256": "6d34a0d7518238b2b9d3a9e9abe021ca209d920c04084a04955c24fbc64d6025"
+        },
+        {
+          "size": 6,
+          "sha256": "ede552861e04f7f49a136272476c8b10a42801cabf20aa13ecb45f0ff5add453"
+        },
+        {
+          "size": 8,
+          "sha256": "e66b76d9ac9fe70cff7e36be033933e748b7ac756589b4fbbcf9657880cdf160"
+        },
+        {
+          "size": 12,
+          "sha256": "cc973682fb3f36e49d1f5c285857f1ba7f56fb3ecf23de27be17439ba345cda2"
+        },
+        {
+          "size": 392,
+          "sha256": "50400e2843c57605a9d4f9888eed87b624fdbc8e4bef7812ffdee262669102d3"
+        }
+      ]
+    },
+    "upstream": {
+      "asyncfatfs": [
+        {
+          "size": 151,
+          "sha256": "f7af19a03d4cb70122d46b5e0b6c7cd5943c84d2fa5379e01027b021ae2fae6d"
+        },
+        {
+          "size": 18,
+          "sha256": "fb4df83576f6516f7e8e552cdb0cb42c06c4b2e7d9e8a1e5b3c0dfbe2130cdfd"
+        },
+        {
+          "size": 198,
+          "sha256": "995516ee26caeba8f14f4984f650e5cfabe85662aa5f33007b98140d5c3bd785"
+        },
+        {
+          "size": 374,
+          "sha256": "d7ea3defc7845b5a7123efd6c47b37e20df31c8997a15bf0675dcfa5742d0a8c"
+        },
+        {
+          "size": 357,
+          "sha256": "4e3bc71a31db4db0511e319861ae06c3c72bfacc4a7c1ae7ca474203ce80accf"
+        },
+        {
+          "size": 56,
+          "sha256": "7324ee9523cc0ad23edac0bf16eebedd05f85196a8a144d8fe2b9255a4e756a8"
+        },
+        {
+          "size": 58,
+          "sha256": "bbf27717e6a1f5db1603b10816910976e1c078389767ce8c5d6a39685c30428d"
+        },
+        {
+          "size": 58,
+          "sha256": "bbf27717e6a1f5db1603b10816910976e1c078389767ce8c5d6a39685c30428d"
+        },
+        {
+          "size": 540,
+          "sha256": "e07b4e820b46360ac6777b1a3a5fb9b2498fac34aa2694718116afeb497ff000"
+        },
+        {
+          "size": 19,
+          "sha256": "c3b6a24b3583b4441e69c1e4a5ce8e5ea3fd841d506b8973a6ad98e325749e49"
+        },
+        {
+          "size": 37,
+          "sha256": "806d9d8dd4607b752dd50d0861d5ad5fa2234df432725cc16a324bc1f110bff2"
+        },
+        {
+          "size": 9,
+          "sha256": "47103ef60044b4ae9928169c71dea34c77f0a1a1f3668fbc922a783e8702804c"
+        },
+        {
+          "size": 176,
+          "sha256": "7222851c8abbe2311d5e4a7b98b55207a4ce3fa11b2b5b7c4b2a8496c2c8cf05"
+        },
+        {
+          "size": 437,
+          "sha256": "ebd31ca169056a01903df36fbc6f4fd1e21b99fafc5feef49acc72390d053baf"
+        },
+        {
+          "size": 17,
+          "sha256": "22eeee774dbbd55638639697d23a7a021d4073a59710e632c5a2f25b23b09f69"
+        },
+        {
+          "size": 61,
+          "sha256": "350b642d6682b3cc418403606e3f486f883e859d14fee2f23e2ded152f3c87fa"
+        },
+        {
+          "size": 37,
+          "sha256": "bb0f843c6a44219b1af99273b6a8a9d0b8d03aeb94d3cbf94d3c8d723332c0bb"
+        },
+        {
+          "size": 366,
+          "sha256": "3d72fc680509f247c3cb1af3860db78e233e1e8aef7e08c513021a2151cc4297"
+        },
+        {
+          "size": 10,
+          "sha256": "6230d2068768165e0941f224d337698542d9f454b49e19a70701b6d6e548fb54"
+        },
+        {
+          "size": 238,
+          "sha256": "e4ad38650672c22e5ed68416554a7b7593ee9f0b6d18ad1b345f9f766b4ac12b"
+        },
+        {
+          "size": 2272,
+          "sha256": "c534ac87fde1298af82a7c5dacea26af46448a35a435a22a4c7688a73a483149"
+        },
+        {
+          "size": 496,
+          "sha256": "c968d93af647444c573e4c519fe2db4a1dd9c8b21cd82494940f20549bb141e4"
+        },
+        {
+          "size": 75,
+          "sha256": "a587fecbe090aa256f3a75f9d3e42460cbbe0f6e841b8561946d8c2136a207f9"
+        },
+        {
+          "size": 766,
+          "sha256": "a4b43b8ea4d995e8e393ec8ba508aa69b26f01635829278567720d80971c25fe"
+        },
+        {
+          "size": 48,
+          "sha256": "fc4827927bf4d99f7367807b860335cd0cce7d01c8b6e3d17c2462ae53541be8"
+        },
+        {
+          "size": 21,
+          "sha256": "8a721a4aa7cfb2696d669c21a01293103a6b4f6fd94cffb1e2fc160ec09d8858"
+        },
+        {
+          "size": 20,
+          "sha256": "16c0f2c200712c677914c109a9eac1026bfae6ff77b77af81bdaadf570e5d62f"
+        },
+        {
+          "size": 92,
+          "sha256": "da7f54edd46389af57209a85b8d0dc55db9a487c277c7c469918762e2eb94299"
+        },
+        {
+          "size": 203,
+          "sha256": "73ae952cffc350df9328d7e2ec9754c803115b735bb1c8f5da0b977023e63912"
+        },
+        {
+          "size": 10,
+          "sha256": "f093338cccb28f6b9663421be743bc7b4a4d793835fd0c6ebff047d199c31a32"
+        },
+        {
+          "size": 19,
+          "sha256": "a20e5b5a4a14046be8d84aec0d7b48ca6b0bc81d3e5f9662a8f251ce146972d5"
+        },
+        {
+          "size": 32,
+          "sha256": "1f58fd52a2cf6d45cc7df4c582140c9f6a8dfbb6a9c68e06ca939047dd684afe"
+        },
+        {
+          "size": 60,
+          "sha256": "25a68749c2ce77aeced69a834306d8dc0f30b81a0249bb21590ff5211b4479ae"
+        },
+        {
+          "size": 138,
+          "sha256": "22afe0c7ebd63d0a1e45a4d172875fe40c9b935028bcc9084845e0fdb81d09d4"
+        },
+        {
+          "size": 8,
+          "sha256": "55f7801af347dd7b39b471cc243aaff712fdb13d839cadf01442d6883c717863"
+        },
+        {
+          "size": 79,
+          "sha256": "6ccf0587c605d77fcf462cc3872977dbe8cc158986095b778417711da5daf2b8"
+        },
+        {
+          "size": 464,
+          "sha256": "0ccd263123dea2b1b8744b445a8d51bcb064e0e31e9ddc1ba76020ca5b41e4ca"
+        },
+        {
+          "size": 244,
+          "sha256": "c7a425fcc0b3d4da4d0af9283dd8ff98f44076fb8f053bbf969cb17abae6e392"
+        },
+        {
+          "size": 352,
+          "sha256": "4c713f95006367ecc7b8158735f28cd5e0ecfc1ae33e0cee018382f4b1a57083"
+        },
+        {
+          "size": 333,
+          "sha256": "cb77c38fa4b6faf1780c0b3b25b907ffb187d0fbe211efa576dc13c660058dff"
+        },
+        {
+          "size": 99,
+          "sha256": "d0d27ec5ef8a423716468dd00644a48bec68bc244e91418023bff906e53da2a0"
+        },
+        {
+          "size": 28,
+          "sha256": "00d556f64e080cd77fd002ae68f4008e9146ac9f724abd4d0bd3593f912506de"
+        },
+        {
+          "size": 120,
+          "sha256": "f0733a7c2e7635bda913ffc77b1a7f73b9fa59e50ac70ce863a67734c2af8611"
+        },
+        {
+          "size": 482,
+          "sha256": "c9a73c512e6d9631050e5d2a693f9b753891097c1e82dd04723ba1e7e0e4a20a"
+        },
+        {
+          "size": 127,
+          "sha256": "1258304fc0dd73cc00bfc4c55fb358afed48226b6acbc8c96760150b921b701a"
+        },
+        {
+          "size": 192,
+          "sha256": "0552fcad41cf0ec0464480daf1a8912f2af217e25551645fda823cf505b5b617"
+        },
+        {
+          "size": 5,
+          "sha256": "e8ebd827d1f36d7cfa5e5220610aa6370284d1589989363f48ac40166362d449"
+        },
+        {
+          "size": 16,
+          "sha256": "0db52174b10e0835d1b3f875ca167bb83852e21d02c50d5caa2462afa30f869f"
+        },
+        {
+          "size": 297,
+          "sha256": "531218994cae223920391e8bb8b4b319871a2fbeba91503e21bdd94278e18520"
+        },
+        {
+          "size": 525,
+          "sha256": "0588fa7bd17fc9e3dce275e1321b1d87ec24e4b6b1a347b06f6ea27b908bbcd9"
+        },
+        {
+          "size": 193,
+          "sha256": "376c053303dfdeab755a5870f9afa6304c7291eeacc8612604b7c1e4377b9da7"
+        },
+        {
+          "size": 265,
+          "sha256": "175fe16b49670f3dfd7b6238ddb2f01bc6622b1bdef1a7ec9e4f2bfe18a5b559"
+        },
+        {
+          "size": 248,
+          "sha256": "4c669e4cb3756fbe2199a454b8a32a567c20090c88d6f41e4b65c987cc710991"
+        },
+        {
+          "size": 222,
+          "sha256": "8d2a5e70f642188c9826f026e66fa4719cc861e297ea00b72e97b469b56f255f"
+        },
+        {
+          "size": 217,
+          "sha256": "eebe392beff4d1b19bbf182e58cb1f2a239fdf94d8bbc167a004a812b3a33fdc"
+        },
+        {
+          "size": 105,
+          "sha256": "7b6cea513ed6f6564b1b54b1a8f7e94d2d3afa61f21de670a368fb5fa626b554"
+        },
+        {
+          "size": 397,
+          "sha256": "dd0707ceafc75b961b07dbff4b7c890450dfe6122e563dcec27a7da3e80ac4ca"
+        },
+        {
+          "size": 17,
+          "sha256": "f6234c8f91a4dd38f22c5a12f24d80b6e56b0cc519f3c45d11eade719dcaaf03"
+        },
+        {
+          "size": 159,
+          "sha256": "48a7bf4b0da5d6aa0f18f9be0d163cda004a8fdc18db8e447d3b35b9caf9859f"
+        },
+        {
+          "size": 527,
+          "sha256": "a33f01a53522316163ea16bafc1a38e7614b41d7685980c9aefc8160995ac4d2"
+        },
+        {
+          "size": 97,
+          "sha256": "c0f4673568b56439a7e286cbc97626d484ab0de6bbe1023adbd283e6f1860004"
+        },
+        {
+          "size": 102,
+          "sha256": "52b9e8bbc0f0fb4cd7f6d6ee030db1180744acc421311e7360eaa88f2903da6b"
+        },
+        {
+          "size": 236,
+          "sha256": "30caa1c65f38aef647c658cd62ce61db751e511b29c8731ac04f0f80dc9731aa"
+        },
+        {
+          "size": 85,
+          "sha256": "f1f7750042577c11b02e9b4ec77d2196c443ef1bf9c0a0a8e95a37820862c30b"
+        },
+        {
+          "size": 68,
+          "sha256": "11ec8c56de2846f1dc12f3e6dd2876e6caaac2a94c847ec580aef1c650f804f4"
+        },
+        {
+          "size": 83,
+          "sha256": "f78f24564f484356bc7eb9fb54b316e746bcd4f9e84eebff3642e7f83951b0a6"
+        },
+        {
+          "size": 7,
+          "sha256": "fa5cf1563d9000e9711be8e845785e4db063a9555da5dcbf31923dd478a55ab5"
+        },
+        {
+          "size": 167,
+          "sha256": "4c2ce8c47910af0a4d632778cd6a099a8a187bb7de5ffd129dc29dc48b29ad61"
+        },
+        {
+          "size": 7,
+          "sha256": "c82a34d7229c15a5a59fe996ffaadea49f7b60aed756df97778db8e045855ff1"
+        },
+        {
+          "size": 22,
+          "sha256": "3e946aca6b59aec720f4f289f0a99e6a5b6b758eb9d4d9f4435a106e24ab0ba5"
+        },
+        {
+          "size": 1075,
+          "sha256": "9678217c564881da8e198608e307afea17a826144fc43e719b691e2b3c4961b0"
+        },
+        {
+          "size": 39,
+          "sha256": "136386e569d537365583c7c876c8a94eaadff0d1a90732687b5b2515b675f0f4"
+        },
+        {
+          "size": 73,
+          "sha256": "3730f137fb23b1ffed095e839438044ca7bedd9449554335c8b0f4f15db3b785"
+        },
+        {
+          "size": 8,
+          "sha256": "be2e33e9167874d59a09d9476a9cff774003163fe9066965a43c1ecfacf37301"
+        },
+        {
+          "size": 129,
+          "sha256": "2a189b8aaa4daed66163341882e2ff616521f40747cda4c15b0641e7d896406e"
+        },
+        {
+          "size": 221,
+          "sha256": "f852618d7607e944b370a946dfd138a74bb9f03d245e5af26cc9d215a49bc28f"
+        },
+        {
+          "size": 334,
+          "sha256": "8aee86e117a3c2b8471f11de631f0dd5bd550b50641c9bf9ee93e9a89070da67"
+        },
+        {
+          "size": 115,
+          "sha256": "e9c27b810d806abf2b0d9b0b235ce2a6cfe7ce84499db882aa62920fb5b48290"
+        },
+        {
+          "size": 212,
+          "sha256": "7f26c6fba0beab1367e7116a92a22b1e5f4304cf02ef562971482ed11e1a115f"
+        },
+        {
+          "size": 309,
+          "sha256": "be8b67a3923a297302525c52a2212d552cfb88e0341e0bcad7a2deaf103a69e2"
+        },
+        {
+          "size": 309,
+          "sha256": "e7f6238ae86eed97e5815d18e47c5cc8b9000e1000bad16b1ec1ef5ee634794a"
+        },
+        {
+          "size": 15,
+          "sha256": "7a315992af6c2a11284e682ab3b506587d3bd34bc0c0c2b1a06217dbc5897e7d"
+        },
+        {
+          "size": 20,
+          "sha256": "8c584ade30b5ea5eeed62020cbfa18094a622d524cc8526efbfec2c135a25eca"
+        },
+        {
+          "size": 25,
+          "sha256": "c38f8cfa7b842ab2be10daaa7e8d2b36c76560ea0581ef70d7b90971d3870b15"
+        }
+      ],
+      "fat_standard": [
+        {
+          "size": 12,
+          "sha256": "24abc48d04c267879995b3b89517ddd9d0d81f2ea4bedd59120bc0da00dd5375"
+        },
+        {
+          "size": 9,
+          "sha256": "5a726d6a209e092746fb6c499d3709e296ad7ebce12fe20c00e4a340015d767a"
+        },
+        {
+          "size": 10,
+          "sha256": "552197f2924d0030fb5800b1dc74891de59b542300c4a503c13beac216402174"
+        },
+        {
+          "size": 356,
+          "sha256": "41ccc0c8b04f35908ae45d9f46feda08dc2c4129f75a5670e5bbbc3453e81579"
+        },
+        {
+          "size": 7,
+          "sha256": "36ea59c3685edc7a18ad68415f42ff77d61e64e77f1835f3c9ceef03f2cfa799"
+        },
+        {
+          "size": 7,
+          "sha256": "6d34a0d7518238b2b9d3a9e9abe021ca209d920c04084a04955c24fbc64d6025"
+        },
+        {
+          "size": 6,
+          "sha256": "ede552861e04f7f49a136272476c8b10a42801cabf20aa13ecb45f0ff5add453"
+        }
+      ]
+    }
+  },
+  "library_resources": {
+    "current": {
+      "static_ram_bytes": 4872,
+      "code_bytes": 36036
+    },
+    "upstream": {
+      "static_ram_bytes": 4784,
+      "code_bytes": 17355
+    }
+  },
+  "sources": {
+    "current": "f6ccf1bd31bd7d8ca85658b2dc2ff749feb1483f685c7bfea06f0e7787736284",
+    "upstream": "8e3a80a2a7b71427bb0c5fcfde1eca37b19deaa15ae714755a6fe1e7dcaf600a"
+  },
+  "harness_sha256": "f4f1efda727cfcff7985cae400f9a01e2ce2be567828c2549722acc37ff73323",
+  "original_harness_sha256": "476c0b32aa3f01d5429f308ef94f978215d30ac5ab603a2fcf16dd0bb9af1b50",
+  "previous_report": "tests\\WRITE_DISPATCH_CPU.json",
+  "interleaved_4096_two_writer_gap": {
+    "original_cycles_per_byte": 22.481211185455322,
+    "prepared_cycles_per_byte": 1.4886703491210938,
+    "reduction_percent": 93.37815771205325
+  }
+}

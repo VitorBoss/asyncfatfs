@@ -1,0 +1,717 @@
+{
+  "status": "passed",
+  "before_sha256": "efa95b479e733facf06fe50c2d6f554baae7d34a289381a43fc3e1a25d8883c1",
+  "after_sha256": "c84fb7e9e1d877d37872d0f35c1457f49ba940f3e5d49aa486bc595f8d105e2c",
+  "global": [
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": false,
+      "before": 9384,
+      "after": 9380,
+      "saved": 4
+    },
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": true,
+      "before": 9380,
+      "after": 9376,
+      "saved": 4
+    },
+    {
+      "configuration": "default",
+      "bits": 32,
+      "short_enums": false,
+      "before": 9720,
+      "after": 9692,
+      "saved": 28
+    },
+    {
+      "configuration": "default",
+      "bits": 64,
+      "short_enums": false,
+      "before": 9880,
+      "after": 9824,
+      "saved": 56
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": false,
+      "before": 10452,
+      "after": 10448,
+      "saved": 4
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": true,
+      "before": 10452,
+      "after": 10444,
+      "saved": 8
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 32,
+      "short_enums": false,
+      "before": 10848,
+      "after": 10816,
+      "saved": 32
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 64,
+      "short_enums": false,
+      "before": 11040,
+      "after": 10968,
+      "saved": 72
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 16,
+      "short_enums": false,
+      "before": 2524,
+      "after": 2520,
+      "saved": 4
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 16,
+      "short_enums": true,
+      "before": 2512,
+      "after": 2500,
+      "saved": 12
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 32,
+      "short_enums": false,
+      "before": 2640,
+      "after": 2636,
+      "saved": 4
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 64,
+      "short_enums": false,
+      "before": 2744,
+      "after": 2736,
+      "saved": 8
+    }
+  ],
+  "components": [
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfs_t",
+      "before": 9384,
+      "after": 9380,
+      "saved": 4
+    },
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfsFile_t",
+      "before": 1050,
+      "after": 1050,
+      "saved": 0
+    },
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfsRequest_t",
+      "before": 680,
+      "after": 680,
+      "saved": 0
+    },
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfsDirectory_t",
+      "before": 46,
+      "after": 46,
+      "saved": 0
+    },
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfsTruncateFile_t",
+      "before": 40,
+      "after": 40,
+      "saved": 0
+    },
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfsJournal_t",
+      "before": 1604,
+      "after": 1604,
+      "saved": 0
+    },
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfs_t",
+      "before": 9380,
+      "after": 9376,
+      "saved": 4
+    },
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfsFile_t",
+      "before": 1050,
+      "after": 1050,
+      "saved": 0
+    },
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfsRequest_t",
+      "before": 680,
+      "after": 680,
+      "saved": 0
+    },
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfsDirectory_t",
+      "before": 46,
+      "after": 46,
+      "saved": 0
+    },
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfsTruncateFile_t",
+      "before": 40,
+      "after": 38,
+      "saved": 2
+    },
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfsJournal_t",
+      "before": 1604,
+      "after": 1604,
+      "saved": 0
+    },
+    {
+      "configuration": "default",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfs_t",
+      "before": 9720,
+      "after": 9692,
+      "saved": 28
+    },
+    {
+      "configuration": "default",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfsFile_t",
+      "before": 1108,
+      "after": 1104,
+      "saved": 4
+    },
+    {
+      "configuration": "default",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfsRequest_t",
+      "before": 708,
+      "after": 708,
+      "saved": 0
+    },
+    {
+      "configuration": "default",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfsDirectory_t",
+      "before": 52,
+      "after": 52,
+      "saved": 0
+    },
+    {
+      "configuration": "default",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfsTruncateFile_t",
+      "before": 48,
+      "after": 48,
+      "saved": 0
+    },
+    {
+      "configuration": "default",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfsJournal_t",
+      "before": 1608,
+      "after": 1608,
+      "saved": 0
+    },
+    {
+      "configuration": "default",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfs_t",
+      "before": 9880,
+      "after": 9824,
+      "saved": 56
+    },
+    {
+      "configuration": "default",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfsFile_t",
+      "before": 1136,
+      "after": 1128,
+      "saved": 8
+    },
+    {
+      "configuration": "default",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfsRequest_t",
+      "before": 760,
+      "after": 760,
+      "saved": 0
+    },
+    {
+      "configuration": "default",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfsDirectory_t",
+      "before": 64,
+      "after": 64,
+      "saved": 0
+    },
+    {
+      "configuration": "default",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfsTruncateFile_t",
+      "before": 56,
+      "after": 56,
+      "saved": 0
+    },
+    {
+      "configuration": "default",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfsJournal_t",
+      "before": 1608,
+      "after": 1608,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfs_t",
+      "before": 10452,
+      "after": 10448,
+      "saved": 4
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfsFile_t",
+      "before": 1050,
+      "after": 1050,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfsRequest_t",
+      "before": 680,
+      "after": 680,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfsDirectory_t",
+      "before": 46,
+      "after": 46,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfsTruncateFile_t",
+      "before": 40,
+      "after": 40,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfsJournal_t",
+      "before": 1604,
+      "after": 1604,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfs_t",
+      "before": 10452,
+      "after": 10444,
+      "saved": 8
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfsFile_t",
+      "before": 1050,
+      "after": 1050,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfsRequest_t",
+      "before": 680,
+      "after": 680,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfsDirectory_t",
+      "before": 46,
+      "after": 46,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfsTruncateFile_t",
+      "before": 40,
+      "after": 38,
+      "saved": 2
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfsJournal_t",
+      "before": 1604,
+      "after": 1604,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfs_t",
+      "before": 10848,
+      "after": 10816,
+      "saved": 32
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfsFile_t",
+      "before": 1108,
+      "after": 1104,
+      "saved": 4
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfsRequest_t",
+      "before": 708,
+      "after": 708,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfsDirectory_t",
+      "before": 52,
+      "after": 52,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfsTruncateFile_t",
+      "before": 48,
+      "after": 48,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfsJournal_t",
+      "before": 1608,
+      "after": 1608,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfs_t",
+      "before": 11040,
+      "after": 10968,
+      "saved": 72
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfsFile_t",
+      "before": 1136,
+      "after": 1128,
+      "saved": 8
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfsRequest_t",
+      "before": 760,
+      "after": 760,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfsDirectory_t",
+      "before": 64,
+      "after": 64,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfsTruncateFile_t",
+      "before": 56,
+      "after": 56,
+      "saved": 0
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfsJournal_t",
+      "before": 1608,
+      "after": 1608,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfs_t",
+      "before": 2524,
+      "after": 2520,
+      "saved": 4
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfsFile_t",
+      "before": 84,
+      "after": 84,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfsRequest_t",
+      "before": 680,
+      "after": 680,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfsDirectory_t",
+      "before": 46,
+      "after": 46,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 16,
+      "short_enums": false,
+      "structure": "afatfsTruncateFile_t",
+      "before": 40,
+      "after": 40,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfs_t",
+      "before": 2512,
+      "after": 2500,
+      "saved": 12
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfsFile_t",
+      "before": 84,
+      "after": 82,
+      "saved": 2
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfsRequest_t",
+      "before": 680,
+      "after": 680,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfsDirectory_t",
+      "before": 46,
+      "after": 46,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 16,
+      "short_enums": true,
+      "structure": "afatfsTruncateFile_t",
+      "before": 40,
+      "after": 38,
+      "saved": 2
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfs_t",
+      "before": 2640,
+      "after": 2636,
+      "saved": 4
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfsFile_t",
+      "before": 104,
+      "after": 104,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfsRequest_t",
+      "before": 708,
+      "after": 708,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfsDirectory_t",
+      "before": 52,
+      "after": 52,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 32,
+      "short_enums": false,
+      "structure": "afatfsTruncateFile_t",
+      "before": 48,
+      "after": 48,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfs_t",
+      "before": 2744,
+      "after": 2736,
+      "saved": 8
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfsFile_t",
+      "before": 128,
+      "after": 128,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfsRequest_t",
+      "before": 760,
+      "after": 760,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfsDirectory_t",
+      "before": 64,
+      "after": 64,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 64,
+      "short_enums": false,
+      "structure": "afatfsTruncateFile_t",
+      "before": 56,
+      "after": 56,
+      "saved": 0
+    }
+  ]
+}

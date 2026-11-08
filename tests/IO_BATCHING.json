@@ -1,0 +1,188 @@
+{
+  "status": "passed",
+  "unchanged_layouts": 24,
+  "operations": [
+    {
+      "cluster": 512,
+      "scenario": "create",
+      "writes_before": 58,
+      "writes_after": 40
+    },
+    {
+      "cluster": 512,
+      "scenario": "create-data",
+      "writes_before": 68,
+      "writes_after": 50
+    },
+    {
+      "cluster": 512,
+      "scenario": "rename",
+      "writes_before": 54,
+      "writes_after": 45
+    },
+    {
+      "cluster": 512,
+      "scenario": "rename-empty",
+      "writes_before": 54,
+      "writes_after": 45
+    },
+    {
+      "cluster": 512,
+      "scenario": "rename-same",
+      "writes_before": 30,
+      "writes_after": 30
+    },
+    {
+      "cluster": 512,
+      "scenario": "rename-same-empty",
+      "writes_before": 30,
+      "writes_after": 30
+    },
+    {
+      "cluster": 512,
+      "scenario": "delete",
+      "writes_before": 45,
+      "writes_after": 45
+    },
+    {
+      "cluster": 512,
+      "scenario": "delete-empty",
+      "writes_before": 23,
+      "writes_after": 23
+    },
+    {
+      "cluster": 4096,
+      "scenario": "create",
+      "writes_before": 24,
+      "writes_after": 23
+    },
+    {
+      "cluster": 4096,
+      "scenario": "create-data",
+      "writes_before": 37,
+      "writes_after": 36
+    },
+    {
+      "cluster": 4096,
+      "scenario": "rename",
+      "writes_before": 35,
+      "writes_after": 34
+    },
+    {
+      "cluster": 4096,
+      "scenario": "rename-empty",
+      "writes_before": 35,
+      "writes_after": 34
+    },
+    {
+      "cluster": 4096,
+      "scenario": "rename-same",
+      "writes_before": 30,
+      "writes_after": 30
+    },
+    {
+      "cluster": 4096,
+      "scenario": "rename-same-empty",
+      "writes_before": 30,
+      "writes_after": 30
+    },
+    {
+      "cluster": 4096,
+      "scenario": "delete",
+      "writes_before": 45,
+      "writes_after": 45
+    },
+    {
+      "cluster": 4096,
+      "scenario": "delete-empty",
+      "writes_before": 23,
+      "writes_after": 23
+    }
+  ],
+  "multi_before": {
+    "fat32": {
+      "reads": 37,
+      "writes": 137,
+      "sessions": 0,
+      "grouped_blocks": 0,
+      "single_blocks": 137
+    },
+    "exfat": {
+      "reads": 2,
+      "writes": 136,
+      "sessions": 0,
+      "grouped_blocks": 0,
+      "single_blocks": 136
+    }
+  },
+  "multi_after": {
+    "fat32": {
+      "reads": 37,
+      "writes": 137,
+      "sessions": 33,
+      "grouped_blocks": 127,
+      "single_blocks": 10
+    },
+    "exfat": {
+      "reads": 2,
+      "writes": 136,
+      "sessions": 42,
+      "grouped_blocks": 127,
+      "single_blocks": 9
+    }
+  },
+  "cuts": 3957,
+  "recovery_cuts": 2142,
+  "guards": 28,
+  "bootstrap_cuts": 86,
+  "source_sha256": {
+    "asyncfatfs.c": "71b2d5eb601bc7a112c98bbcd0f952e26bfbf15d5b5c9f00736a9becdd918ded",
+    "asyncfatfs.h": "3091ca85c6ab7a2255210c2766682a0e9015465bf33092e2d764799db6d0c16a",
+    "asyncfatfs_api.inc": "8319b3584917b80c514f02dc97f5c4430f60f4d797346358728c568dc1eb67f3",
+    "asyncfatfs_exfatjournal.inc": "ead2aca6d28b9d0f8e72c7ea4725ff3f30696b5c08568859a1a5ae1bfb906cec",
+    "asyncfatfs_fatjournal.inc": "1c2078e0458013f3c88ba4ae113ae3ada8aa2e22138934500d0f723196506492",
+    "asyncfatfs_format.inc": "64158fe17360962dd7920c6b6c69daee9e34bc96d789ffec2432784a761af26b",
+    "asyncfatfs_journal.h": "dcaf6259f125a8d3fd763e91fda42d1ad20035b714adb06247c1ca7bc5e22028",
+    "asyncfatfs_journal.inc": "ad20ba1f9f97992632225676cdb8116e2f481ade2709aad0f546b89ae4b95a62",
+    "asyncfatfs_lfn.inc": "b61ba9dac8f9da58874c563260bd5ec1609dcbf24b79f1a05abf87b92b59025e",
+    "builddefs.h": "a934b93a8aaea355e83f39ff1bb18188bece7c023d6ca45d0373d261b5eae623",
+    "fat_standard.c": "68b93d04744f34374988dbafc91d7315c25a1e14c1fb1f609581f1efd3220f40",
+    "fat_standard.h": "f1be485a582e50a75faa62897eb75672514b8e5ab066f17f36f44e75d68bab99",
+    "sdcard.h": "9f8a380378011a98461dc7ba3545da9219389b6dc1350d16337f4510ff636955"
+  },
+  "baseline_sha256": {
+    "asyncfatfs.c": "7cba4e498d9d85d17414944ee0d351d5355a345d23cd86ecbd622726a9bd7b4e",
+    "asyncfatfs.h": "3091ca85c6ab7a2255210c2766682a0e9015465bf33092e2d764799db6d0c16a",
+    "asyncfatfs_api.inc": "8319b3584917b80c514f02dc97f5c4430f60f4d797346358728c568dc1eb67f3",
+    "asyncfatfs_exfatjournal.inc": "ead2aca6d28b9d0f8e72c7ea4725ff3f30696b5c08568859a1a5ae1bfb906cec",
+    "asyncfatfs_fatjournal.inc": "1c2078e0458013f3c88ba4ae113ae3ada8aa2e22138934500d0f723196506492",
+    "asyncfatfs_format.inc": "64158fe17360962dd7920c6b6c69daee9e34bc96d789ffec2432784a761af26b",
+    "asyncfatfs_journal.h": "dcaf6259f125a8d3fd763e91fda42d1ad20035b714adb06247c1ca7bc5e22028",
+    "asyncfatfs_journal.inc": "ad20ba1f9f97992632225676cdb8116e2f481ade2709aad0f546b89ae4b95a62",
+    "asyncfatfs_lfn.inc": "b61ba9dac8f9da58874c563260bd5ec1609dcbf24b79f1a05abf87b92b59025e",
+    "builddefs.h": "a934b93a8aaea355e83f39ff1bb18188bece7c023d6ca45d0373d261b5eae623",
+    "fat_standard.c": "68b93d04744f34374988dbafc91d7315c25a1e14c1fb1f609581f1efd3220f40",
+    "fat_standard.h": "f1be485a582e50a75faa62897eb75672514b8e5ab066f17f36f44e75d68bab99",
+    "sdcard.h": "9f8a380378011a98461dc7ba3545da9219389b6dc1350d16337f4510ff636955"
+  },
+  "evidence_sha256": {
+    "tests/build/io-batching/layout/report.json": "811d6c982a933bdcd2a98c5dfb3c7969af59f1ec9ab29bc5976b4430df5f0f8b",
+    "tests/build/io-batching/powercut/report.json": "7699fee5a6721dbb388639fa6ab482e4b1a4f354a204426b33139509aceff6bb",
+    "tests/build/io-batching/powercut/guards/report.json": "b5ee59516103575354b4f9658f9d1c8f9b76cddac1a43eb36eb1265ec169c63a",
+    "tests/build/io-batching/powercut/provision/report.json": "574daccaf2cc2c02d71e7ab8e12a1657aaa4c5001d967eca272d1557f9980066",
+    "tests/build/io-batching/powercut/recovery/report.json": "48b3f804c8b4e2de5d21fc71d3823b15903895d3e3c6a29609e0e2b77a8f86eb",
+    "tests/build/io-batching/asan.log": "3fc1716b32431dcc60f1e521e2aa5e4ebeab1b5abb0d3477cc3b849ee306970e",
+    "tests/build/io-batching/benchmark.log": "423f3f3fb3f99c24a95122c8429ed5b8fd19fe147e9b9b6246d133aa26fe8360",
+    "tests/build/io-batching/cache.log": "8238b88e404247cb96e4bb36ff0c27282554096ff309b5cbfa5b9a6eb1d82e6d",
+    "tests/build/io-batching/layout.log": "a93fa86bd2a90132a452eec0beb742c3ff806f36d15cb586ddcb3e8c2fa73569",
+    "tests/build/io-batching/multi.log": "1f9520bce93c7157ffbe91367ee1acab97011a96d49048f9e102921efdd01abb",
+    "tests/build/io-batching/powercut.log": "c25f476b252cd9fe1f7d817399f78b58b8874f699f053c5f1e8df34ed8fb32e1",
+    "tests/build/io-batching/regression.log": "880ba41bd278192c3165128f9be11bf4a41a4daf28ad7fb115d6b0f42f3c5f50",
+    "tests/build/io-batching/multi-combined-after/test.log": "777be74bd4836809c11872e8a435a4b6d97125a01906d3e866685f1eac29b04f",
+    "tests/build/io-batching/multi-combined-before/test.log": "bf492a376d26be8ac9dfbac02fb2e7d008a533ecf756886938d96b956531da3a",
+    "tests/build/io-batching/multi-default-after/test.log": "b98ade424855f81035a456d2b76162ccfdf47d0a9183706f40ab66a9386af0e9",
+    "tests/build/io-batching/multi-default-before/test.log": "9336550f7ee051c9e92ef2db296590bb8276c2f0c29c163c929fdea5b1e8c4b4",
+    "tests/build/io-batching/cache-default/test.log": "81b1a949e9af66aafa47d26ccd53fbe2c7eae643ade1cecfe86c7260f77ed56b",
+    "tests/build/io-batching/cache-no_multiblock/test.log": "81b1a949e9af66aafa47d26ccd53fbe2c7eae643ade1cecfe86c7260f77ed56b"
+  }
+}
