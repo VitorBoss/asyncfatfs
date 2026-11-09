@@ -7,7 +7,7 @@ fault-injecting in-memory backend. No physical card or disk is accessed.
 
 | Check | Result |
 | --- | --- |
-| x64 default exFAT, FAT-only and exFAT + freefile configurations, `/W3 /WX` | Passed |
+| x64 FAT/LFN default, FAT-only, external FAT/LFN, explicit exFAT, exFAT + freefile and LFN + exFAT configurations, `/W3 /WX` | Passed |
 | x86 default configuration | Passed |
 | x64 AddressSanitizer | Passed, no reported memory violations |
 | Caller scratch reduced from 256 to 32 bytes | Passed |
@@ -20,6 +20,8 @@ fault-injecting in-memory backend. No physical card or disk is accessed.
 | Power loss in truncate/rename/expand request APIs | Passed: 1,119 operation cuts and 224 interrupted undo-replay cuts, with clean fsck results; 72 pre-operation startup handoffs remained safely read-only with zero writes |
 | C99 Boolean bit-fields and alignment | Passed: x86/x64 flag-combination tests and XC16 16-bit C99 layout assertions with normal/short enums; measured RAM decreased in all configurations. See [alignment report](BITFIELD_ALIGNMENT.md). |
 | Runtime member ordering | Passed: aligned scratch and embedded sub-operation prefixes, unchanged disk records and lower global RAM across 12 target/configuration cases. See [before/after memory report](MEMORY_LAYOUT_REPORT.md). |
+| FAT16/FAT32 LFN | Passed: 255-character names, aliases/collisions, malformed chains, enumeration, rename/delete, directories, concurrent operations, backend retries, x64 ASan and six independent FATtools image checks. See [LFN validation and RAM report](LFN_VALIDATION.md). |
+| Native Windows FAT32/LFN | Passed: three 512-MiB VHDs (512-byte, 4-KiB and native-default clusters), 99 name/alias pairs, native/library round trips and 12 read-only CHKDSK checks. Fixed close/sync of directory handles with no runtime layout growth. See [native FAT32 report](WINDOWS_FAT32_LFN_VALIDATION.md). |
 
 `tests/test_exfat.c` exercises cursor truncation down through cluster/sector
 boundaries to zero, unchanged EOF, preserved prefixes and positions, FAT chains,

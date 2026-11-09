@@ -28,25 +28,30 @@ static unsigned afatfs_apiUpper(unsigned character)
     return character >= 'a' && character <= 'z' ? character - 'a' + 'A' : character;
 }
 
-static void afatfs_apiShortName(char *out, const uint8_t *name)
+static void afatfs_apiShortName(char *out, const uint8_t *name, uint8_t caseFlags)
 {
     unsigned n = 0;
     for (unsigned i = 0; i < 8 && name[i] != ' '; i++) {
-        out[n++] = (char)name[i];
+        unsigned character = name[i];
+        out[n++] = (char)((caseFlags & 0x08) && character >= 'A' && character <= 'Z' ? character + 32 : character);
     }
     if (name[8] != ' ') {
         out[n++] = '.';
         for (unsigned i = 8; i < 11 && name[i] != ' '; i++) {
-            out[n++] = (char)name[i];
+            unsigned character = name[i];
+            out[n++] = (char)((caseFlags & 0x10) && character >= 'A' && character <= 'Z' ? character + 32 : character);
         }
     }
     out[n] = 0;
 }
 
-static void afatfs_apiFatInfo(afatfsFileInfo_t *info, const fatDirectoryEntry_t *entry)
+static void afatfs_apiFatInfo(afatfsFileInfo_t *info, const fatDirectoryEntry_t *entry, bool longName)
 {
-    memset(info, 0, sizeof(*info));
-    afatfs_apiShortName(info->name, entry->fileName);
+    if (!longName) {
+        memset(info, 0, sizeof(*info));
+        afatfs_apiShortName(info->name, entry->fileName, entry->ntReserved);
+    }
+    info->contiguous = false;
     info->attributes = entry->attrib;
     info->firstCluster = ((uint32_t)entry->firstClusterHigh << 16) | entry->firstClusterLow;
     info->size = entry->fileSize;
@@ -100,7 +105,24 @@ afatfsOperationStatus_e afatfs_fstat(afatfsFilePtr_t file, afatfsFileInfo_t *inf
             return AFATFS_OPERATION_IN_PROGRESS;
         }
         if (entry) {
-            afatfs_apiFatInfo(info, entry);
+#ifdef ASYNCFS_ENABLE_LFN
+            if (file->lfnOutput != info) {
+                afatfs_apiFatInfo(info, entry, false);
+            }
+            if (file->lfnEntryCount && file->lfnAscii) {
+                afatfsOperationStatus_e status = afatfs_lfnFileName(file, info);
+                if (status == AFATFS_OPERATION_FAILURE) {
+                    file->lfnOutput = NULL;
+                    file->lfnProgress = 0;
+                    return afatfs_apiError(AFATFS_ERROR_BAD_FILESYSTEM_HEADER);
+                }
+                if (status != AFATFS_OPERATION_SUCCESS) {
+                    return status;
+                }
+            }
+#else
+            afatfs_apiFatInfo(info, entry, false);
+#endif
         } else {
             memset(info, 0, sizeof(*info));
             strcpy(info->name, "/");
@@ -222,9 +244,10 @@ static afatfsOperationStatus_e afatfs_apiReadDirectory(afatfsDirectory_t *dir, a
     if (!afatfs_mediaSessionActive() || !dir || !info || dir->generation != afatfs_mediaGeneration) {
         return afatfs_apiError(AFATFS_ERROR_INVALID_OBJECT);
     }
-    if (dir->remaining && dir->output != info) {
+    if (dir->reading && dir->output != info) {
         return afatfs_apiError(AFATFS_ERROR_INVALID_PARAMETER);
     }
+    dir->output = info;
     for (unsigned budget = 0; budget < 16; budget++) {
         uint8_t *bytes;
         afatfsDirEntryPointer_t pos;
@@ -234,13 +257,13 @@ static afatfsOperationStatus_e afatfs_apiReadDirectory(afatfsDirectory_t *dir, a
         }
         if (!bytes || !bytes[0]) {
             dir->cursor.ended = true;
-            dir->remaining = 0;
+            memset(&dir->nameState, 0, sizeof(dir->nameState));
             memset(info, 0, sizeof(*info));
             return AFATFS_OPERATION_SUCCESS;
         }
 #ifdef ASYNCFS_ENABLE_EXFAT
         if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_EXFAT) {
-            if (!dir->remaining) {
+            if (!dir->nameState.exfat.remaining) {
                 if (bytes[0] != EXFAT_DIR_FILEDIR) {
                     continue;
                 }
@@ -254,56 +277,61 @@ static afatfsOperationStatus_e afatfs_apiReadDirectory(afatfsDirectory_t *dir, a
                 info->created = ((uint32_t)primary->creationDate << 16) | primary->creationTime;
                 info->modified = ((uint32_t)primary->lastWriteDate << 16) | primary->lastWriteTime;
                 info->accessed = ((uint32_t)primary->lastAccessDate << 16) | primary->lastAccessTime;
-                dir->expectedChecksum = primary->checksum;
-                dir->checksum = 0;
-                dir->remaining = bytes[1] + 1;
-                dir->entryIndex = 0;
-                dir->nameWritten = 0;
+                dir->nameState.exfat.expectedChecksum = primary->checksum;
+                dir->nameState.exfat.checksum = 0;
+                dir->nameState.exfat.remaining = bytes[1] + 1;
+                dir->nameState.exfat.entryIndex = 0;
+                dir->nameState.exfat.nameWritten = 0;
             }
             for (unsigned n = 0; n < 32; n++) {
-                if (dir->entryIndex == 0 && (n == 2 || n == 3)) {
+                if (dir->nameState.exfat.entryIndex == 0 && (n == 2 || n == 3)) {
                     continue;
                 }
-                dir->checksum = (uint16_t)((dir->checksum >> 1 | (uint32_t)dir->checksum << 15) + bytes[n]);
+                dir->nameState.exfat.checksum =
+                    (uint16_t)((dir->nameState.exfat.checksum >> 1 | (uint32_t)dir->nameState.exfat.checksum << 15) +
+                        bytes[n]);
             }
-            if (dir->entryIndex == 1) {
+            if (dir->nameState.exfat.entryIndex == 1) {
                 const exFatStreamEntry_t *stream = (const exFatStreamEntry_t *)bytes;
                 if (bytes[0] != EXFAT_DIR_STREAM || !stream->nameLength || stream->dataSize > UINT32_MAX ||
                     stream->fileSize > stream->dataSize || stream->dataSize > UINT32_MAX - afatfs_clusterSize() + 1) {
                     return afatfs_apiError(AFATFS_ERROR_UNSUPPORTED);
                 }
-                dir->nameLength = stream->nameLength;
-                dir->nameHash = stream->nameHash;
+                dir->nameState.exfat.nameLength = stream->nameLength;
+                dir->nameState.exfat.nameHash = stream->nameHash;
                 info->firstCluster = stream->firstCluster;
                 info->size = (uint32_t)stream->dataSize;
                 info->validSize = (uint32_t)stream->fileSize;
                 info->allocatedSize = roundUpTo(info->size, afatfs_clusterSize());
                 info->contiguous = (stream->flags & 2) != 0;
-            } else if (dir->entryIndex >= 2 && dir->nameWritten < dir->nameLength) {
+            } else if (dir->nameState.exfat.entryIndex >= 2 &&
+                dir->nameState.exfat.nameWritten < dir->nameState.exfat.nameLength) {
                 if (bytes[0] != EXFAT_DIR_FILENAME) {
                     return afatfs_apiError(AFATFS_ERROR_BAD_FILESYSTEM_HEADER);
                 }
-                for (unsigned n = 0; n < 15 && dir->nameWritten < dir->nameLength; n++) {
+                for (unsigned n = 0; n < 15 && dir->nameState.exfat.nameWritten < dir->nameState.exfat.nameLength;
+                    n++) {
                     if (!bytes[2 + n * 2] || bytes[2 + n * 2] >= 128 || bytes[3 + n * 2]) {
                         return afatfs_apiError(AFATFS_ERROR_UNSUPPORTED);
                     }
-                    info->name[dir->nameWritten++] = (char)bytes[2 + n * 2];
+                    info->name[dir->nameState.exfat.nameWritten++] = (char)bytes[2 + n * 2];
                 }
-            } else if (dir->entryIndex >= 2 && (bytes[0] & 0xE0) != 0xE0) {
+            } else if (dir->nameState.exfat.entryIndex >= 2 && (bytes[0] & 0xE0) != 0xE0) {
                 return afatfs_apiError(AFATFS_ERROR_UNSUPPORTED);
             }
-            dir->entryIndex++;
-            if (--dir->remaining) {
+            dir->nameState.exfat.entryIndex++;
+            if (--dir->nameState.exfat.remaining) {
                 continue;
             }
             uint16_t hash = 0;
-            for (unsigned n = 0; n < dir->nameWritten; n++) {
+            for (unsigned n = 0; n < dir->nameState.exfat.nameWritten; n++) {
                 uint16_t ch = afatfs.upcaseAscii[(uint8_t)info->name[n]];
                 hash = (uint16_t)((hash >> 1 | (uint32_t)hash << 15) + (ch & 255));
                 hash = (uint16_t)((hash >> 1 | (uint32_t)hash << 15) + (ch >> 8));
             }
-            if (dir->checksum != dir->expectedChecksum || dir->nameWritten != dir->nameLength ||
-                hash != dir->nameHash) {
+            if (dir->nameState.exfat.checksum != dir->nameState.exfat.expectedChecksum ||
+                dir->nameState.exfat.nameWritten != dir->nameState.exfat.nameLength ||
+                hash != dir->nameState.exfat.nameHash) {
                 return afatfs_apiError(AFATFS_ERROR_BAD_FILESYSTEM_HEADER);
             }
             if (info->attributes & FAT_FILE_ATTRIBUTE_DIRECTORY) {
@@ -313,11 +341,21 @@ static afatfsOperationStatus_e afatfs_apiReadDirectory(afatfsDirectory_t *dir, a
 #endif
         {
             fatDirectoryEntry_t *entry = (fatDirectoryEntry_t *)bytes;
+#ifdef ASYNCFS_ENABLE_LFN
+            if (!fat_isDirectoryEntryEmpty(entry) && fat_isLfnEntry(entry)) {
+                afatfs_lfnConsume(&dir->nameState.lfn, bytes, NULL, info->name);
+                continue;
+            }
+            bool longName = afatfs_lfnAttached(&dir->nameState.lfn, bytes) && dir->nameState.lfn.ascii;
+            memset(&dir->nameState, 0, sizeof(dir->nameState));
+#else
+            bool longName = false;
+#endif
             if (fat_isDirectoryEntryEmpty(entry) || fat_isVolumeLabel(entry) || fat_isLfnEntry(entry) ||
                 !memcmp(entry->fileName, ".          ", 11) || !memcmp(entry->fileName, "..         ", 11)) {
                 continue;
             }
-            afatfs_apiFatInfo(info, entry);
+            afatfs_apiFatInfo(info, entry, longName);
         }
         if (!dir->pattern || afatfs_apiMatch(dir->pattern, info->name)) {
             return AFATFS_OPERATION_SUCCESS;
@@ -346,7 +384,7 @@ afatfsOperationStatus_e afatfs_rewinddir(afatfsDirectory_t *dir)
     dir->cursor.cluster = dir->cursor.firstCluster;
     dir->cursor.clusterIndex = dir->cursor.offset = 0;
     dir->cursor.ended = false;
-    dir->remaining = 0;
+    memset(&dir->nameState, 0, sizeof(dir->nameState));
     dir->output = NULL;
     dir->reading = false;
     return AFATFS_OPERATION_SUCCESS;
@@ -1106,9 +1144,11 @@ static void afatfs_apiRename(afatfsRequest_t *request)
             }
             uint8_t *entry = buffer + target->directoryEntryPos.entryIndex * 32;
             uint8_t name[11];
+            uint8_t caseFlags = entry[12];
             memcpy(name, entry, 11);
             memcpy(entry, request->scratch, 32);
             memcpy(entry, name, 11);
+            entry[12] = caseFlags;
         }
         request->phase = 4;
     }
@@ -1128,7 +1168,12 @@ static void afatfs_apiRename(afatfsRequest_t *request)
 static bool afatfs_apiFileRequest(
     afatfsRequest_t *request, unsigned operation, afatfsFilePtr_t file, afatfsResultCallback_t callback, void *user)
 {
-    if (!file || file->type != AFATFS_FILE_TYPE_NORMAL || afatfs_fileIsBusy(file)) {
+    bool directory =
+        file && (file->type == AFATFS_FILE_TYPE_DIRECTORY || file->type == AFATFS_FILE_TYPE_FAT16_ROOT_DIRECTORY);
+    if (!file ||
+        (file->type != AFATFS_FILE_TYPE_NORMAL &&
+            !(directory && (operation == AFATFS_API_CLOSE || operation == AFATFS_API_SYNC))) ||
+        afatfs_fileIsBusy(file)) {
         return false;
     }
     if (!afatfs_apiBegin(request, operation, callback, user)) {

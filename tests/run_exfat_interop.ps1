@@ -21,7 +21,7 @@ try {
     $suffix = if ($AddressSanitizer) { "${Architecture}_asan" } else { $Architecture }
     $binary = "tests/build/test_exfat_external_$suffix.exe"
     $sanitizerFlags = if ($AddressSanitizer) { "/fsanitize=address /Zi /Fdtests\build\interop_$suffix.pdb" } else { '' }
-    & cmd /c "`"$vcvars`" >nul && cl /nologo /std:c11 /W3 /WX /D_CRT_SECURE_NO_WARNINGS $sanitizerFlags /Ilib /Itests tests\test_exfat_external.c tests\sdcard_sim.c lib\asyncfatfs.c lib\fat_standard.c /Fotests\build\ /Fe$binary /link /INCREMENTAL:NO"
+    & cmd /c "`"$vcvars`" >nul && cl /nologo /std:c11 /W3 /WX /D_CRT_SECURE_NO_WARNINGS /DAFATFS_EXTERNAL_CONFIG /Itests\config\exfat_only $sanitizerFlags /Ilib /Itests tests\test_exfat_external.c tests\sdcard_sim.c lib\asyncfatfs.c lib\fat_standard.c /Fotests\build\ /Fe$binary /link /INCREMENTAL:NO"
     if ($LASTEXITCODE) { throw 'Interoperability test compilation failed.' }
     if ($AddressSanitizer) {
         # The ASan DLL is installed beside the compiler, rather than beside the test executable.

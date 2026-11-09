@@ -57,15 +57,40 @@ be created and remain on the volume.
 
 #### Filenames
 
-FAT16/FAT32 files and directories must be referred to by their ASCII 8.3 filenames. `ASYNCFS_ENABLE_LFN`
-remains unfinished and now produces a compile-time error rather than enabling the incomplete writer.
+The default configuration enables `ASYNCFS_ENABLE_LFN` for FAT16/FAT32 and disables exFAT.
+With `AFATFS_EXTERNAL_CONFIG`, define `ASYNCFS_ENABLE_LFN` in your own `afatfs_config.h` to enable it;
+omitting it retains the smaller 8.3-only implementation.
+
+LFN supports leaf names up to 255 printable ASCII characters, with case-preserving enumeration and
+case-insensitive lookup by either the long name or its 8.3 alias. Spaces and multiple dots are accepted;
+`" * / : < > ? \\ |`, trailing dots/spaces and non-ASCII API names are rejected. Paths in filenames remain
+unsupported: use `afatfs_chdir` as before. Native UTF-16LE entries are streamed through the existing cache,
+including across fragmented directory chains, with ordinal, checksum, type, cluster and padding checks.
+Malformed chains fall back to their short entry. Non-ASCII on-disk names remain accessible by their short
+alias; Unicode API encoding is outside the current scope.
+
+Creation generates collision-checked numeric aliases when required, flushes LFN entries before publishing
+the short entry, and preserves the following directory end marker. Deletion makes the short entry durable
+before releasing its attached LFN slots. Rename uses the existing asynchronous copy/publish/delete flow.
+FAT has no persistent journal: these ordering barriers do not make FAT rename or a multi-sector update
+atomic under power loss. Existing 8.3 names and the raw `afatfs_findNext` interface remain supported;
+use `afatfs_readdir`/`afatfs_findnext` for assembled long names.
+
+`afatfs_fstat` may yield while reading a long name. Retain the same output object until it completes;
+the caller's output supplies the assembly buffer, avoiding another 256-byte buffer per handle. The
+operation union retains the requested name only during creation/search. See
+[LFN validation and memory results](../tests/LFN_VALIDATION.md) for the measured alignment and RAM costs.
+The [native Windows FAT32 validation](../tests/WINDOWS_FAT32_LFN_VALIDATION.md) covers bidirectional VHD
+round trips, Windows-generated aliases and read-only CHKDSK checks. Request-based close/sync also accept
+directory handles returned by open, including root directories.
 exFAT names support 1 to 255 printable ASCII characters, excluding `" * / : < > ? \\ |`. The exFAT
 implementation uses the volume's up-case table for case-insensitive comparison and name hashes.
 
 #### exFAT Development Support
 
-The default configuration enables `ASYNCFS_ENABLE_EXFAT`. With `AFATFS_EXTERNAL_CONFIG`, define it in
-your own `afatfs_config.h`. This feature is independent of FAT LFN support.
+exFAT is disabled by default. With `AFATFS_EXTERNAL_CONFIG`, define `ASYNCFS_ENABLE_EXFAT` in
+your own `afatfs_config.h` to opt in. This feature is independent of FAT LFN support and can coexist
+with it. The exFAT regression/VHD/power-cut runners explicitly select their exFAT test configuration.
 
 Mounting verifies the boot checksum, header geometry, mandatory bitmap and up-case entries, and the
 up-case table checksum. Root directories, allocation bitmaps, and up-case tables can have fragmented FAT

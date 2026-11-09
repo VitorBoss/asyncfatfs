@@ -1933,6 +1933,10 @@ static void waitRequest(afatfsRequest_t *request, afatfsError_e expected)
         afatfs_poll();
         assert(afatfs_getFilesystemState() != AFATFS_FILESYSTEM_STATE_FATAL);
     }
+    if (!completed || apiResult != expected || request->result != expected) {
+        fprintf(stderr, "request %u phase %u: expected %u, callback %u, result %u\n", request->operation,
+            request->phase, expected, apiResult, request->result);
+    }
     assert(completed && apiResult == expected && request->result == expected);
 }
 #define API_TEST(call, expected)                                                                                       \
@@ -2364,6 +2368,10 @@ static void exerciseCloseDurability(void)
     puts("close durability: held I/O, failed submission/ACK/end-write and immediate remount passed");
 }
 
+#ifdef TEST_LFN
+#include "fat_lfn.inc"
+#endif
+
 static void exerciseFat(bool fat32, unsigned sectorsPerCluster)
 {
     memset(media, 0, sizeof(media));
@@ -2380,6 +2388,9 @@ static void exerciseFat(bool fat32, unsigned sectorsPerCluster)
     media[511] = 0xAA;
     uint8_t *boot = media + PARTITION * SECTOR;
     fatVolumeID_t *volume = (fatVolumeID_t *)boot;
+    volume->jmpBoot[0] = 0xEB;
+    volume->jmpBoot[1] = 0x3C;
+    volume->jmpBoot[2] = 0x90;
     volume->fat.bytesPerSector = SECTOR;
     volume->fat.sectorsPerCluster = (uint8_t)sectorsPerCluster;
     volume->fat.reservedSectorCount = 1;
@@ -2407,6 +2418,9 @@ static void exerciseFat(bool fat32, unsigned sectorsPerCluster)
     }
     mount();
     exerciseNewApi(false);
+#ifdef TEST_LFN
+    exerciseLfn();
+#endif
     exerciseAccessProtection(false);
     exerciseCloseDurability();
     uint8_t data[2000];

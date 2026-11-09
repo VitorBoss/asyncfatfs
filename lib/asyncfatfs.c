@@ -26,9 +26,9 @@
 #define AFATFS_MAX_OPEN_FILES 3
 #define AFATFS_MIN_MULTIPLE_BLOCK_WRITE_COUNT 2
 //#define AFATFS_USE_FREEFILE
-#define ASYNCFS_ENABLE_EXFAT
+//#define ASYNCFS_ENABLE_EXFAT
 //#define ASYNCFS_ENABLE_LBA64 // Reserved: requires widening the backend and public APIs.
-//#define ASYNCFS_ENABLE_LFN // Reserved: FAT LFN support is unfinished; exFAT names are independent.
+#define ASYNCFS_ENABLE_LFN
 #define AFATFS_FREEFILE_LEAVE_CLUSTERS 100
 #define AFATFS_FREESPACE_FILENAME "FREESPAC.E"
 #define AFATFS_INTROSPEC_LOG_FILENAME "ASYNCFAT.LOG"
@@ -38,10 +38,6 @@
 #include "afatfs_config.h"
 #endif
 
-// FAT long filenames are a separate, unfinished feature. exFAT names do not depend on it.
-#ifdef ASYNCFS_ENABLE_LFN
-#error "ASYNCFS_ENABLE_LFN is not implemented; leave it disabled (exFAT supports long ASCII names independently)."
-#endif
 #ifdef ASYNCFS_ENABLE_LBA64
 #error "ASYNCFS_ENABLE_LBA64 requires a 64-bit storage backend and finder API; the current interfaces use uint32_t."
 #endif
@@ -162,6 +158,8 @@ enum {
     AFATFS_CREATEFILE_PHASE_CREATE_NEW_FILE,
     AFATFS_CREATEFILE_PHASE_WRITE_FILE_ATTRIB,
     AFATFS_CREATEFILE_PHASE_WRITE_FILE_ENTRY,
+    AFATFS_CREATEFILE_PHASE_LFN_FLUSH,
+    AFATFS_CREATEFILE_PHASE_LFN_PUBLISH,
     AFATFS_CREATEFILE_PHASE_SUCCESS,
     AFATFS_CREATEFILE_PHASE_FAILURE,
 };
@@ -259,6 +257,14 @@ typedef struct afatfsFreeSpaceFAT_t {
 typedef struct afatfsCreateFile_t {
     afatfsFileCallback_t callback;
     void *user;
+#ifdef ASYNCFS_ENABLE_LFN
+    // Alias search and free-slot reservation never run simultaneously.
+    union {
+        uint32_t aliasNumber;
+        uint32_t orphanSector;
+    } location;
+    afatfsLongNameState_t lfn;
+#endif
 
 #if !defined(ASYNCFS_ENABLE_LFN) && !defined(ASYNCFS_ENABLE_EXFAT)
     uint8_t fileName[FAT_FILENAME_LENGTH];
@@ -271,7 +277,13 @@ typedef struct afatfsCreateFile_t {
     uint8_t entriesRead;
 #endif
     uint8_t phase;
-#ifdef ASYNCFS_ENABLE_EXFAT
+#ifdef ASYNCFS_ENABLE_LFN
+    uint8_t shortName[FAT_FILENAME_LENGTH];
+    uint8_t freeEntries;
+    uint8_t writeIndex;
+    uint8_t orphanIndex;
+#endif
+#if defined(ASYNCFS_ENABLE_EXFAT) || defined(ASYNCFS_ENABLE_LFN)
     bool directory : 1;
     bool directoryEnd : 1;
 #else
@@ -334,9 +346,9 @@ typedef enum {
 
 typedef struct afatfsExtendSubdirectory_t {
     // We need to call this as a sub-operation so we have it as our first member to be compatible with its memory layout:
+    afatfsAppendFreeCluster_t appendFreeCluster;
     afatfsFileCallback_t callback;
     void *user;
-    afatfsAppendFreeCluster_t appendFreeCluster;
     LBA_t parentDirectoryCluster;
     afatfsExtendSubdirectoryPhase_e phase;
 } afatfsExtendSubdirectory_t;
@@ -382,10 +394,9 @@ typedef enum {
 } afatfsDeleteFilePhase_e;
 
 typedef struct afatfsDeleteFile_t {
+    afatfsTruncateFile_t truncateFile;
     afatfsCallback_t callback;
     void *user;
-
-    afatfsTruncateFile_t truncateFile;
 } afatfsUnlinkFile_t;
 
 typedef struct afatfsCloseFile_t {
@@ -443,6 +454,11 @@ typedef struct afatfsFile_t {
 #endif
     // The position of our directory entry on the disk (so we can update it without consulting a parent directory file)
     afatfsDirEntryPointer_t directoryEntryPos;
+#ifdef ASYNCFS_ENABLE_LFN
+    afatfsFileInfo_t *lfnOutput;
+    uint32_t lfnCluster;
+    uint32_t lfnOffset;
+#endif
     // The byte offset of the cursor within the file
     uint32_t cursorOffset;
     /* The file size in bytes as seen by users of the filesystem (the exact length of the file they've written).
@@ -499,14 +515,27 @@ typedef struct afatfsFile_t {
     int8_t writeLockedCacheIndex;
     // Ditto for fread():
     int8_t readRetainCacheIndex;
+#ifdef ASYNCFS_ENABLE_LFN
+    uint8_t lfnEntryCount;
+    uint8_t lfnProgress;
+    uint8_t lfnDeleteIndex;
+#endif
 #ifdef ASYNCFS_ENABLE_EXFAT
     uint8_t exfatEntryCount;
     uint8_t exfatWriteIndex;
     bool modified : 1;
+#ifdef ASYNCFS_ENABLE_LFN
+    bool lfnAscii : 1;
+#endif
     bool exfatNoFatChain : 1;
     bool dataDirty : 1;
 #else
+#ifdef ASYNCFS_ENABLE_LFN
+    bool modified : 1;
+    bool lfnAscii : 1;
+#else
     bool modified;
+#endif
 #endif
 } afatfsFile_t;
 
@@ -2457,6 +2486,10 @@ static afatfsOperationStatus_e afatfs_FATFillWithPattern(
  *     AFATFS_OPERATION_IN_PROGRESS - Cache is too busy, retry later
  *     AFATFS_OPERATION_FAILURE - If the filesystem enters the fatal state
  */
+#ifdef ASYNCFS_ENABLE_LFN
+static afatfsOperationStatus_e afatfs_lfnDelete(afatfsFilePtr_t file);
+#endif
+
 static afatfsOperationStatus_e afatfs_saveDirectoryEntry(afatfsFilePtr_t file, afatfsSaveDirectoryEntryMode_e mode)
 {
     uint8_t *sector;
@@ -2465,6 +2498,11 @@ static afatfsOperationStatus_e afatfs_saveDirectoryEntry(afatfsFilePtr_t file, a
     if (file->directoryEntryPos.sectorNumberPhysical == 0) {
         return AFATFS_OPERATION_SUCCESS; // Root directories don't have a directory entry
     }
+#ifdef ASYNCFS_ENABLE_LFN
+    if (mode == AFATFS_SAVE_DIRECTORY_DELETED && file->lfnDeleteIndex) {
+        return afatfs_lfnDelete(file);
+    }
+#endif
     if (file->modified && file->type == AFATFS_FILE_TYPE_NORMAL) {
         file->attrib |= FAT_FILE_ATTRIBUTE_ARCHIVE;
     }
@@ -2555,6 +2593,12 @@ static afatfsOperationStatus_e afatfs_saveDirectoryEntry(afatfsFilePtr_t file, a
                 entry->lastWriteTime = timeStamp & 0xFFFF;
                 file->modified = false;
             }
+#ifdef ASYNCFS_ENABLE_LFN
+            if (mode == AFATFS_SAVE_DIRECTORY_DELETED && file->lfnEntryCount) {
+                file->lfnDeleteIndex = 1;
+                return afatfs_lfnDelete(file);
+            }
+#endif
         } else {
             return AFATFS_OPERATION_FAILURE;
         }
@@ -3626,7 +3670,9 @@ static afatfsOperationStatus_e afatfs_extendSubdirectory(
     directory->operation.active = AFATFS_FILE_OPERATION_EXTEND_SUBDIRECTORY;
 
     opState->phase = AFATFS_EXTEND_SUBDIRECTORY_PHASE_INITIAL;
-    opState->parentDirectoryCluster = parentDirectory ? parentDirectory->firstCluster : 0;
+    // FAT encodes the root parent as zero, including a FAT32 root stored in cluster 2 or later.
+    opState->parentDirectoryCluster =
+        parentDirectory && parentDirectory->directoryEntryPos.sectorNumberPhysical ? parentDirectory->firstCluster : 0;
     opState->callback = callback;
     opState->user = user;
 
@@ -4382,6 +4428,10 @@ static bool afatfs_fileOpenAllowed(afatfsFilePtr_t file)
     return true;
 }
 
+#ifdef ASYNCFS_ENABLE_LFN
+#include "asyncfatfs_lfn.inc"
+#endif
+
 static void afatfs_createFileContinue(afatfsFile_t *file)
 {
     afatfsCreateFile_t *opState = &file->operation.state.createFile;
@@ -4390,6 +4440,20 @@ static void afatfs_createFileContinue(afatfsFile_t *file)
 #ifdef ASYNCFS_ENABLE_EXFAT
     if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_EXFAT && opState->phase < AFATFS_CREATEFILE_PHASE_SUCCESS) {
         status = afatfs_createExFatContinue(file);
+        if (status == AFATFS_OPERATION_FAILURE) {
+            if (afatfs.cwdWalkMutex == file) {
+                afatfs_findLastCWD(&afatfs.currentDirectory);
+            }
+            opState->phase = AFATFS_CREATEFILE_PHASE_FAILURE;
+        } else if (status != AFATFS_OPERATION_SUCCESS) {
+            return;
+        }
+    }
+#endif
+
+#ifdef ASYNCFS_ENABLE_LFN
+    if (afatfs.fileSystemType != FAT_FILESYSTEM_TYPE_EXFAT && opState->phase < AFATFS_CREATEFILE_PHASE_SUCCESS) {
+        status = afatfs_createLfnContinue(file);
         if (status == AFATFS_OPERATION_FAILURE) {
             if (afatfs.cwdWalkMutex == file) {
                 afatfs_findLastCWD(&afatfs.currentDirectory);
@@ -4503,16 +4567,13 @@ doMore:
                 opState->phase = AFATFS_CREATEFILE_PHASE_FAILURE;
                 goto doMore;
             }
-#ifdef ASYNCFS_ENABLE_EXFAT
-            if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_EXFAT && file->type == AFATFS_FILE_TYPE_DIRECTORY &&
-                file->firstCluster == 0) {
+            if (file->type == AFATFS_FILE_TYPE_DIRECTORY && file->firstCluster == 0) {
                 afatfsFileCallback_t callback = opState->callback;
                 void *user = opState->user;
                 file->operation.active = AFATFS_FILE_OPERATION_NONE;
                 afatfs_extendSubdirectory(file, &afatfs.currentDirectory, callback, user);
                 break;
             }
-#endif
             if ((file->mode & AFATFS_FILE_MODE_RETAIN_DIRECTORY) != 0) {
                 /*
                  * For this high performance file type, we require the directory entry for the file to be retained
@@ -4805,6 +4866,15 @@ static afatfsFilePtr_t afatfs_createFile(
         }
         return file;
     }
+#ifdef ASYNCFS_ENABLE_LFN
+    if (afatfs.fileSystemType != FAT_FILESYSTEM_TYPE_EXFAT && strcmp(name, ".") && !afatfs_lfnValidName(name)) {
+        afatfs_fileError(file, AFATFS_ERROR_INVALID_NAME);
+        if (callback) {
+            callback(NULL, user);
+        }
+        return file;
+    }
+#else
     if (afatfs.fileSystemType != FAT_FILESYSTEM_TYPE_EXFAT && strcmp(name, ".")) {
         unsigned base = 0;
         unsigned extension = 0;
@@ -4840,6 +4910,7 @@ static afatfsFilePtr_t afatfs_createFile(
             return file;
         }
     }
+#endif
 #ifdef ASYNCFS_ENABLE_EXFAT
     if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_EXFAT && file != &afatfs.journalFile &&
         (fileMode &
@@ -4946,7 +5017,17 @@ static afatfsFilePtr_t afatfs_createFile(
             memcpy(opState->fileName, name, length + 1);
         } else
 #endif
+        {
+#ifdef ASYNCFS_ENABLE_LFN
+            memcpy(opState->fileName, name, strlen(name) + 1);
+            if (!afatfs_lfnShortName(name, opState->shortName)) {
+                opState->location.aliasNumber = 1;
+                afatfs_lfnAlias(opState);
+            }
+#else
             fat_convertFileNameToFATStyle(name, opState->fileName);
+#endif
+        }
         file->attrib = attrib;
 
         if ((attrib & FAT_FILE_ATTRIBUTE_DIRECTORY) != 0) {
@@ -6250,6 +6331,11 @@ afatfsError_e afatfs_getLastError()
 
 static bool afatfs_fileHasPendingWork(afatfsFilePtr_t file)
 {
+#ifdef ASYNCFS_ENABLE_LFN
+    if (file->type != AFATFS_FILE_TYPE_NONE && file->lfnOutput) {
+        return true;
+    }
+#endif
     if (afatfs_fileIsBusy(file)) {
         return true;
     }

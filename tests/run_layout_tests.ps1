@@ -20,7 +20,7 @@ try {
         xc16Available = (Test-Path -LiteralPath $Xc16Compiler)
     }
     try {
-        foreach ($variant in @('default', 'fat_only', 'exfat_freefile')) {
+        foreach ($variant in @('default', 'fat_only', 'fat_lfn', 'exfat_only', 'exfat_freefile', 'lfn_exfat')) {
             $flags = if ($variant -eq 'default') {
                 ''
             } else {

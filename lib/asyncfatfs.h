@@ -142,6 +142,16 @@ typedef struct afatfsDirectoryCursor_t {
     uint8_t ended;
 } afatfsDirectoryCursor_t;
 
+// Incremental VFAT parser; filename assembly uses the caller's buffer.
+typedef struct afatfsLongNameState_t {
+    uint8_t remaining;
+    uint8_t checksum;
+    uint8_t count;
+    uint8_t length;
+    bool matched : 1;
+    bool ascii : 1;
+} afatfsLongNameState_t;
+
 typedef struct afatfsDirectory_t {
     // Keep this object alive until closedir; fields below are private.
     afatfsDirectoryCursor_t cursor;
@@ -149,13 +159,19 @@ typedef struct afatfsDirectory_t {
     const char *pattern;
     afatfsFileInfo_t *output;
     uint32_t generation;
-    uint16_t checksum;
-    uint16_t expectedChecksum;
-    uint16_t nameHash;
-    uint8_t remaining;
-    uint8_t entryIndex;
-    uint8_t nameLength;
-    uint8_t nameWritten;
+    // FAT LFN and exFAT enumeration share their incremental workspace.
+    union {
+        struct {
+            uint16_t checksum;
+            uint16_t expectedChecksum;
+            uint16_t nameHash;
+            uint8_t remaining;
+            uint8_t entryIndex;
+            uint8_t nameLength;
+            uint8_t nameWritten;
+        } exfat;
+        afatfsLongNameState_t lfn;
+    } nameState;
     // Runtime flags use C99 bool bit-fields; storage order is compiler-specific.
     bool registered : 1;
     bool reading : 1;
@@ -199,6 +215,7 @@ typedef struct afatfsRequest_t {
 } afatfsRequest_t;
 
 // Result-bearing alternatives to the legacy file callbacks. Read/write report accepted bytes in transferred.
+// Close/sync also accept directory handles returned by open; data I/O/truncate require regular files.
 bool afatfs_open(afatfsRequest_t *request, const char *name, const char *mode, afatfsFilePtr_t *file,
     afatfsResultCallback_t callback, void *user);
 bool afatfs_close(afatfsRequest_t *request, afatfsFilePtr_t file, afatfsResultCallback_t callback, void *user);

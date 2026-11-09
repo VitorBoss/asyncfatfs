@@ -8,12 +8,12 @@ try {
     $vs = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
     if (!$vs) { throw 'Visual Studio C/C++ build tools were not found.' }
     $vcvars = Join-Path $vs 'VC/Auxiliary/Build/vcvars64.bat'
-    & cmd /c "`"$vcvars`" >nul && cl /nologo /std:c11 /W3 /WX /D_CRT_SECURE_NO_WARNINGS /Ilib tests\test_exfat.c lib\asyncfatfs.c lib\fat_standard.c /Fotests\build\ /Fetests\build\test_exfat.exe /link /INCREMENTAL:NO"
+    & cmd /c "`"$vcvars`" >nul && cl /nologo /std:c11 /W3 /WX /DTEST_FAT_ONLY /DTEST_LFN /D_CRT_SECURE_NO_WARNINGS /Ilib tests\test_exfat.c lib\asyncfatfs.c lib\fat_standard.c /Fotests\build\ /Fetests\build\test_exfat.exe /link /INCREMENTAL:NO"
     if ($LASTEXITCODE) { throw 'Compilation failed.' }
     & ./tests/build/test_exfat.exe
-    if ($LASTEXITCODE) { throw 'exFAT tests failed.' }
-    foreach ($variant in @('fat_only', 'exfat_freefile')) {
-        $testFlags = if ($variant -eq 'fat_only') { '/DTEST_FAT_ONLY' } else { '' }
+    if ($LASTEXITCODE) { throw 'Default FAT/LFN tests failed.' }
+    foreach ($variant in @('fat_only', 'fat_lfn', 'exfat_only', 'exfat_freefile', 'lfn_exfat')) {
+        $testFlags = if ($variant -eq 'fat_only') { '/DTEST_FAT_ONLY' } elseif ($variant -eq 'fat_lfn') { '/DTEST_FAT_ONLY /DTEST_LFN' } elseif ($variant -eq 'lfn_exfat') { '/DTEST_LFN' } else { '' }
         & cmd /c "`"$vcvars`" >nul && cl /nologo /std:c11 /W3 /WX /D_CRT_SECURE_NO_WARNINGS /DAFATFS_EXTERNAL_CONFIG $testFlags /Ilib /Itests\config\$variant tests\test_exfat.c lib\asyncfatfs.c lib\fat_standard.c /Fotests\build\ /Fetests\build\test_$variant.exe /link /INCREMENTAL:NO"
         if ($LASTEXITCODE) { throw "Compilation failed for $variant." }
         & "./tests/build/test_$variant.exe"

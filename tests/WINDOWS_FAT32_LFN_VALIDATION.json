@@ -1,0 +1,678 @@
+{
+  "status": "passed",
+  "native_report_sha256": "6870376a21576526bf12f9726b07536711d8a3d681762a6f8587eb627fd7bd8a",
+  "binary_sha256": "2E59BE334E0F5D8A427F7791B1F88A881D1946681F5B0F30483FC7A1FC8C6B8F",
+  "source_sha256": {
+    "lib\\fat_standard.c": "68B93D04744F34374988DBAFC91D7315C25A1E14C1FB1F609581F1EFD3220F40",
+    "lib\\fat_standard.h": "F1BE485A582E50A75FAA62897EB75672514B8E5AB066F17F36F44E75D68BAB99",
+    "tests\\test_exfat_external.c": "A8C78F517E452A1DB6487D47ED88E4AB34BFD608917FCCDABAE6F987427F644A",
+    "tests\\fat_lfn_native.inc": "3ABD6AE5174D36D6AC9AD655BCF7C85C42A827F216DF0CC21DBEA6D68C0EA541",
+    "tests\\sdcard_sim.c": "23155FB9455789E4EBDD3EAD89DD0435A7061B128F7142AE8EA5B9CAB65D3940",
+    "lib\\asyncfatfs_lfn.inc": "31A98AD7C3B63225EA9AFA6C4B22CB3FBFEB26E62F4F5010C5196A8B4941EEDD",
+    "lib\\asyncfatfs_journal.inc": "E687A0E710162C91C7C5349B886FBC92D8EC9A3E0470FAA5CFA5AB11E6C61DDC",
+    "tests\\exfat_native_api.inc": "087E0857E22A83F7DF37F933DACD18C821CE1541E2F76187C006E51D1A2BB295",
+    "lib\\asyncfatfs.h": "3091CA85C6AB7A2255210C2766682A0E9015465BF33092E2D764799DB6D0C16A",
+    "lib\\builddefs.h": "A934B93A8AAEA355E83F39FF1BB18188BECE7C023D6CA45D0373D261B5EAE623",
+    "lib\\asyncfatfs_api.inc": "44C3A825048EA619174BD4717C993A351566680A1701F09D695C991F470B58B1",
+    "lib\\sdcard.h": "9F8A380378011A98461DC7BA3545DA9219389B6DC1350D16337F4510FF636955",
+    "tests\\run_windows_fat32_lfn_tests.ps1": "CBC41F8DDB1FB9BA216BDA2A43720894FF3F2BFA862502A16447BB6A57B29D8C",
+    "lib\\asyncfatfs.c": "2CEC513C68880BE567B725DF93AB43FA91F4EF666E4375C9EABFF08155DBD67A",
+    "lib\\asyncfatfs_format.inc": "64158FE17360962DD7920C6B6C69DAEE9E34BC96D789FFEC2432784A761AF26B",
+    "lib\\asyncfatfs_journal.h": "B8416603F426D3E8E4030F918F5439E2FBEC7142AC826C73DCD221B3C42B3062"
+  },
+  "windows": "Microsoft Windows NT 10.0.26300.0",
+  "fat_driver": "10.0.26100.9711 (WinBuild.160101.0800)",
+  "cases": [
+    {
+      "name": "512",
+      "cluster_size": 512,
+      "status": "passed",
+      "aliases": [
+        {
+          "name": "Windows mixed Case long filename.txt",
+          "alias": "WINDOW~1.TXT",
+          "size": 1203,
+          "tag": 110
+        },
+        {
+          "name": "Windows truncate long filename.bin",
+          "alias": "WINDOW~1.BIN",
+          "size": 1204,
+          "tag": 111
+        },
+        {
+          "name": "Windows delete by alias long filename.bin",
+          "alias": "WINDOW~2.BIN",
+          "size": 1205,
+          "tag": 112
+        },
+        {
+          "name": "lower.txt",
+          "alias": "lower.txt",
+          "size": 1206,
+          "tag": 113
+        },
+        {
+          "name": "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.bin",
+          "alias": "WWWWWW~1.BIN",
+          "size": 1207,
+          "tag": 114
+        },
+        {
+          "name": "Collision native filename number 00.bin",
+          "alias": "COLLIS~1.BIN",
+          "size": 1208,
+          "tag": 115
+        },
+        {
+          "name": "Collision native filename number 01.bin",
+          "alias": "COLLIS~2.BIN",
+          "size": 1209,
+          "tag": 116
+        },
+        {
+          "name": "Collision native filename number 02.bin",
+          "alias": "COLLIS~3.BIN",
+          "size": 1210,
+          "tag": 117
+        },
+        {
+          "name": "Collision native filename number 03.bin",
+          "alias": "COLLIS~4.BIN",
+          "size": 1211,
+          "tag": 118
+        },
+        {
+          "name": "Collision native filename number 04.bin",
+          "alias": "CO483D~1.BIN",
+          "size": 1212,
+          "tag": 119
+        },
+        {
+          "name": "Collision native filename number 05.bin",
+          "alias": "COF209~1.BIN",
+          "size": 1213,
+          "tag": 120
+        },
+        {
+          "name": "Collision native filename number 06.bin",
+          "alias": "COADC4~1.BIN",
+          "size": 1214,
+          "tag": 121
+        },
+        {
+          "name": "Collision native filename number 07.bin",
+          "alias": "COB76F~1.BIN",
+          "size": 1215,
+          "tag": 122
+        },
+        {
+          "name": "Collision native filename number 08.bin",
+          "alias": "CO036C~1.BIN",
+          "size": 1216,
+          "tag": 123
+        },
+        {
+          "name": "Collision native filename number 09.bin",
+          "alias": "CO52D7~1.BIN",
+          "size": 1217,
+          "tag": 124
+        },
+        {
+          "name": "Collision native filename number 10.bin",
+          "alias": "CO17AD~1.BIN",
+          "size": 1218,
+          "tag": 125
+        },
+        {
+          "name": "Collision native filename number 11.bin",
+          "alias": "COA32E~1.BIN",
+          "size": 1219,
+          "tag": 126
+        },
+        {
+          "name": "Collision native filename number 12.bin",
+          "alias": "COB116~1.BIN",
+          "size": 1220,
+          "tag": 127
+        },
+        {
+          "name": "Collision native filename number 13.bin",
+          "alias": "CO074A~1.BIN",
+          "size": 1221,
+          "tag": 128
+        },
+        {
+          "name": "Collision library filename number 00.bin",
+          "alias": "COLLIS~5.BIN"
+        },
+        {
+          "name": "Collision library filename number 01.bin",
+          "alias": "COLLIS~6.BIN"
+        },
+        {
+          "name": "Collision library filename number 02.bin",
+          "alias": "COLLIS~7.BIN"
+        },
+        {
+          "name": "Collision library filename number 03.bin",
+          "alias": "COLLIS~8.BIN"
+        },
+        {
+          "name": "Collision library filename number 04.bin",
+          "alias": "COLLIS~9.BIN"
+        },
+        {
+          "name": "Collision library filename number 05.bin",
+          "alias": "COLLI~10.BIN"
+        },
+        {
+          "name": "Collision library filename number 06.bin",
+          "alias": "COLLI~11.BIN"
+        },
+        {
+          "name": "Collision library filename number 07.bin",
+          "alias": "COLLI~12.BIN"
+        },
+        {
+          "name": "Collision library filename number 08.bin",
+          "alias": "COLLI~13.BIN"
+        },
+        {
+          "name": "Collision library filename number 09.bin",
+          "alias": "COLLI~14.BIN"
+        },
+        {
+          "name": "Collision library filename number 10.bin",
+          "alias": "COLLI~15.BIN"
+        },
+        {
+          "name": "Collision library filename number 11.bin",
+          "alias": "COLLI~16.BIN"
+        },
+        {
+          "name": "Collision library filename number 12.bin",
+          "alias": "COLLI~17.BIN"
+        },
+        {
+          "name": "Collision library filename number 13.bin",
+          "alias": "COLLI~18.BIN"
+        }
+      ],
+      "footer_sha256": "9782853F770E9C9313FCAA9FC1EF7B082F22980F0717F27021053D92380D52D1"
+    },
+    {
+      "name": "4096",
+      "cluster_size": 4096,
+      "status": "passed",
+      "aliases": [
+        {
+          "name": "Windows mixed Case long filename.txt",
+          "alias": "WINDOW~1.TXT",
+          "size": 1203,
+          "tag": 110
+        },
+        {
+          "name": "Windows truncate long filename.bin",
+          "alias": "WINDOW~1.BIN",
+          "size": 1204,
+          "tag": 111
+        },
+        {
+          "name": "Windows delete by alias long filename.bin",
+          "alias": "WINDOW~2.BIN",
+          "size": 1205,
+          "tag": 112
+        },
+        {
+          "name": "lower.txt",
+          "alias": "lower.txt",
+          "size": 1206,
+          "tag": 113
+        },
+        {
+          "name": "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.bin",
+          "alias": "WWWWWW~1.BIN",
+          "size": 1207,
+          "tag": 114
+        },
+        {
+          "name": "Collision native filename number 00.bin",
+          "alias": "COLLIS~1.BIN",
+          "size": 1208,
+          "tag": 115
+        },
+        {
+          "name": "Collision native filename number 01.bin",
+          "alias": "COLLIS~2.BIN",
+          "size": 1209,
+          "tag": 116
+        },
+        {
+          "name": "Collision native filename number 02.bin",
+          "alias": "COLLIS~3.BIN",
+          "size": 1210,
+          "tag": 117
+        },
+        {
+          "name": "Collision native filename number 03.bin",
+          "alias": "COLLIS~4.BIN",
+          "size": 1211,
+          "tag": 118
+        },
+        {
+          "name": "Collision native filename number 04.bin",
+          "alias": "CO483D~1.BIN",
+          "size": 1212,
+          "tag": 119
+        },
+        {
+          "name": "Collision native filename number 05.bin",
+          "alias": "COF209~1.BIN",
+          "size": 1213,
+          "tag": 120
+        },
+        {
+          "name": "Collision native filename number 06.bin",
+          "alias": "COADC4~1.BIN",
+          "size": 1214,
+          "tag": 121
+        },
+        {
+          "name": "Collision native filename number 07.bin",
+          "alias": "COB76F~1.BIN",
+          "size": 1215,
+          "tag": 122
+        },
+        {
+          "name": "Collision native filename number 08.bin",
+          "alias": "CO036C~1.BIN",
+          "size": 1216,
+          "tag": 123
+        },
+        {
+          "name": "Collision native filename number 09.bin",
+          "alias": "CO52D7~1.BIN",
+          "size": 1217,
+          "tag": 124
+        },
+        {
+          "name": "Collision native filename number 10.bin",
+          "alias": "CO17AD~1.BIN",
+          "size": 1218,
+          "tag": 125
+        },
+        {
+          "name": "Collision native filename number 11.bin",
+          "alias": "COA32E~1.BIN",
+          "size": 1219,
+          "tag": 126
+        },
+        {
+          "name": "Collision native filename number 12.bin",
+          "alias": "COB116~1.BIN",
+          "size": 1220,
+          "tag": 127
+        },
+        {
+          "name": "Collision native filename number 13.bin",
+          "alias": "CO074A~1.BIN",
+          "size": 1221,
+          "tag": 128
+        },
+        {
+          "name": "Collision library filename number 00.bin",
+          "alias": "COLLIS~5.BIN"
+        },
+        {
+          "name": "Collision library filename number 01.bin",
+          "alias": "COLLIS~6.BIN"
+        },
+        {
+          "name": "Collision library filename number 02.bin",
+          "alias": "COLLIS~7.BIN"
+        },
+        {
+          "name": "Collision library filename number 03.bin",
+          "alias": "COLLIS~8.BIN"
+        },
+        {
+          "name": "Collision library filename number 04.bin",
+          "alias": "COLLIS~9.BIN"
+        },
+        {
+          "name": "Collision library filename number 05.bin",
+          "alias": "COLLI~10.BIN"
+        },
+        {
+          "name": "Collision library filename number 06.bin",
+          "alias": "COLLI~11.BIN"
+        },
+        {
+          "name": "Collision library filename number 07.bin",
+          "alias": "COLLI~12.BIN"
+        },
+        {
+          "name": "Collision library filename number 08.bin",
+          "alias": "COLLI~13.BIN"
+        },
+        {
+          "name": "Collision library filename number 09.bin",
+          "alias": "COLLI~14.BIN"
+        },
+        {
+          "name": "Collision library filename number 10.bin",
+          "alias": "COLLI~15.BIN"
+        },
+        {
+          "name": "Collision library filename number 11.bin",
+          "alias": "COLLI~16.BIN"
+        },
+        {
+          "name": "Collision library filename number 12.bin",
+          "alias": "COLLI~17.BIN"
+        },
+        {
+          "name": "Collision library filename number 13.bin",
+          "alias": "COLLI~18.BIN"
+        }
+      ],
+      "footer_sha256": "CAF331FFFE479A5B1D47DEC782918773EA7F148097E0407AA4ADE05EABA927D5"
+    },
+    {
+      "name": "default",
+      "cluster_size": 4096,
+      "status": "passed",
+      "aliases": [
+        {
+          "name": "Windows mixed Case long filename.txt",
+          "alias": "WINDOW~1.TXT",
+          "size": 1203,
+          "tag": 110
+        },
+        {
+          "name": "Windows truncate long filename.bin",
+          "alias": "WINDOW~1.BIN",
+          "size": 1204,
+          "tag": 111
+        },
+        {
+          "name": "Windows delete by alias long filename.bin",
+          "alias": "WINDOW~2.BIN",
+          "size": 1205,
+          "tag": 112
+        },
+        {
+          "name": "lower.txt",
+          "alias": "lower.txt",
+          "size": 1206,
+          "tag": 113
+        },
+        {
+          "name": "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.bin",
+          "alias": "WWWWWW~1.BIN",
+          "size": 1207,
+          "tag": 114
+        },
+        {
+          "name": "Collision native filename number 00.bin",
+          "alias": "COLLIS~1.BIN",
+          "size": 1208,
+          "tag": 115
+        },
+        {
+          "name": "Collision native filename number 01.bin",
+          "alias": "COLLIS~2.BIN",
+          "size": 1209,
+          "tag": 116
+        },
+        {
+          "name": "Collision native filename number 02.bin",
+          "alias": "COLLIS~3.BIN",
+          "size": 1210,
+          "tag": 117
+        },
+        {
+          "name": "Collision native filename number 03.bin",
+          "alias": "COLLIS~4.BIN",
+          "size": 1211,
+          "tag": 118
+        },
+        {
+          "name": "Collision native filename number 04.bin",
+          "alias": "CO483D~1.BIN",
+          "size": 1212,
+          "tag": 119
+        },
+        {
+          "name": "Collision native filename number 05.bin",
+          "alias": "COF209~1.BIN",
+          "size": 1213,
+          "tag": 120
+        },
+        {
+          "name": "Collision native filename number 06.bin",
+          "alias": "COADC4~1.BIN",
+          "size": 1214,
+          "tag": 121
+        },
+        {
+          "name": "Collision native filename number 07.bin",
+          "alias": "COB76F~1.BIN",
+          "size": 1215,
+          "tag": 122
+        },
+        {
+          "name": "Collision native filename number 08.bin",
+          "alias": "CO036C~1.BIN",
+          "size": 1216,
+          "tag": 123
+        },
+        {
+          "name": "Collision native filename number 09.bin",
+          "alias": "CO52D7~1.BIN",
+          "size": 1217,
+          "tag": 124
+        },
+        {
+          "name": "Collision native filename number 10.bin",
+          "alias": "CO17AD~1.BIN",
+          "size": 1218,
+          "tag": 125
+        },
+        {
+          "name": "Collision native filename number 11.bin",
+          "alias": "COA32E~1.BIN",
+          "size": 1219,
+          "tag": 126
+        },
+        {
+          "name": "Collision native filename number 12.bin",
+          "alias": "COB116~1.BIN",
+          "size": 1220,
+          "tag": 127
+        },
+        {
+          "name": "Collision native filename number 13.bin",
+          "alias": "CO074A~1.BIN",
+          "size": 1221,
+          "tag": 128
+        },
+        {
+          "name": "Collision library filename number 00.bin",
+          "alias": "COLLIS~5.BIN"
+        },
+        {
+          "name": "Collision library filename number 01.bin",
+          "alias": "COLLIS~6.BIN"
+        },
+        {
+          "name": "Collision library filename number 02.bin",
+          "alias": "COLLIS~7.BIN"
+        },
+        {
+          "name": "Collision library filename number 03.bin",
+          "alias": "COLLIS~8.BIN"
+        },
+        {
+          "name": "Collision library filename number 04.bin",
+          "alias": "COLLIS~9.BIN"
+        },
+        {
+          "name": "Collision library filename number 05.bin",
+          "alias": "COLLI~10.BIN"
+        },
+        {
+          "name": "Collision library filename number 06.bin",
+          "alias": "COLLI~11.BIN"
+        },
+        {
+          "name": "Collision library filename number 07.bin",
+          "alias": "COLLI~12.BIN"
+        },
+        {
+          "name": "Collision library filename number 08.bin",
+          "alias": "COLLI~13.BIN"
+        },
+        {
+          "name": "Collision library filename number 09.bin",
+          "alias": "COLLI~14.BIN"
+        },
+        {
+          "name": "Collision library filename number 10.bin",
+          "alias": "COLLI~15.BIN"
+        },
+        {
+          "name": "Collision library filename number 11.bin",
+          "alias": "COLLI~16.BIN"
+        },
+        {
+          "name": "Collision library filename number 12.bin",
+          "alias": "COLLI~17.BIN"
+        },
+        {
+          "name": "Collision library filename number 13.bin",
+          "alias": "COLLI~18.BIN"
+        }
+      ],
+      "footer_sha256": "BF847777C6B5CE4CAEA3C77BF971D3409EF3982642D705300116A07E0FAADAC4"
+    }
+  ],
+  "chkdsk_checks": [
+    {
+      "name": "baseline-chkdsk-512",
+      "exit_code": 0
+    },
+    {
+      "name": "after-library-chkdsk-512",
+      "exit_code": 0
+    },
+    {
+      "name": "after-native-write-chkdsk-512",
+      "exit_code": 0
+    },
+    {
+      "name": "final-chkdsk-512",
+      "exit_code": 0
+    },
+    {
+      "name": "baseline-chkdsk-4096",
+      "exit_code": 0
+    },
+    {
+      "name": "after-library-chkdsk-4096",
+      "exit_code": 0
+    },
+    {
+      "name": "after-native-write-chkdsk-4096",
+      "exit_code": 0
+    },
+    {
+      "name": "final-chkdsk-4096",
+      "exit_code": 0
+    },
+    {
+      "name": "baseline-chkdsk-default",
+      "exit_code": 0
+    },
+    {
+      "name": "after-library-chkdsk-default",
+      "exit_code": 0
+    },
+    {
+      "name": "after-native-write-chkdsk-default",
+      "exit_code": 0
+    },
+    {
+      "name": "final-chkdsk-default",
+      "exit_code": 0
+    }
+  ],
+  "layouts_identical": 24,
+  "default_sizes": [
+    {
+      "bits": 16,
+      "short_enums": false,
+      "int_bytes": 2,
+      "pointer_bytes": 2,
+      "afatfs_t": 3544,
+      "afatfsFile_t": 340,
+      "afatfsRequest_t": 680,
+      "afatfsDirectory_t": 46,
+      "afatfsTruncateFile_t": 40
+    },
+    {
+      "bits": 16,
+      "short_enums": true,
+      "int_bytes": 2,
+      "pointer_bytes": 2,
+      "afatfs_t": 3524,
+      "afatfsFile_t": 338,
+      "afatfsRequest_t": 680,
+      "afatfsDirectory_t": 46,
+      "afatfsTruncateFile_t": 38
+    },
+    {
+      "bits": 32,
+      "short_enums": false,
+      "int_bytes": 4,
+      "pointer_bytes": 4,
+      "afatfs_t": 3644,
+      "afatfsFile_t": 356,
+      "afatfsRequest_t": 708,
+      "afatfsDirectory_t": 52,
+      "afatfsTruncateFile_t": 48
+    },
+    {
+      "bits": 64,
+      "short_enums": false,
+      "int_bytes": 4,
+      "pointer_bytes": 8,
+      "afatfs_t": 3728,
+      "afatfsFile_t": 376,
+      "afatfsRequest_t": 760,
+      "afatfsDirectory_t": 64,
+      "afatfsTruncateFile_t": 56
+    }
+  ],
+  "cleanup": {
+    "status": "passed",
+    "images": [
+      {
+        "name": "512",
+        "attached": false,
+        "footerSha256": "9782853F770E9C9313FCAA9FC1EF7B082F22980F0717F27021053D92380D52D1"
+      },
+      {
+        "name": "4096",
+        "attached": false,
+        "footerSha256": "CAF331FFFE479A5B1D47DEC782918773EA7F148097E0407AA4ADE05EABA927D5"
+      },
+      {
+        "name": "default",
+        "attached": false,
+        "footerSha256": "BF847777C6B5CE4CAEA3C77BF971D3409EF3982642D705300116A07E0FAADAC4"
+      }
+    ]
+  }
+}

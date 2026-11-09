@@ -59,11 +59,22 @@ static void nativeApiWrite(afatfsFilePtr_t file, uint32_t count, unsigned tag)
         offset += amount;
     }
 }
+static void nativeApiStat(afatfsFilePtr_t file, afatfsFileInfo_t *info)
+{
+    afatfsOperationStatus_e status;
+    for (unsigned retry = 0; (status = afatfs_fstat(file, info)) == AFATFS_OPERATION_IN_PROGRESS; retry++) {
+        CHECK(retry < MAX_POLLS);
+        pump();
+    }
+    CHECK(status == AFATFS_OPERATION_SUCCESS);
+}
+
 static void nativeApiVerify(const char *name, uint32_t count, unsigned tag)
 {
     afatfsFilePtr_t file = nativeApiOpen(name, "r");
     afatfsFileInfo_t info;
-    CHECK(afatfs_fstat(file, &info) == AFATFS_OPERATION_SUCCESS && info.size == count);
+    nativeApiStat(file, &info);
+    CHECK(info.size == count);
     uint8_t buffer[777];
     for (uint32_t offset = 0; offset < count;) {
         uint32_t amount = count - offset < sizeof(buffer) ? count - offset : sizeof(buffer);
@@ -180,7 +191,8 @@ static void verifyNativeApiRoundtrip(unsigned clusterSize)
     NATIVE_API(
         afatfs_stat(&nativeRequest, "api renamed file.bin", &info, nativeApiDone, &context), AFATFS_ERROR_NOT_FOUND);
     afatfsFilePtr_t file = nativeApiOpen("api preallocated.bin", "r");
-    CHECK(afatfs_fstat(file, &info) == AFATFS_OPERATION_SUCCESS && info.size == clusterSize * 4 + 220);
+    nativeApiStat(file, &info);
+    CHECK(info.size == clusterSize * 4 + 220);
     uint8_t buffer[777];
     uint32_t size = info.size;
     uint32_t original = clusterSize * 3 + 123;

@@ -1,0 +1,59 @@
+{
+  "status": "passed",
+  "rows": [
+    {
+      "bits": 16,
+      "short_enums": false,
+      "old_default": 9380,
+      "new_default": 3544,
+      "default_saved": 5836,
+      "fat_sfn": 2520,
+      "lfn_global_cost": 1024,
+      "sfn_handle": 84,
+      "lfn_handle": 340,
+      "directory": 46,
+      "request": 680
+    },
+    {
+      "bits": 16,
+      "short_enums": true,
+      "old_default": 9376,
+      "new_default": 3524,
+      "default_saved": 5852,
+      "fat_sfn": 2500,
+      "lfn_global_cost": 1024,
+      "sfn_handle": 82,
+      "lfn_handle": 338,
+      "directory": 46,
+      "request": 680
+    },
+    {
+      "bits": 32,
+      "short_enums": false,
+      "old_default": 9692,
+      "new_default": 3644,
+      "default_saved": 6048,
+      "fat_sfn": 2636,
+      "lfn_global_cost": 1008,
+      "sfn_handle": 104,
+      "lfn_handle": 356,
+      "directory": 52,
+      "request": 708
+    },
+    {
+      "bits": 64,
+      "short_enums": false,
+      "old_default": 9824,
+      "new_default": 3728,
+      "default_saved": 6096,
+      "fat_sfn": 2736,
+      "lfn_global_cost": 992,
+      "sfn_handle": 128,
+      "lfn_handle": 376,
+      "directory": 64,
+      "request": 760
+    }
+  ],
+  "before_sha256": "70b23d9c6d4e87fd3cbd97e93d50735b39989fb4029a892f4185513e2fce8c88",
+  "after_sha256": "c6056942258af61d411f16220149df5c2e4b5607311551a40f95eda29270f2c4"
+}

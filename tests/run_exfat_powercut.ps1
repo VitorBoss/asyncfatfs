@@ -21,7 +21,7 @@ try {
     $suffix = if ($AddressSanitizer) { '_asan' } else { '' }
     $binary = if ($Api) { "tests/build/test_exfat_api_powercut$suffix.exe" } else { "tests/build/test_exfat_powercut$suffix.exe" }
     $sanitizerFlags = if ($AddressSanitizer) { '/fsanitize=address /Zi /Fdtests\build\powercut_asan.pdb' } else { '' }
-    & cmd /c "`"$vcvars`" >nul && cl /nologo /std:c11 /W3 /WX /D_CRT_SECURE_NO_WARNINGS $sanitizerFlags /Ilib /Itests tests\test_exfat_powercut.c lib\asyncfatfs.c lib\fat_standard.c /Fotests\build\ /Fe$binary /link /INCREMENTAL:NO"
+    & cmd /c "`"$vcvars`" >nul && cl /nologo /std:c11 /W3 /WX /D_CRT_SECURE_NO_WARNINGS /DAFATFS_EXTERNAL_CONFIG /Itests\config\exfat_only $sanitizerFlags /Ilib /Itests tests\test_exfat_powercut.c lib\asyncfatfs.c lib\fat_standard.c /Fotests\build\ /Fe$binary /link /INCREMENTAL:NO"
     if ($LASTEXITCODE) { throw 'Power-cut harness compilation failed.' }
     $savedPath = $env:PATH
     if ($AddressSanitizer) {

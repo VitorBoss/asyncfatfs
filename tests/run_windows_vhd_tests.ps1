@@ -199,7 +199,7 @@ if (!$ElevatedWorker) {
     $vcvars = Join-Path $vs 'VC/Auxiliary/Build/vcvars64.bat'
     Push-Location $repository
     try {
-        & cmd /c "`"$vcvars`" >nul && cl /nologo /std:c11 /W3 /WX /D_CRT_SECURE_NO_WARNINGS /Ilib /Itests tests\test_exfat_external.c tests\sdcard_sim.c lib\asyncfatfs.c lib\fat_standard.c /Fo`"$runDirectory\\`" /Fe`"$binary`" /link /INCREMENTAL:NO"
+        & cmd /c "`"$vcvars`" >nul && cl /nologo /std:c11 /W3 /WX /D_CRT_SECURE_NO_WARNINGS /DAFATFS_EXTERNAL_CONFIG /Itests\config\exfat_only /Ilib /Itests tests\test_exfat_external.c tests\sdcard_sim.c lib\asyncfatfs.c lib\fat_standard.c /Fo`"$runDirectory\\`" /Fe`"$binary`" /link /INCREMENTAL:NO"
         if ($LASTEXITCODE) { throw 'Workload compilation failed.' }
     } finally { Pop-Location }
     $shell = (Get-Process -Id $PID).Path

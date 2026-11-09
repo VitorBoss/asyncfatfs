@@ -32,6 +32,14 @@ LAYOUT_ASSERT(check_exfat_cluster_offset, offsetof(exFatStreamEntry_t, firstClus
 LAYOUT_ASSERT(check_boot_shift_offset, offsetof(fatVolumeID_t, exFat.bytesPerSectorShift) == 108);
 LAYOUT_ASSERT(check_extend_prefix, offsetof(afatfsExtendSubdirectory_t, appendFreeCluster) == 0);
 LAYOUT_ASSERT(check_unlink_prefix, offsetof(afatfsUnlinkFile_t, truncateFile) == 0);
+#ifdef ASYNCFS_ENABLE_LFN
+LAYOUT_ASSERT(check_lfn_cluster, MEMBER_ALIGNED(afatfsFile_t, lfnCluster, uint32_t));
+LAYOUT_ASSERT(check_lfn_offset, MEMBER_ALIGNED(afatfsFile_t, lfnOffset, uint32_t));
+LAYOUT_ASSERT(check_lfn_output, MEMBER_ALIGNED(afatfsFile_t, lfnOutput, afatfsFileInfo_t *));
+LAYOUT_ASSERT(check_lfn_alias, MEMBER_ALIGNED(afatfsCreateFile_t, location, uint32_t));
+LAYOUT_ASSERT(check_lfn_entry_size, sizeof(fatLfnDirectoryEntry_t) == 32);
+LAYOUT_ASSERT(check_lfn_cluster_offset, offsetof(fatLfnDirectoryEntry_t, lfnAlwaysZero) == 26);
+#endif
 #ifdef __XC16__
 LAYOUT_ASSERT(check_16bit_int, sizeof(int) == 2);
 #endif
@@ -97,6 +105,28 @@ LAYOUT_ASSERT(check_journal_cluster, MEMBER_ALIGNED(afatfsJournal_t, firstCluste
     APPLY(fsInfoDirty)
 #endif
 
+#ifdef ASYNCFS_ENABLE_LFN
+#undef CREATE_FLAGS
+#define CREATE_FLAGS(APPLY)                                                                                            \
+    APPLY(directory)                                                                                                   \
+    APPLY(directoryEnd)
+#undef FILE_FLAGS
+#ifdef ASYNCFS_ENABLE_EXFAT
+#define FILE_FLAGS(APPLY)                                                                                              \
+    APPLY(modified)                                                                                                    \
+    APPLY(lfnAscii)                                                                                                    \
+    APPLY(exfatNoFatChain)                                                                                             \
+    APPLY(dataDirty)
+#else
+#define FILE_FLAGS(APPLY)                                                                                              \
+    APPLY(modified)                                                                                                    \
+    APPLY(lfnAscii)
+#endif
+#define LONGNAME_FLAGS(APPLY)                                                                                          \
+    APPLY(matched)                                                                                                     \
+    APPLY(ascii)
+#endif
+
 #define COUNT_FLAG(member) +1
 #define STORE_FLAG(member)                                                                                             \
     do {                                                                                                               \
@@ -137,6 +167,9 @@ DEFINE_FLAG_TEST(check_truncate_flags, afatfsTruncateFile_t, TRUNCATE_FLAGS)
 DEFINE_FLAG_TEST(check_create_flags, afatfsCreateFile_t, CREATE_FLAGS)
 DEFINE_FLAG_TEST(check_file_flags, afatfsFile_t, FILE_FLAGS)
 DEFINE_FLAG_TEST(check_filesystem_flags, afatfs_t, FILESYSTEM_FLAGS)
+#ifdef ASYNCFS_ENABLE_LFN
+DEFINE_FLAG_TEST(check_longname_flags, afatfsLongNameState_t, LONGNAME_FLAGS)
+#endif
 #ifdef ASYNCFS_ENABLE_EXFAT
 DEFINE_FLAG_TEST(check_gpt_flags, afatfsGpt_t, GPT_FLAGS)
 DEFINE_FLAG_TEST(check_journal_flags, afatfsJournal_t, JOURNAL_FLAGS)
@@ -168,6 +201,9 @@ int main(void)
     result |= check_create_flags();
     result |= check_file_flags();
     result |= check_filesystem_flags();
+#ifdef ASYNCFS_ENABLE_LFN
+    result |= check_longname_flags();
+#endif
 #ifdef ASYNCFS_ENABLE_EXFAT
     result |= check_gpt_flags();
     result |= check_journal_flags();

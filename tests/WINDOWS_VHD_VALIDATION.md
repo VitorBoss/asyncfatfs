@@ -1,5 +1,7 @@
 # Native Windows exFAT validation
 
+FAT32/LFN results are recorded separately in [native FAT32 validation](WINDOWS_FAT32_LFN_VALIDATION.md).
+
 Validated on 2026-11-06 using the native Windows storage stack, .NET file I/O,
 `Format-Volume` and `chkdsk.exe`. The OS reported `Microsoft Windows NT 10.0.26300.0`;
 the installed exFAT driver version was `10.0.26100.9711`.

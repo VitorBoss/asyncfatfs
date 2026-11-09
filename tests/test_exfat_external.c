@@ -233,16 +233,27 @@ static void exercise(unsigned clusterSize)
     verifyDirectory("Library directory", clusterSize);
 }
 #include "exfat_native_api.inc"
+#ifdef TEST_NATIVE_LFN
+#include "fat_lfn_native.inc"
+#endif
 
 int main(int argc, char **argv)
 {
     setvbuf(stdout, NULL, _IONBF, 0);
-    CHECK(argc == 4);
+    CHECK(argc == 4 || argc == 5);
     unsigned clusterSize = (unsigned)strtoul(argv[3], NULL, 10);
     CHECK(clusterSize >= 512 && clusterSize <= 65536);
     CHECK(sdcard_sim_init(argv[1]));
     mountImage();
-    if (strcmp(argv[2], "exercise") == 0) {
+#ifdef TEST_NATIVE_LFN
+    if (strcmp(argv[2], "exercise-lfn") == 0) {
+        CHECK(argc == 5);
+        exerciseNativeLfn(clusterSize, argv[4]);
+    } else if (strcmp(argv[2], "verify-lfn-roundtrip") == 0) {
+        verifyNativeLfnRoundtrip();
+    } else
+#endif
+        if (strcmp(argv[2], "exercise") == 0) {
         exercise(clusterSize);
     } else if (strcmp(argv[2], "exercise-api") == 0) {
         exerciseNativeApi(clusterSize);
