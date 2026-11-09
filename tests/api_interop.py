@@ -4,11 +4,13 @@ Only regular image files are accessed. FATtools supplies an independent parser
 and chain reader; exfatprogs additionally checks exFAT allocation/entry integrity.
 """
 import argparse
+import hashlib
+from importlib.metadata import version
 import json
 import struct
 from pathlib import Path
 
-from exfat_interop import (COMMAND_LOG, Chain, check_volume, close_volume,
+from exfat_interop import (ROOT, COMMAND_LOG, Chain, check_volume, close_volume,
                            extract, pattern, volume)
 
 
@@ -17,10 +19,28 @@ def main():
     parser.add_argument("--images", type=Path, default=Path("tests/build/api-images"))
     parser.add_argument("--exfatprogs", type=Path, help="Also run fsck.exfat; omit for FATtools-only verification")
     args = parser.parse_args()
-    results = []
+    report = {"status": "incomplete", "results": [], "fsck_requested": bool(args.exfatprogs),
+              "fattools_version": version("FATtools"), "commands": COMMAND_LOG,
+              "source_sha256": {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
+                                for path in sorted((ROOT / "lib").glob("*"))
+                                if path.suffix in (".c", ".h", ".inc")}}
+    if args.exfatprogs:
+        report["exfatprogs_sha256"] = hashlib.sha256(args.exfatprogs.read_bytes()).hexdigest()
+    try:
+        verify_images(args, report)
+        report["status"] = "passed"
+    finally:
+        # Failed checks must replace older success reports and retain the tool's exit code.
+        (args.images / "verification.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+
+
+def verify_images(args, report):
     for kind, scheme in ((2, "mbr"), (3, "mbr"), (4, "mbr"), (4, "gpt")):
         disk = args.images / f"api-fat{kind}-{scheme}.img"
         partition = args.images / f"volume-fat{kind}-{scheme}.img"
+        result = {"type": kind, "scheme": scheme, "verified": False,
+                  "image_sha256": hashlib.sha256(disk.read_bytes()).hexdigest()}
+        report["results"].append(result)
         extract(disk, partition)
         root = volume(partition)
         try:
@@ -40,17 +60,14 @@ def main():
         finally:
             close_volume(root)
         if kind == 4 and args.exfatprogs:
-            check_volume(args.exfatprogs, partition)
+            result["fsck"] = check_volume(args.exfatprogs, partition).strip()
         elif kind == 3:
             with partition.open("rb") as image:
                 for sector in (1, 7):
                     image.seek(sector * 512 + 488)
                     assert struct.unpack("<II", image.read(8)) == (0xFFFFFFFF, 0xFFFFFFFF)
-        results.append({"type": kind, "scheme": scheme, "bytes": size,
-                        "modified": hex(modified), "verified": True})
+        result.update(bytes=size, modified=hex(modified), verified=True)
         print(f"Verified FAT type {kind}/{scheme}: payload, size and timestamp")
-    report = {"results": results, "fsck_requested": bool(args.exfatprogs), "commands": COMMAND_LOG}
-    (args.images / "verification.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
 
 
 if __name__ == "__main__":

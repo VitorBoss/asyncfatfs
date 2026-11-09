@@ -17,7 +17,7 @@
 static FILE *simFile;
 
 #define SDCARD_SIM_WRITE_DELAY 4
-#define SDCARD_SIM_READ_DELAY  1
+#define SDCARD_SIM_READ_DELAY 1
 
 #define SDCARD_SIM_BLOCK_SIZE 512
 
@@ -54,7 +54,7 @@ static struct {
  */
 static uint32_t getCurrentTime()
 {
-    return ((uint64_t) clock() * 1000000) / CLOCKS_PER_SEC;
+    return ((uint64_t)clock() * 1000000) / CLOCKS_PER_SEC;
 }
 
 bool sdcard_sim_init(const char *filename)
@@ -92,16 +92,19 @@ void sdcard_reset(void)
 static void sdcard_continueReadBlock()
 {
     if (--sdcard.currentOperation.countdownTimer <= 0) {
-        uint64_t byteIndex = (uint64_t) sdcard.currentOperation.blockIndex * SDCARD_SIM_BLOCK_SIZE;
+        uint64_t byteIndex = (uint64_t)sdcard.currentOperation.blockIndex * SDCARD_SIM_BLOCK_SIZE;
 
         fseeko(simFile, byteIndex, SEEK_SET);
 
-        if (fread(sdcard.currentOperation.buffer, sizeof(uint8_t), SDCARD_SIM_BLOCK_SIZE, simFile) == SDCARD_SIM_BLOCK_SIZE) {
+        if (fread(sdcard.currentOperation.buffer, sizeof(uint8_t), SDCARD_SIM_BLOCK_SIZE, simFile) ==
+            SDCARD_SIM_BLOCK_SIZE) {
             if (sdcard.currentOperation.callback) {
-                sdcard.currentOperation.callback(SDCARD_BLOCK_OPERATION_READ, sdcard.currentOperation.blockIndex, sdcard.currentOperation.buffer, sdcard.currentOperation.callbackData);
+                sdcard.currentOperation.callback(SDCARD_BLOCK_OPERATION_READ, sdcard.currentOperation.blockIndex,
+                    sdcard.currentOperation.buffer, sdcard.currentOperation.callbackData);
             }
             if (sdcard.profiler) {
-                sdcard.profiler(SDCARD_BLOCK_OPERATION_READ, sdcard.currentOperation.blockIndex, getCurrentTime() - sdcard.currentOperation.startTime);
+                sdcard.profiler(SDCARD_BLOCK_OPERATION_READ, sdcard.currentOperation.blockIndex,
+                    getCurrentTime() - sdcard.currentOperation.startTime);
             }
         } else {
             fprintf(stderr, "SDCardSim: fread failed on underlying file\n");
@@ -115,11 +118,12 @@ static void sdcard_continueReadBlock()
 static void sdcard_continueWriteBlock()
 {
     if (--sdcard.currentOperation.countdownTimer <= 0) {
-        uint64_t byteIndex = (uint64_t) sdcard.currentOperation.blockIndex * SDCARD_SIM_BLOCK_SIZE;
+        uint64_t byteIndex = (uint64_t)sdcard.currentOperation.blockIndex * SDCARD_SIM_BLOCK_SIZE;
 
         fseeko(simFile, byteIndex, SEEK_SET);
 
-        if (fwrite(sdcard.currentOperation.buffer, sizeof(uint8_t), SDCARD_SIM_BLOCK_SIZE, simFile) == SDCARD_SIM_BLOCK_SIZE) {
+        if (fwrite(sdcard.currentOperation.buffer, sizeof(uint8_t), SDCARD_SIM_BLOCK_SIZE, simFile) ==
+            SDCARD_SIM_BLOCK_SIZE) {
             if (sdcard.multiWriteBlocksRemain > 1) {
                 sdcard.multiWriteBlocksRemain--;
                 sdcard.multiWriteNextBlock++;
@@ -135,16 +139,17 @@ static void sdcard_continueWriteBlock()
             }
 
             if (sdcard.currentOperation.callback) {
-                sdcard.currentOperation.callback(SDCARD_BLOCK_OPERATION_WRITE, sdcard.currentOperation.blockIndex, sdcard.currentOperation.buffer, sdcard.currentOperation.callbackData);
+                sdcard.currentOperation.callback(SDCARD_BLOCK_OPERATION_WRITE, sdcard.currentOperation.blockIndex,
+                    sdcard.currentOperation.buffer, sdcard.currentOperation.callbackData);
             }
             if (sdcard.profiler) {
-                sdcard.profiler(SDCARD_BLOCK_OPERATION_WRITE, sdcard.currentOperation.blockIndex, getCurrentTime() - sdcard.currentOperation.startTime);
+                sdcard.profiler(SDCARD_BLOCK_OPERATION_WRITE, sdcard.currentOperation.blockIndex,
+                    getCurrentTime() - sdcard.currentOperation.startTime);
             }
         } else {
             fprintf(stderr, "SDCardSim: fwrite failed on underlying file\n");
             exit(-1);
         }
-
     }
 }
 
@@ -154,7 +159,8 @@ sdcardOperationStatus_e sdcard_endWriteBlocks()
         case SDCARD_STATE_WRITING_MULTIPLE_BLOCKS:
 #ifdef AFATFS_DEBUG_VERBOSE
             if (sdcard.multiWriteBlocksRemain > 0) {
-                fprintf(stderr, "SD card - Terminated multiple block write with %u still remaining\n", sdcard.multiWriteBlocksRemain);
+                fprintf(stderr, "SD card - Terminated multiple block write with %u still remaining\n",
+                    sdcard.multiWriteBlocksRemain);
             } else {
                 fprintf(stderr, "SD card - Finished multiple block write\n");
             }
@@ -165,17 +171,18 @@ sdcardOperationStatus_e sdcard_endWriteBlocks()
 
             // Fall through
 
-       case SDCARD_STATE_READY:
+        case SDCARD_STATE_READY:
             return SDCARD_OPERATION_SUCCESS;
 
-       default:
+        default:
             return SDCARD_OPERATION_BUSY;
     }
 }
 
-bool sdcard_readBlock(uint32_t blockIndex, uint8_t *buffer, sdcard_operationCompleteCallback_c callback, uint32_t callbackData)
+bool sdcard_readBlock(
+    uint32_t blockIndex, uint8_t *buffer, sdcard_operationCompleteCallback_c callback, uint32_t callbackData)
 {
-    uint64_t byteIndex = (uint64_t) blockIndex * SDCARD_SIM_BLOCK_SIZE;
+    uint64_t byteIndex = (uint64_t)blockIndex * SDCARD_SIM_BLOCK_SIZE;
 
     if (sdcard.state != SDCARD_STATE_READY) {
         if (sdcard.state == SDCARD_STATE_WRITING_MULTIPLE_BLOCKS) {
@@ -190,7 +197,8 @@ bool sdcard_readBlock(uint32_t blockIndex, uint8_t *buffer, sdcard_operationComp
 #endif
 
     if (byteIndex >= sdcard.capacity) {
-        fprintf(stderr, "SDCardSim: Attempted to read from %" PRIu64 " but capacity is %" PRIu64 "\n", byteIndex, sdcard.capacity);
+        fprintf(stderr, "SDCardSim: Attempted to read from %" PRIu64 " but capacity is %" PRIu64 "\n", byteIndex,
+            sdcard.capacity);
         exit(-1);
     }
 
@@ -210,9 +218,10 @@ bool sdcard_readBlock(uint32_t blockIndex, uint8_t *buffer, sdcard_operationComp
     return true;
 }
 
-sdcardOperationStatus_e sdcard_writeBlock(uint32_t blockIndex, uint8_t *buffer, sdcard_operationCompleteCallback_c callback, uint32_t callbackData)
+sdcardOperationStatus_e sdcard_writeBlock(
+    uint32_t blockIndex, uint8_t *buffer, sdcard_operationCompleteCallback_c callback, uint32_t callbackData)
 {
-    uint64_t byteIndex = (uint64_t) blockIndex * SDCARD_SIM_BLOCK_SIZE;
+    uint64_t byteIndex = (uint64_t)blockIndex * SDCARD_SIM_BLOCK_SIZE;
 
     if (sdcard.state != SDCARD_STATE_READY) {
         if (sdcard.state == SDCARD_STATE_WRITING_MULTIPLE_BLOCKS) {
@@ -229,7 +238,8 @@ sdcardOperationStatus_e sdcard_writeBlock(uint32_t blockIndex, uint8_t *buffer, 
 #endif
 
     if (byteIndex >= sdcard.capacity) {
-        fprintf(stderr, "SDCardSim: Attempted to write to block at %" PRIu64 " but capacity is %" PRIu64 "\n", byteIndex, sdcard.capacity);
+        fprintf(stderr, "SDCardSim: Attempted to write to block at %" PRIu64 " but capacity is %" PRIu64 "\n",
+            byteIndex, sdcard.capacity);
         exit(-1);
     }
 
@@ -251,7 +261,7 @@ sdcardOperationStatus_e sdcard_writeBlock(uint32_t blockIndex, uint8_t *buffer, 
 
 sdcardOperationStatus_e sdcard_beginWriteBlocks(uint32_t blockIndex, uint32_t blockCount)
 {
-    uint64_t byteIndex = (uint64_t) blockIndex * SDCARD_SIM_BLOCK_SIZE;
+    uint64_t byteIndex = (uint64_t)blockIndex * SDCARD_SIM_BLOCK_SIZE;
 
     if (sdcard.state != SDCARD_STATE_READY) {
         if (sdcard.state == SDCARD_STATE_WRITING_MULTIPLE_BLOCKS) {
@@ -267,7 +277,9 @@ sdcardOperationStatus_e sdcard_beginWriteBlocks(uint32_t blockIndex, uint32_t bl
     }
 
     if (byteIndex + blockCount * SDCARD_SIM_BLOCK_SIZE > sdcard.capacity) {
-        fprintf(stderr, "SDCardSim: Attempted to write to multi-block write at %" PRIu64 " but capacity is %" PRIu64 "\n", byteIndex + blockCount * SDCARD_SIM_BLOCK_SIZE, sdcard.capacity);
+        fprintf(stderr,
+            "SDCardSim: Attempted to write to multi-block write at %" PRIu64 " but capacity is %" PRIu64 "\n",
+            byteIndex + blockCount * SDCARD_SIM_BLOCK_SIZE, sdcard.capacity);
         exit(-1);
     }
 
@@ -287,14 +299,14 @@ sdcardOperationStatus_e sdcard_beginWriteBlocks(uint32_t blockIndex, uint32_t bl
      */
     uint8_t garbageBuffer[SDCARD_SIM_BLOCK_SIZE];
 
-    for (uint32_t i = 0 ; i < SDCARD_SIM_BLOCK_SIZE; i++) {
+    for (uint32_t i = 0; i < SDCARD_SIM_BLOCK_SIZE; i++) {
         garbageBuffer[i] = i | 1;
     }
 
     fseeko(simFile, byteIndex, SEEK_SET);
 
     for (uint32_t i = 0; i < blockCount; i++) {
-        fwrite((char*) garbageBuffer, sizeof(uint8_t), SDCARD_SIM_BLOCK_SIZE, simFile);
+        fwrite((char *)garbageBuffer, sizeof(uint8_t), SDCARD_SIM_BLOCK_SIZE, simFile);
     }
 
     return SDCARD_OPERATION_SUCCESS;
@@ -310,12 +322,11 @@ bool sdcard_poll()
     switch (sdcard.state) {
         case SDCARD_STATE_READING:
             sdcard_continueReadBlock();
-        break;
+            break;
         case SDCARD_STATE_WRITING:
             sdcard_continueWriteBlock();
-        break;
-        default:
-            ;
+            break;
+        default:;
     }
 
     return sdcard_sim_isReady();

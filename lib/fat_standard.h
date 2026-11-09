@@ -13,10 +13,10 @@
 //https://wiki.osdev.org/FAT#FAT_32
 //https://www.ntfs.com/exfat-overview.htm
 //https://www.ntfs.com/fat-filenames.htm
-#define MBR_PARTITION_TYPE_EXFAT     0x07
-#define MBR_PARTITION_TYPE_GPT       0xEE
-#define MBR_PARTITION_TYPE_FAT16     0x06
-#define MBR_PARTITION_TYPE_FAT32     0x0B
+#define MBR_PARTITION_TYPE_EXFAT 0x07
+#define MBR_PARTITION_TYPE_GPT 0xEE
+#define MBR_PARTITION_TYPE_FAT16 0x06
+#define MBR_PARTITION_TYPE_FAT32 0x0B
 #define MBR_PARTITION_TYPE_FAT32_LBA 0x0C
 #define MBR_PARTITION_TYPE_FAT16_LBA 0x0E
 
@@ -33,12 +33,12 @@
 #define FAT16_MAX_CLUSTERS 65524
 
 #define FAT_FILE_ATTRIBUTE_READ_ONLY 0x01
-#define FAT_FILE_ATTRIBUTE_HIDDEN    0x02
-#define FAT_FILE_ATTRIBUTE_SYSTEM    0x04
+#define FAT_FILE_ATTRIBUTE_HIDDEN 0x02
+#define FAT_FILE_ATTRIBUTE_SYSTEM 0x04
 #define FAT_FILE_ATTRIBUTE_VOLUME_ID 0x08
-#define FAT_FILE_ATTRIBUTE_LONGNAME  0x0F
+#define FAT_FILE_ATTRIBUTE_LONGNAME 0x0F
 #define FAT_FILE_ATTRIBUTE_DIRECTORY 0x10
-#define FAT_FILE_ATTRIBUTE_ARCHIVE   0x20
+#define FAT_FILE_ATTRIBUTE_ARCHIVE 0x20
 
 #define FAT_FILENAME_LENGTH 11
 #define FAT_DELETED_FILE_MARKER 0xE5
@@ -46,15 +46,15 @@
 #define FAT_LONG_FILENAME_ENTRY 0x40
 
 // exFAT directory entry types
-#define	EXFAT_DIR_MASK	    0x80	// Allocation bit mask
-#define	EXFAT_DIR_BITMAP	0x81	// Allocation bitmap
-#define	EXFAT_DIR_UPCASE	0x82	// Up-case table
-#define	EXFAT_DIR_VLABEL	0x83	// Volume label
-#define	EXFAT_DIR_FILEDIR	0x85	// File and directory
-#define	EXFAT_DIR_STREAM	0xC0	// Stream extension
-#define	EXFAT_DIR_FILENAME	0xC1	// Name extension
+#define EXFAT_DIR_MASK 0x80     // Allocation bit mask
+#define EXFAT_DIR_BITMAP 0x81   // Allocation bitmap
+#define EXFAT_DIR_UPCASE 0x82   // Up-case table
+#define EXFAT_DIR_VLABEL 0x83   // Volume label
+#define EXFAT_DIR_FILEDIR 0x85  // File and directory
+#define EXFAT_DIR_STREAM 0xC0   // Stream extension
+#define EXFAT_DIR_FILENAME 0xC1 // Name extension
 
-#define FAT_MAKE_DATE(year, month, day)     (day | (month << 5) | ((year - 1980) << 9))
+#define FAT_MAKE_DATE(year, month, day) (day | (month << 5) | ((year - 1980) << 9))
 #define FAT_MAKE_TIME(hour, minute, second) ((second / 2) | (minute << 5) | (hour << 11))
 
 typedef enum {
@@ -119,23 +119,23 @@ typedef struct bpbFat_t {
 } FAT_PACKED bpbFat_t;
 
 typedef struct bpbExFat_t {
-  uint8_t mustBeZero[53];
-  uint64_t partitionOffset;
-  uint64_t volumeLength;
-  uint32_t fatOffset;
-  uint32_t fatLength;
-  uint32_t clusterHeapOffset;
-  uint32_t clusterCount;
-  uint32_t rootDirectoryCluster;
-  uint32_t volumeSerialNumber;
-  uint16_t fileSystemRevision;
-  uint16_t volumeFlags;
-  uint8_t bytesPerSectorShift;
-  uint8_t sectorsPerClusterShift;
-  uint8_t numFATs;
-  uint8_t driveSelect;
-  uint8_t percentInUse;
-  uint8_t reserved[7];
+    uint8_t mustBeZero[53];
+    uint64_t partitionOffset;
+    uint64_t volumeLength;
+    uint32_t fatOffset;
+    uint32_t fatLength;
+    uint32_t clusterHeapOffset;
+    uint32_t clusterCount;
+    uint32_t rootDirectoryCluster;
+    uint32_t volumeSerialNumber;
+    uint16_t fileSystemRevision;
+    uint16_t volumeFlags;
+    uint8_t bytesPerSectorShift;
+    uint8_t sectorsPerClusterShift;
+    uint8_t numFATs;
+    uint8_t driveSelect;
+    uint8_t percentInUse;
+    uint8_t reserved[7];
 } FAT_PACKED bpbExFat_t;
 
 typedef struct fatVolumeID_t {
@@ -209,7 +209,7 @@ typedef struct exFatStreamEntry_t {
 typedef struct exFatFileNameEntry_t {
     uint8_t type;
     uint8_t flags;
-    char fileName[FAT_DIRECTORY_ENTRY_SIZE-2];
+    char fileName[FAT_DIRECTORY_ENTRY_SIZE - 2];
 } FAT_PACKED exFatFileNameEntry_t;
 
 typedef struct exFatUpTableEntry_t {
@@ -224,7 +224,7 @@ typedef struct exFatUpTableEntry_t {
 typedef struct exFatVolumeEntry_t {
     uint8_t type;
     uint8_t charCount;
-    char fileName[FAT_DIRECTORY_ENTRY_SIZE-10];
+    char fileName[FAT_DIRECTORY_ENTRY_SIZE - 10];
     uint8_t reserved[8];
 } FAT_PACKED exFatVolumeEntry_t;
 
@@ -240,16 +240,16 @@ bool fat_isDirectoryEntryTerminator(fatDirectoryEntry_t *entry);
 bool fat_isDirectoryEntryEmpty(fatDirectoryEntry_t *entry);
 bool fat_isVolumeLabel(fatDirectoryEntry_t *entry);
 
-bool fat_compareLongFileEntry (const char *fileName, fatLfnDirectoryEntry_t *entry);
+bool fat_compareLongFileEntry(const char *fileName, fatLfnDirectoryEntry_t *entry);
 bool fat_isLfnEntry(fatDirectoryEntry_t *entry);
 bool fat_isAvailableEntry(fatDirectoryEntry_t *entry, fatFilesystemType_e fileSystemType);
 
 void fat_convertFileNameToFATStyle(const char *fileName, uint8_t *fatFilename);
 void fat_convertLongFileNameToFATStyle(const char *fileName, uint8_t *fatFilename);
-uint8_t fat_createCheckSum (const char *fileName);
-uint16_t exFat_nameHash (const char *fileName);
-uint32_t exFat_upCaseTableCheckSum (const char *data, int size);
-uint16_t fat_unicodeToUpperCase (uint16_t uni);
+uint8_t fat_createCheckSum(const char *fileName);
+uint16_t exFat_nameHash(const char *fileName);
+uint32_t exFat_upCaseTableCheckSum(const char *data, int size);
+uint16_t fat_unicodeToUpperCase(uint16_t uni);
 
 uint16_t exFat_entrySetChecksum(const uint8_t *entries, unsigned int size);
 

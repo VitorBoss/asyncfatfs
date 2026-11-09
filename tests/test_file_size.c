@@ -111,27 +111,29 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
             logEntryIndex = 0;
 
             afatfs_fopen(filename, fileMode, filesizeTestFileCreatedForAppend, NULL);
-        break;
+            break;
         case FILESIZE_TEST_STAGE_APPEND:
             // Write just more than one sector of log entries
             if (writeLogTestEntries(filesizeFile, &logEntryIndex, logEntriesToWrite)) {
                 testAssert(afatfs_feof(filesizeFile), "feof() should be true after extending file with write");
-                testAssert(afatfs_ftell(filesizeFile, &logFileSize), "ftell() expected to work when no file operation queued");
+                testAssert(
+                    afatfs_ftell(filesizeFile, &logFileSize), "ftell() expected to work when no file operation queued");
                 testAssert(logFileSize == bytesToWrite, "Log file correct after writes within a cluster");
 
-                testAssert(afatfs_fseek(filesizeFile, 0, AFATFS_SEEK_END, NULL, NULL) == AFATFS_OPERATION_SUCCESS, "Seeks to end of file when we're already at end should be immediate");
+                testAssert(afatfs_fseek(filesizeFile, 0, AFATFS_SEEK_END, NULL, NULL) == AFATFS_OPERATION_SUCCESS,
+                    "Seeks to end of file when we're already at end should be immediate");
                 testAssert(afatfs_ftell(filesizeFile, &logFileSize), "ftell() should work after immediate seek");
                 testAssert(logFileSize == bytesToWrite, "fseek() seeked to the wrong position for AFATFS_SEEK_END");
 
                 filesizeStage = FILESIZE_TEST_STAGE_CLOSE;
             }
-        break;
+            break;
         case FILESIZE_TEST_STAGE_CLOSE:
             if (closeFileAndWait(filesizeFile)) {
                 filesizeStage = FILESIZE_TEST_STAGE_FLUSH;
                 return false; // Test is over now!
             }
-        break;
+            break;
         case FILESIZE_TEST_STAGE_FLUSH:
             // Wait for all the flushable data (completed sectors and updated directory entries) to make it to the disk
             if (afatfs_flush() && sdcard_sim_isReady()) {
@@ -143,92 +145,101 @@ bool continueFilesizeTest(bool start, const char *filename, const char *fileMode
 
                 filesizeStage = FILESIZE_TEST_STAGE_READ_OPEN;
             }
-        break;
+            break;
         case FILESIZE_TEST_STAGE_READ_OPEN:
             filesizeStage = FILESIZE_TEST_STAGE_IDLE;
             logEntryIndex = 0;
             afatfs_fopen(filename, "r", filesizeTestFileOpenedForRead, NULL);
-        break;
+            break;
         case FILESIZE_TEST_STAGE_READ_SEEK_TO_END:
-            testAssert(afatfs_fseek(filesizeFile, 0, AFATFS_SEEK_END, NULL, NULL) != AFATFS_OPERATION_FAILURE, "Seek to end should work");
+            testAssert(afatfs_fseek(filesizeFile, 0, AFATFS_SEEK_END, NULL, NULL) != AFATFS_OPERATION_FAILURE,
+                "Seek to end should work");
 
             filesizeStage = FILESIZE_TEST_STAGE_READ_MEASURE_FILE_LENGTH;
-        break;
+            break;
         case FILESIZE_TEST_STAGE_READ_MEASURE_FILE_LENGTH:
             // We must wait for the the seek to complete before ftell() will succeed
             if (afatfs_ftell(filesizeFile, &position) == AFATFS_OPERATION_SUCCESS) {
                 testAssert(position == bytesToWrite, "Logical filesize was not recorded correctly after close");
 
-                testAssert(afatfs_fseek(filesizeFile, 0, AFATFS_SEEK_SET, NULL, NULL) == AFATFS_OPERATION_SUCCESS, "Should be able to seek to begininng of file instantly");
+                testAssert(afatfs_fseek(filesizeFile, 0, AFATFS_SEEK_SET, NULL, NULL) == AFATFS_OPERATION_SUCCESS,
+                    "Should be able to seek to begininng of file instantly");
                 filesizeStage = FILESIZE_TEST_STAGE_READ_VALIDATE;
             }
-        break;
+            break;
         case FILESIZE_TEST_STAGE_READ_VALIDATE:
             // All the data we wrote must be readable
             if (validateLogTestEntries(filesizeFile, &logEntryIndex, bytesToWrite / TEST_LOG_ENTRY_SIZE)) {
                 filesizeStage = FILESIZE_TEST_STAGE_READ_CLOSE;
             }
-        break;
+            break;
         case FILESIZE_TEST_STAGE_READ_CLOSE:
             if (closeFileAndWait(filesizeFile)) {
                 return false; // Test is over now!
             }
-        break;
+            break;
         case FILESIZE_TEST_STAGE_IDLE:
             // Waiting for callbacks
-        break;
+            break;
     }
 
     return true; // Still continuing test
 }
 
-bool continueTesting() {
+bool continueTesting()
+{
 
     switch (testStage) {
         case TEST_STAGE_SOLID_APPEND_BEGIN:
         case TEST_STAGE_SOLID_APPEND_CONTINUE:
             // Write a sector and an incomplete sector to make sure the logical filesize is properly recorded
-            if (continueFilesizeTest(testStage == TEST_STAGE_SOLID_APPEND_BEGIN, "test.txt", "as", TEST_LOG_ENTRIES_PER_SECTOR + 4)) {
+            if (continueFilesizeTest(
+                    testStage == TEST_STAGE_SOLID_APPEND_BEGIN, "test.txt", "as", TEST_LOG_ENTRIES_PER_SECTOR + 4)) {
                 testStage = TEST_STAGE_SOLID_APPEND_CONTINUE;
             } else {
                 testStage = TEST_STAGE_APPEND_BEGIN;
             }
-        break;
+            break;
         case TEST_STAGE_APPEND_BEGIN:
         case TEST_STAGE_APPEND_CONTINUE:
-            if (continueFilesizeTest(testStage == TEST_STAGE_APPEND_BEGIN, "test2.txt", "a", TEST_LOG_ENTRIES_PER_SECTOR + 4)) {
+            if (continueFilesizeTest(
+                    testStage == TEST_STAGE_APPEND_BEGIN, "test2.txt", "a", TEST_LOG_ENTRIES_PER_SECTOR + 4)) {
                 testStage = TEST_STAGE_APPEND_CONTINUE;
             } else {
-                fprintf(stderr, "[Success]  Logical filesize recorded accurately after file close (\"as\" and \"a\" filemodes, 1 sector written)\n");
+                fprintf(stderr,
+                    "[Success]  Logical filesize recorded accurately after file close (\"as\" and \"a\" filemodes, 1 sector written)\n");
                 testStage = TEST_STAGE_SOLID_APPEND_LARGE_BEGIN;
             }
-        break;
+            break;
         case TEST_STAGE_SOLID_APPEND_LARGE_BEGIN:
         case TEST_STAGE_SOLID_APPEND_LARGE_CONTINUE:
             /* Write one supercluster + a little bit, so we can verify that the filesize in the directory gets increased
              * properly when superclusters are added to the file
              */
-            if (continueFilesizeTest(testStage == TEST_STAGE_SOLID_APPEND_LARGE_BEGIN, "test3.txt", "as", afatfs_superClusterSize() / TEST_LOG_ENTRY_SIZE + 4)) {
+            if (continueFilesizeTest(testStage == TEST_STAGE_SOLID_APPEND_LARGE_BEGIN, "test3.txt", "as",
+                    afatfs_superClusterSize() / TEST_LOG_ENTRY_SIZE + 4)) {
                 testStage = TEST_STAGE_SOLID_APPEND_LARGE_CONTINUE;
             } else {
                 testStage = TEST_STAGE_APPEND_LARGE_BEGIN;
             }
-        break;
+            break;
         case TEST_STAGE_APPEND_LARGE_BEGIN:
         case TEST_STAGE_APPEND_LARGE_CONTINUE:
             /* Write one cluster + a little bit, so we can verify that the filesize in the directory gets increased
              * properly when superclusters are added to the file
              */
-            if (continueFilesizeTest(testStage == TEST_STAGE_APPEND_LARGE_BEGIN, "test4.txt", "a", afatfs_clusterSize() / TEST_LOG_ENTRY_SIZE + 4)) {
+            if (continueFilesizeTest(testStage == TEST_STAGE_APPEND_LARGE_BEGIN, "test4.txt", "a",
+                    afatfs_clusterSize() / TEST_LOG_ENTRY_SIZE + 4)) {
                 testStage = TEST_STAGE_APPEND_LARGE_CONTINUE;
             } else {
-                fprintf(stderr, "[Success]  Logical filesize recorded accurately after file close (\"as\" and \"a\" filemodes, 1 cluster written)\n");
+                fprintf(stderr,
+                    "[Success]  Logical filesize recorded accurately after file close (\"as\" and \"a\" filemodes, 1 cluster written)\n");
                 testStage = TEST_STAGE_COMPLETE;
             }
-        break;
+            break;
         case TEST_STAGE_IDLE:
             // Waiting for file operations...
-        break;
+            break;
         case TEST_STAGE_COMPLETE:
             return false;
     }
@@ -262,12 +273,11 @@ int main(int argc, char **argv)
                     keepGoing = false;
                     break;
                 }
-           break;
-           case AFATFS_FILESYSTEM_STATE_FATAL:
+                break;
+            case AFATFS_FILESYSTEM_STATE_FATAL:
                 fprintf(stderr, "[Fail]     Fatal filesystem error\n");
                 exit(-1);
-           default:
-               ;
+            default:;
         }
     }
 

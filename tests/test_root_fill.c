@@ -46,7 +46,8 @@ void logFileCreated(afatfsFilePtr_t file, void *user)
     }
 }
 
-void logDirectoryOpened(afatfsFilePtr_t file, void *user) {
+void logDirectoryOpened(afatfsFilePtr_t file, void *user)
+{
     (void)user;
     rootDirectory = file;
 
@@ -59,7 +60,8 @@ void logDirectoryOpened(afatfsFilePtr_t file, void *user) {
     }
 }
 
-bool continueTesting() {
+bool continueTesting()
+{
     char filenameBuffer[13];
     afatfsOperationStatus_e status;
     fatDirectoryEntry_t *dirEntry;
@@ -75,10 +77,10 @@ bool continueTesting() {
 
                 afatfs_fopen(filenameBuffer, "a", logFileCreated, NULL);
             }
-        break;
+            break;
         case TEST_STAGE_IDLE:
             // Waiting for file operations...
-        break;
+            break;
         case TEST_STAGE_OPEN_ROOT:
             if (testLogFileNumber == 0) {
                 fprintf(stderr, "[Fail]     Failed to create any files in the root directory\n");
@@ -86,7 +88,7 @@ bool continueTesting() {
             } else {
                 afatfs_fopen(".", "r", logDirectoryOpened, NULL);
             }
-        break;
+            break;
         case TEST_STAGE_VALIDATE_DIRECTORY_CONTENTS:
             status = afatfs_findNext(rootDirectory, &finder, &dirEntry);
 
@@ -109,9 +111,10 @@ bool continueTesting() {
                     }
                 }
             }
-        break;
+            break;
         case TEST_STAGE_FAILURE:
-            fprintf(stderr, "[Fail]     Root directory only retained %d/%d files\n", validateLogFileNumber, testLogFileNumber);
+            fprintf(stderr, "[Fail]     Root directory only retained %d/%d files\n", validateLogFileNumber,
+                testLogFileNumber);
             exit(-1);
 
         case TEST_STAGE_COMPLETE:
@@ -148,12 +151,11 @@ int main(int argc, char **argv)
                     keepGoing = false;
                     break;
                 }
-           break;
-           case AFATFS_FILESYSTEM_STATE_FATAL:
+                break;
+            case AFATFS_FILESYSTEM_STATE_FATAL:
                 fprintf(stderr, "[Fail]     Fatal filesystem error\n");
                 exit(-1);
-           default:
-               ;
+            default:;
         }
     }
 

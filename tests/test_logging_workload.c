@@ -30,13 +30,15 @@ typedef enum {
 static testStage_e testStage = TEST_STAGE_INIT;
 static afatfsFilePtr_t testFile;
 
-static uint32_t writeLogFileNumber, readLogFileNumber;
-static uint32_t writeLogEntryCount, readLogEntryCount;
+static uint32_t writeLogFileNumber;
+static uint32_t readLogFileNumber;
+static uint32_t writeLogEntryCount;
+static uint32_t readLogEntryCount;
 
 static bool shouldKeepLog(uint32_t logNumber)
 {
     // Use something like a LCG with the logNumber as the seed to decide to keep 1/2 logs (and delete the remainder)
-    return ((uint32_t) (logNumber * 1103515245 + 12345) & 0x02) != 0;
+    return ((uint32_t)(logNumber * 1103515245 + 12345) & 0x02) != 0;
 }
 
 void logFileCreatedForSolidAppend(afatfsFilePtr_t file, void *user)
@@ -89,11 +91,11 @@ void logFileOpenedForRead(afatfsFilePtr_t file, void *user)
     }
 }
 
-
-bool continueTesting() {
+bool continueTesting()
+{
     char filename[13];
 
-    doMore:
+doMore:
     switch (testStage) {
         case TEST_STAGE_CREATE_LOG_DIRECTORY:
             // Create a subdirectory for logging
@@ -106,7 +108,7 @@ bool continueTesting() {
             writeLogFileNumber = 0;
 
             afatfs_mkdir("logs", logDirCreated, NULL);
-        break;
+            break;
         case TEST_STAGE_CREATE_LOG_FILE:
             writeLogFileNumber++;
 
@@ -123,14 +125,14 @@ bool continueTesting() {
 
                 afatfs_fopen(filename, "as", logFileCreatedForSolidAppend, NULL);
             }
-        break;
+            break;
         case TEST_STAGE_WRITE_LOG:
             if (writeLogTestEntries(testFile, &writeLogEntryCount, LOG_ENTRY_COUNT)) {
                 testStage = TEST_STAGE_CLOSE_LOG;
             } else if (afatfs_isFull()) {
                 testStage = TEST_STAGE_CLOSE_LOG;
             }
-        break;
+            break;
         case TEST_STAGE_CLOSE_LOG:
             /* Wait for the file close operation to queue on the file, but just like Blackbox, don't wait for the close
              * operation to complete before continuing on to open more files.
@@ -149,7 +151,7 @@ bool continueTesting() {
 
             testStage = TEST_STAGE_CREATE_LOG_FILE;
             goto doMore;
-        break;
+            break;
         case TEST_STAGE_OPEN_LOG_FOR_READ:
             readLogFileNumber++;
 
@@ -164,13 +166,13 @@ bool continueTesting() {
 
                 afatfs_fopen(filename, "r", logFileOpenedForRead, NULL);
             }
-        break;
+            break;
         case TEST_STAGE_READ_LOG:
             if (validateLogTestEntries(testFile, &readLogEntryCount, LOG_ENTRY_COUNT)) {
                 testStage = TEST_STAGE_READ_LOG_CLOSE;
                 goto doMore;
             }
-        break;
+            break;
         case TEST_STAGE_READ_LOG_CLOSE:
             if (closeFileAndWait(testFile)) {
                 sprintf(filename, "LOG%05d.TXT", readLogFileNumber);
@@ -178,10 +180,10 @@ bool continueTesting() {
                 testStage = TEST_STAGE_OPEN_LOG_FOR_READ;
                 goto doMore;
             }
-        break;
+            break;
         case TEST_STAGE_IDLE:
             // Waiting for file operations...
-        break;
+            break;
         case TEST_STAGE_COMPLETE:
             fprintf(stderr, "[Success]  Logged %u bytes in %u files in simulated logging workload\n",
                 TEST_LOG_ENTRY_SIZE * LOG_ENTRY_COUNT * writeLogFileNumber, writeLogFileNumber);
@@ -218,12 +220,11 @@ int main(int argc, char **argv)
                     keepGoing = false;
                     break;
                 }
-           break;
-           case AFATFS_FILESYSTEM_STATE_FATAL:
+                break;
+            case AFATFS_FILESYSTEM_STATE_FATAL:
                 fprintf(stderr, "[Fail]     Fatal filesystem error\n");
                 exit(-1);
-           default:
-               ;
+            default:;
         }
     }
 

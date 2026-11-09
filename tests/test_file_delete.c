@@ -81,9 +81,12 @@ static spaceReclaimTestStage_e reclaimTestStage;
 static spaceRetainTestStage_e retainTestStage;
 
 static afatfsFilePtr_t testFile;
-static afatfsFilePtr_t retainTestFileA, retainTestFileB, retainTestFileC;
+static afatfsFilePtr_t retainTestFileA;
+static afatfsFilePtr_t retainTestFileB;
+static afatfsFilePtr_t retainTestFileC;
 
-static uint32_t logEntryIndex, logFileIndex;
+static uint32_t logEntryIndex;
+static uint32_t logFileIndex;
 
 void spaceReclaimTestFileCreatedForEmpty(afatfsFilePtr_t file, void *user)
 {
@@ -181,67 +184,68 @@ bool continueSpaceReclaimTest(bool start)
         case SPACE_RECLAIM_TEST_STAGE_EMPTY_INIT:
             reclaimTestStage = SPACE_RECLAIM_TEST_STAGE_EMPTY_OPEN;
             logFileIndex = 0;
-        break;
+            break;
         case SPACE_RECLAIM_TEST_STAGE_EMPTY_OPEN:
             reclaimTestStage = SPACE_RECLAIM_TEST_STAGE_IDLE;
             logEntryIndex = 0;
             afatfs_fopen("test.txt", "w+", spaceReclaimTestFileCreatedForEmpty, NULL);
-        break;
+            break;
         case SPACE_RECLAIM_TEST_STAGE_EMPTY_DELETE:
             if (afatfs_funlink(testFile, spaceReclaimTestFileEmptyDeleted, NULL)) {
                 // Wait for the unlink to complete
                 reclaimTestStage = SPACE_RECLAIM_TEST_STAGE_IDLE;
             }
-        break;
+            break;
         case SPACE_RECLAIM_TEST_STAGE_SOLID_APPEND_INIT:
             reclaimTestStage = SPACE_RECLAIM_TEST_STAGE_SOLID_APPEND_OPEN;
             logFileIndex = 0;
-        break;
+            break;
         case SPACE_RECLAIM_TEST_STAGE_SOLID_APPEND_OPEN:
             reclaimTestStage = SPACE_RECLAIM_TEST_STAGE_IDLE;
 
             logEntryIndex = 0;
 
             afatfs_fopen("test.txt", "as", spaceReclaimTestFileCreatedForSolidAppend, NULL);
-        break;
+            break;
         case SPACE_RECLAIM_TEST_STAGE_SOLID_APPEND:
             if (writeLogTestEntries(testFile, &logEntryIndex, RECLAIM_LOG_ENTRY_COUNT)) {
                 reclaimTestStage = SPACE_RECLAIM_TEST_STAGE_SOLID_APPEND_DELETE;
             }
-        break;
+            break;
         case SPACE_RECLAIM_TEST_STAGE_SOLID_APPEND_DELETE:
             if (afatfs_funlink(testFile, spaceReclaimTestFileSolidAppendDeleted, NULL)) {
                 // Wait for the unlink to complete
                 reclaimTestStage = SPACE_RECLAIM_TEST_STAGE_IDLE;
             }
-        break;
+            break;
         case SPACE_RECLAIM_TEST_STAGE_APPEND_INIT:
             reclaimTestStage = SPACE_RECLAIM_TEST_STAGE_APPEND_OPEN;
             logFileIndex = 0;
-        break;
+            break;
         case SPACE_RECLAIM_TEST_STAGE_APPEND_OPEN:
             reclaimTestStage = SPACE_RECLAIM_TEST_STAGE_IDLE;
 
             logEntryIndex = 0;
 
             afatfs_fopen("test.txt", "a", spaceReclaimTestFileCreatedForAppend, NULL);
-        break;
+            break;
         case SPACE_RECLAIM_TEST_STAGE_APPEND:
             if (writeLogTestEntries(testFile, &logEntryIndex, RECLAIM_LOG_ENTRY_COUNT)) {
                 reclaimTestStage = SPACE_RECLAIM_TEST_STAGE_APPEND_DELETE;
             }
-        break;
+            break;
         case SPACE_RECLAIM_TEST_STAGE_APPEND_DELETE:
             if (afatfs_funlink(testFile, spaceReclaimTestFileAppendDeleted, NULL)) {
                 // Wait for the unlink to complete
                 reclaimTestStage = SPACE_RECLAIM_TEST_STAGE_IDLE;
             }
-        break;
+            break;
         case SPACE_RECLAIM_TEST_STAGE_IDLE:
             // Waiting for file operations...
-        break;
+            break;
         case SPACE_RECLAIM_TEST_STAGE_COMPLETE:
-            fprintf(stderr, "[Success]  Free space is reclaimed when files are deleted (empty, solid and standard append)\n");
+            fprintf(stderr,
+                "[Success]  Free space is reclaimed when files are deleted (empty, solid and standard append)\n");
             return false;
     }
 
@@ -351,124 +355,126 @@ bool continueSpaceRetainTest(bool start, const char *fileMode)
         retainTestStage = SPACE_RETAIN_TEST_STAGE_CREATE_A;
     }
 
-    doMore:
+doMore:
     switch (retainTestStage) {
         case SPACE_RETAIN_TEST_STAGE_CREATE_A:
             retainTestStage = SPACE_RETAIN_TEST_STAGE_IDLE;
             afatfs_fopen("test-a.txt", fileMode, spaceRetainTestFileACreated, NULL);
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_FILL_A:
             if (writeLogTestEntries(retainTestFileA, &logEntryIndex, RETAIN_LOG_ENTRY_COUNT)) {
                 retainTestStage = SPACE_RETAIN_TEST_STAGE_CLOSE_A;
             }
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_CLOSE_A:
             if (closeFileAndWait(retainTestFileA)) {
                 retainTestFileA = NULL;
                 retainTestStage = SPACE_RETAIN_TEST_STAGE_CREATE_B;
             }
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_CREATE_B:
             retainTestStage = SPACE_RETAIN_TEST_STAGE_IDLE;
             afatfs_fopen("test-b.txt", fileMode, spaceRetainTestFileBCreated, NULL);
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_FILL_B:
             if (writeLogTestEntries(retainTestFileB, &logEntryIndex, RETAIN_LOG_ENTRY_COUNT)) {
                 retainTestStage = SPACE_RETAIN_TEST_STAGE_CLOSE_B;
             }
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_CLOSE_B:
             if (closeFileAndWait(retainTestFileB)) {
                 retainTestFileB = NULL;
                 retainTestStage = SPACE_RETAIN_TEST_STAGE_CREATE_C;
             }
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_CREATE_C:
             retainTestStage = SPACE_RETAIN_TEST_STAGE_IDLE;
             afatfs_fopen("test-c.txt", fileMode, spaceRetainTestFileCCreated, NULL);
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_FILL_C:
             if (writeLogTestEntries(retainTestFileC, &logEntryIndex, RETAIN_LOG_ENTRY_COUNT)) {
                 retainTestStage = SPACE_RETAIN_TEST_STAGE_CLOSE_C;
             }
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_CLOSE_C:
             if (closeFileAndWait(retainTestFileC)) {
                 retainTestFileC = NULL;
                 retainTestStage = SPACE_RETAIN_TEST_STAGE_OPEN_B_FOR_UNLINK;
             }
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_OPEN_B_FOR_UNLINK:
             retainTestStage = SPACE_RETAIN_TEST_STAGE_IDLE;
 
             afatfs_fopen("test-b.txt", "r+", retainTestFileBOpenedForUnlink, NULL);
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_UNLINK_B:
             if (afatfs_funlink(retainTestFileB, retainTestFileBDeleted, NULL)) {
                 retainTestFileB = NULL;
                 retainTestStage = SPACE_RETAIN_TEST_STAGE_IDLE;
             }
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_VERIFY_A_OPEN:
             retainTestStage = SPACE_RETAIN_TEST_STAGE_IDLE;
 
             logEntryIndex = 0;
 
             afatfs_fopen("test-a.txt", "r+", retainTestFileAOpenedForRead, NULL);
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_VERIFY_A_READ:
             if (validateLogTestEntries(retainTestFileA, &logEntryIndex, RETAIN_LOG_ENTRY_COUNT)) {
                 retainTestStage = SPACE_RETAIN_TEST_STAGE_VERIFY_A_UNLINK;
                 goto doMore;
             }
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_VERIFY_A_UNLINK:
             if (afatfs_funlink(retainTestFileA, NULL, NULL)) {
                 retainTestFileA = NULL;
                 retainTestStage = SPACE_RETAIN_TEST_STAGE_VERIFY_B_OPEN;
                 goto doMore;
             }
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_VERIFY_B_OPEN:
             retainTestStage = SPACE_RETAIN_TEST_STAGE_IDLE;
 
             // We expect this open to fail
             afatfs_fopen("test-b.txt", "r", retainTestFileBOpenedForRead, NULL);
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_VERIFY_C_OPEN:
             retainTestStage = SPACE_RETAIN_TEST_STAGE_IDLE;
 
             logEntryIndex = 0;
 
             afatfs_fopen("test-c.txt", "r+", retainTestFileCOpenedForRead, NULL);
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_VERIFY_C_READ:
             if (validateLogTestEntries(retainTestFileC, &logEntryIndex, RETAIN_LOG_ENTRY_COUNT)) {
                 retainTestStage = SPACE_RETAIN_TEST_STAGE_VERIFY_C_UNLINK;
                 goto doMore;
             }
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_VERIFY_C_UNLINK:
             if (afatfs_funlink(retainTestFileC, NULL, NULL)) {
                 retainTestFileC = NULL;
                 retainTestStage = SPACE_RETAIN_TEST_STAGE_COMPLETE;
                 goto doMore;
             }
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_IDLE:
             // Waiting for file operations...
-        break;
+            break;
         case SPACE_RETAIN_TEST_STAGE_COMPLETE:
             // Unlink is asynchronous: the next subtest may reuse these names or
             // request the shared contiguous writer only after deletion finishes.
-            if (!afatfs_isIdle()) return true;
-            fprintf(stderr, "[Success]  Allocated files are retained when unrelated files are deleted (file mode: %s)\n", fileMode);
+            if (!afatfs_isIdle()) {
+                return true;
+            }
+            fprintf(stderr,
+                "[Success]  Allocated files are retained when unrelated files are deleted (file mode: %s)\n", fileMode);
             return false;
     }
 
     return true; // Still work to be done
 }
-
 
 bool continueTesting()
 {
@@ -480,7 +486,7 @@ bool continueTesting()
             } else {
                 testStage = TEST_STAGE_SPACE_RECLAIM_CONTINUE;
             }
-        break;
+            break;
         case TEST_STAGE_SPACE_RETAIN_APPEND_BEGIN:
         case TEST_STAGE_SPACE_RETAIN_APPEND_CONTINUE:
             if (!continueSpaceRetainTest(testStage == TEST_STAGE_SPACE_RETAIN_APPEND_BEGIN, "a")) {
@@ -488,7 +494,7 @@ bool continueTesting()
             } else {
                 testStage = TEST_STAGE_SPACE_RETAIN_APPEND_CONTINUE;
             }
-        break;
+            break;
         case TEST_STAGE_SPACE_RETAIN_SOLID_BEGIN:
         case TEST_STAGE_SPACE_RETAIN_SOLID_CONTINUE:
             if (!continueSpaceRetainTest(testStage == TEST_STAGE_SPACE_RETAIN_SOLID_BEGIN, "as")) {
@@ -496,7 +502,7 @@ bool continueTesting()
             } else {
                 testStage = TEST_STAGE_SPACE_RETAIN_SOLID_CONTINUE;
             }
-        break;
+            break;
         case TEST_STAGE_COMPLETE:
             return false;
     }
@@ -530,12 +536,11 @@ int main(int argc, char **argv)
                     keepGoing = false;
                     break;
                 }
-           break;
-           case AFATFS_FILESYSTEM_STATE_FATAL:
+                break;
+            case AFATFS_FILESYSTEM_STATE_FATAL:
                 fprintf(stderr, "[Fail]     Fatal filesystem error\n");
                 exit(-1);
-           default:
-               ;
+            default:;
         }
     }
 

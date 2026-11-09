@@ -114,3 +114,10 @@ length), and use its `Chain` reader for 255-character names. The adapter uses th
 published `exfat_mkfs` API because that version's standalone `mkfat.py` parser has an
 argument-default error. No third-party source is modified, and the independent fsck
 checks still validate all fixture and library output.
+
+On 2026-11-09 the current extended-API library was rebuilt and the full seven-case
+matrix was rerun in MBR and GPT. All 56 fsck checkpoints exited successfully with
+clean volumes; reports are under `tests/build/fsck-current-mbr` and
+`tests/build/fsck-current-gpt`. Two freshly library-formatted exFAT images also
+passed fsck, completing the previously blocked check described in
+[API validation](API_VALIDATION.md#completed-fsck-validation-2026-11-09).

@@ -105,14 +105,16 @@ void logFileOpenedForWrite(afatfsFilePtr_t file, void *user)
     testAssert(afatfs_ftell(file, &position), "ftell should work after file opens");
     testAssert(position == 0, "File opened for write didn't start at offset 0");
 
-    testAssert(afatfs_fseek(file, 0, AFATFS_SEEK_END, NULL, NULL) == AFATFS_OPERATION_SUCCESS, "fseek to end of empty file should complete instantly");
+    testAssert(afatfs_fseek(file, 0, AFATFS_SEEK_END, NULL, NULL) == AFATFS_OPERATION_SUCCESS,
+        "fseek to end of empty file should complete instantly");
     testAssert(afatfs_ftell(file, &position), "ftell() should run without queueing");
     testAssert(position == 0, "Opening file for write did not truncate the file");
 
     testStage = TEST_STAGE_WRITE_CLOSE;
 }
 
-bool continueTesting() {
+bool continueTesting()
+{
     switch (testStage) {
         case TEST_STAGE_SOLID_APPEND_OPEN:
             testStage = TEST_STAGE_IDLE;
@@ -120,82 +122,85 @@ bool continueTesting() {
             logEntryIndex = 0;
 
             afatfs_fopen("test.txt", "as", logFileCreatedForSolidAppend, NULL);
-        break;
+            break;
         case TEST_STAGE_SOLID_APPEND:
             if (writeLogTestEntries(testFile, &logEntryIndex, LOG_ENTRY_COUNT)) {
-                testAssert(afatfs_ftell(testFile, &logFileSize), "ftell() expected to work when no file operation queued");
+                testAssert(
+                    afatfs_ftell(testFile, &logFileSize), "ftell() expected to work when no file operation queued");
                 testAssert(logFileSize > 0, "Log file still empty after solid appends");
 
                 testStage = TEST_STAGE_SOLID_APPEND_CLOSE;
             }
-        break;
+            break;
         case TEST_STAGE_SOLID_APPEND_CLOSE:
             if (closeFileAndWait(testFile)) {
                 testStage = TEST_STAGE_READ_OPEN;
             }
-        break;
+            break;
         case TEST_STAGE_READ_OPEN:
             testStage = TEST_STAGE_IDLE;
             logEntryIndex = 0;
             afatfs_fopen("test.txt", "r", logFileOpenedForRead, NULL);
-        break;
+            break;
         case TEST_STAGE_READ_VALIDATE:
             if (validateLogTestEntries(testFile, &logEntryIndex, LOG_ENTRY_COUNT)) {
                 testStage = TEST_STAGE_READ_CLOSE;
             }
-        break;
+            break;
         case TEST_STAGE_READ_CLOSE:
             if (closeFileAndWait(testFile)) {
                 testStage = TEST_STAGE_APPEND_OPEN;
             }
-        break;
+            break;
         case TEST_STAGE_APPEND_OPEN:
             testStage = TEST_STAGE_IDLE;
             afatfs_fopen("test.txt", "a", logFileOpenedForAppend, NULL);
-        break;
+            break;
         case TEST_STAGE_APPEND:
             if (writeLogTestEntries(testFile, &logEntryIndex, LOG_ENTRY_COUNT + 10)) {
                 uint32_t newLogFileSize;
 
-                testAssert(afatfs_ftell(testFile, &newLogFileSize), "ftell() expected to work when no file operation queued");
-                testAssert(newLogFileSize == logFileSize + 10 * TEST_LOG_ENTRY_SIZE, "Cursor didn't move properly after append");
+                testAssert(
+                    afatfs_ftell(testFile, &newLogFileSize), "ftell() expected to work when no file operation queued");
+                testAssert(newLogFileSize == logFileSize + 10 * TEST_LOG_ENTRY_SIZE,
+                    "Cursor didn't move properly after append");
 
                 testStage = TEST_STAGE_APPEND_CLOSE;
             }
-        break;
+            break;
         case TEST_STAGE_APPEND_CLOSE:
             if (closeFileAndWait(testFile)) {
                 testStage = TEST_STAGE_READ_WRITE_OPEN;
             }
-        break;
+            break;
         case TEST_STAGE_READ_WRITE_OPEN:
             testStage = TEST_STAGE_IDLE;
             logEntryIndex = 0;
             afatfs_fopen("test.txt", "r+", logFileOpenedForReadWrite, NULL);
-        break;
+            break;
         case TEST_STAGE_READ_WRITE_VALIDATE:
             if (validateLogTestEntries(testFile, &logEntryIndex, LOG_ENTRY_COUNT + 10)) {
                 testStage = TEST_STAGE_READ_WRITE_CLOSE;
             }
-        break;
+            break;
         case TEST_STAGE_READ_WRITE_CLOSE:
             if (closeFileAndWait(testFile)) {
                 testStage = TEST_STAGE_WRITE_OPEN;
             }
-        break;
+            break;
         case TEST_STAGE_WRITE_OPEN:
             testStage = TEST_STAGE_IDLE;
             logEntryIndex = 0;
             afatfs_fopen("test.txt", "w", logFileOpenedForWrite, NULL);
-        break;
+            break;
         case TEST_STAGE_WRITE_CLOSE:
             if (closeFileAndWait(testFile)) {
                 testStage = TEST_STAGE_COMPLETE;
             }
-        break;
+            break;
         case TEST_STAGE_IDLE:
             // Waiting for file operations...
-        break;
+            break;
         case TEST_STAGE_COMPLETE:
             fprintf(stderr, "[Success]  File modes a, as, r, r+ and w work\n");
             return false;
@@ -230,12 +235,11 @@ int main(int argc, char **argv)
                     keepGoing = false;
                     break;
                 }
-           break;
-           case AFATFS_FILESYSTEM_STATE_FATAL:
+                break;
+            case AFATFS_FILESYSTEM_STATE_FATAL:
                 fprintf(stderr, "[Fail]     Fatal filesystem error\n");
                 exit(-1);
-           default:
-               ;
+            default:;
         }
     }
 

@@ -581,7 +581,7 @@ opened in a writable mode, or the filesystem has run out of space. To check if t
 `afatfs_isFull` function. If the filesystem is not full, writes may be periodically retried until they
 succeed.
 
-`int afatfs_fputc(afatfsFilePtr_t file, uint8_t c)`
+`int afatfs_fputc(afatfsFilePtr_t file, uint8_t character)`
 
 Returns 1 if the byte was accepted, or -1 if rejected. On BUSY, poll and retry the same byte. Consult
 `afatfs_ferror(file)` for denial or lack of space. Existing code that ignored the former void return

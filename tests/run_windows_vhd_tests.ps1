@@ -1,6 +1,7 @@
 #requires -Version 7.2
 param(
     [ValidateSet('all', 'default', '4096', '65536')][string]$Cases = 'all',
+    [ValidateSet('MBR', 'GPT')][string]$PartitionTable = 'MBR',
     [switch]$ElevatedWorker,
     [switch]$NoWait,
     [string]$RunName = ('run-' + [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 8))
@@ -103,6 +104,56 @@ function Assert-NativeFile([string]$Root, [string]$Name, [int]$Count, [int]$Tag)
     }
 }
 
+function Assert-NativeAllocation([string]$Root, [string]$Name, [long]$Size, [long]$Allocated) {
+    $actual = [VhdNativeInfo]::GetSizes((Native-Path $Root $Name))
+    if ($actual[0] -ne $Allocated -or $actual[1] -ne $Size) {
+        throw "Wrong native allocation/EOF for ${Name}: $($actual -join '/'), expected $Allocated/$Size."
+    }
+    $script:report.commands += [ordered]@{ name = "native-allocation-$Name"; allocationSize = $actual[0]; endOfFile = $actual[1] }
+    Save-Report
+}
+
+function Assert-NativeApi([string]$Root, [int]$Cluster) {
+    Assert-NativeFile $Root 'api renamed truncate.bin' ($Cluster + 17) 101
+    Assert-NativeAllocation $Root 'api renamed truncate.bin' ($Cluster + 17) ($Cluster * 2)
+    Assert-NativeFile $Root 'api renamed file.bin' 1203 103
+    Assert-NativeFile $Root 'api native collision.bin' 33 107
+    Assert-NativeFile $Root 'API renamed directory\child.bin' 87 109
+    Assert-NativeFile $Root 'api renamed fragmented.bin' ($Cluster - 7) 149
+    Assert-NativeAllocation $Root 'api renamed fragmented.bin' ($Cluster - 7) $Cluster
+    Assert-NativeFile $Root 'api native fragment blocker.bin' $Cluster 151
+    Assert-NativeFile $Root 'api prealloc clipped.bin' ($Cluster - 7) 113
+    Assert-NativeAllocation $Root 'api prealloc clipped.bin' ($Cluster - 7) $Cluster
+    Assert-NativeFile $Root 'api hint.bin' 0 0
+    Assert-NativeAllocation $Root 'api hint.bin' 0 0
+    Assert-NativeFile $Root 'api zero truncate.bin' 0 0
+    Assert-NativeAllocation $Root 'api zero truncate.bin' 0 0
+    foreach ($old in @('api native truncate.bin', 'api native rename.bin', 'api native fragmented.bin', 'api native empty.bin', 'api unexpected.bin')) {
+        if ([IO.File]::Exists((Native-Path $Root $old))) { throw "Unexpected old/deleted name: $old" }
+    }
+    if ([IO.Directory]::Exists((Native-Path $Root 'API native directory'))) { throw 'Old directory name survived rename.' }
+    $renamed = Native-Path $Root 'api renamed truncate.bin'
+    if (([IO.File]::GetAttributes($renamed) -band [IO.FileAttributes]::Hidden) -eq 0 -or
+        [IO.File]::GetLastWriteTime($renamed) -ne [DateTime]::new(2024, 1, 2, 3, 4, 6)) { throw 'Native metadata mismatch after utime/chmod.' }
+    $zeros = [IO.File]::ReadAllBytes((Native-Path $Root 'api preallocated.bin'))
+    if ($zeros.Length -ne $Cluster * 3 + 123 -or @($zeros | Where-Object { $_ -ne 0 }).Count) { throw 'Unwritten preallocation exposed nonzero data.' }
+    Assert-NativeAllocation $Root 'api preallocated.bin' ($Cluster * 3 + 123) ($Cluster * 4)
+    if ([IO.File]::ReadAllText((Native-Path $Root 'api text.txt')) -cne "value=42`nline two`n") { throw 'Native text mismatch.' }
+}
+
+function Write-NativeApiRoundtrip([string]$Root, [int]$Cluster) {
+    [IO.File]::Move((Native-Path $Root 'api renamed file.bin'), (Native-Path $Root 'api windows renamed.bin'))
+    $file = [IO.File]::Open((Native-Path $Root 'api renamed truncate.bin'), [IO.FileMode]::Open, [IO.FileAccess]::Write, [IO.FileShare]::None)
+    try { $file.SetLength(333); $file.Flush($true) } finally { $file.Dispose() }
+    $file = [IO.File]::Open((Native-Path $Root 'api preallocated.bin'), [IO.FileMode]::Open, [IO.FileAccess]::Write, [IO.FileShare]::None)
+    try {
+        $file.Position = $Cluster + 11; $data = New-Pattern 43 131; $file.Write($data, 0, $data.Length)
+        $file.Position = $file.Length; $data = New-Pattern ($Cluster + 97) 137; $file.Write($data, 0, $data.Length); $file.Flush($true)
+    } finally { $file.Dispose() }
+    Assert-NativeAllocation $Root 'api preallocated.bin' ($Cluster * 4 + 220) ($Cluster * 5)
+    [IO.File]::AppendAllText((Native-Path $Root 'api text.txt'), "native`n", [Text.UTF8Encoding]::new($false))
+}
+
 function Get-FixedFooter([string]$ImagePath) {
     $absolute = Assert-TestImage $ImagePath
     if ((Get-DiskImage -ImagePath $absolute).Attached) { throw 'The VHD must be detached before raw access.' }
@@ -148,11 +199,11 @@ if (!$ElevatedWorker) {
     $vcvars = Join-Path $vs 'VC/Auxiliary/Build/vcvars64.bat'
     Push-Location $repository
     try {
-        & cmd /c "`"$vcvars`" >nul && cl /nologo /std:c11 /W3 /WX /D_CRT_SECURE_NO_WARNINGS /Ilib /Itests tests\test_exfat_external.c tests\sdcard_sim.c lib\asyncfatfs.c lib\fat_standard.c /Fotests\build\ /Fe`"$binary`" /link /INCREMENTAL:NO"
+        & cmd /c "`"$vcvars`" >nul && cl /nologo /std:c11 /W3 /WX /D_CRT_SECURE_NO_WARNINGS /Ilib /Itests tests\test_exfat_external.c tests\sdcard_sim.c lib\asyncfatfs.c lib\fat_standard.c /Fo`"$runDirectory\\`" /Fe`"$binary`" /link /INCREMENTAL:NO"
         if ($LASTEXITCODE) { throw 'Workload compilation failed.' }
     } finally { Pop-Location }
     $shell = (Get-Process -Id $PID).Path
-    $arguments = @('-NoProfile', '-File', ('"' + $PSCommandPath + '"'), '-ElevatedWorker', '-RunName', $RunName, '-Cases', $Cases)
+    $arguments = @('-NoProfile', '-File', ('"' + $PSCommandPath + '"'), '-ElevatedWorker', '-RunName', $RunName, '-Cases', $Cases, '-PartitionTable', $PartitionTable)
     $parameters = @{ FilePath = $shell; ArgumentList = $arguments; WindowStyle = 'Hidden'; PassThru = $true }
     if (!(Test-Administrator)) { $parameters.Verb = 'RunAs' }
     $worker = Start-Process @parameters
@@ -172,11 +223,48 @@ $script:report = [ordered]@{
     windowsVersion = [Environment]::OSVersion.VersionString
     exfatDriverVersion = (Get-Item -LiteralPath (Join-Path $env:SystemRoot 'System32/drivers/exfat.sys')).VersionInfo.FileVersion
     binarySha256 = (Get-FileHash -LiteralPath $binary -Algorithm SHA256).Hash
+    partitionTable = $PartitionTable
+    sourceSha256 = @{}
     cases = @(); commands = @(); error = $null; cleanupErrors = @()
 }
 $images = [Collections.Generic.List[string]]::new()
 Save-Report
 try {
+    foreach ($source in @(Get-ChildItem -LiteralPath (Join-Path $repository 'lib') -File) + @(
+        Get-Item -LiteralPath $PSCommandPath, (Join-Path $PSScriptRoot 'test_exfat_external.c'), (Join-Path $PSScriptRoot 'exfat_native_api.inc'))) {
+        if ($source.Extension -in @('.c', '.h', '.inc', '.ps1')) {
+            $script:report.sourceSha256[$source.FullName.Substring($repository.Length + 1)] = (Get-FileHash -LiteralPath $source.FullName -Algorithm SHA256).Hash
+        }
+    }
+    Add-Type -TypeDefinition @'
+using System;
+using System.IO;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
+public static class VhdNativeInfo {
+    [StructLayout(LayoutKind.Sequential)]
+    private struct StandardInfo {
+        public long AllocationSize;
+        public long EndOfFile;
+        public uint NumberOfLinks;
+        public byte DeletePending;
+        public byte Directory;
+    }
+    [DllImport("kernel32.dll", SetLastError=true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetFileInformationByHandleEx(SafeFileHandle handle, int kind,
+        out StandardInfo info, uint size);
+    public static long[] GetSizes(string path) {
+        using (var handle = File.OpenHandle(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete)) {
+            StandardInfo info;
+            if (!GetFileInformationByHandleEx(handle, 1, out info, (uint)Marshal.SizeOf<StandardInfo>()))
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            return new long[] {info.AllocationSize, info.EndOfFile};
+        }
+    }
+}
+'@
     $selected = if ($Cases -eq 'all') { @('4096', '65536', 'default') } else { @($Cases) }
     foreach ($case in $selected) {
         $imagePath = Assert-TestImage (Join-Path $runDirectory "native-$case.vhd")
@@ -193,7 +281,7 @@ try {
         if ($disk.IsOffline) { $disk | Set-Disk -IsOffline $false }
         $disk = Get-TestDisk $imagePath
         if ($disk.PartitionStyle -ne 'RAW') { throw 'Only a newly created, uninitialized VHD may be initialized.' }
-        $disk | Initialize-Disk -PartitionStyle MBR | Out-Null
+        $disk | Initialize-Disk -PartitionStyle $PartitionTable | Out-Null
         $disk = Get-TestDisk $imagePath
         $partition = $disk | New-Partition -UseMaximumSize
         if ($partition.DiskNumber -ne (Get-TestDisk $imagePath).Number) { throw 'Partition does not belong to the test VHD.' }
@@ -223,12 +311,26 @@ try {
         [void][IO.Directory]::CreateDirectory((Native-Path $root 'External directory'))
         Write-NativeFile $root 'External directory\external child.bin' 91 49
         Assert-NativeFile $root 'external fragmented.bin' ($cluster * 3) 37
+        Write-NativeFile $root 'api native truncate.bin' ($cluster * 3 + 99) 101
+        Write-NativeFile $root 'api native rename.bin' 1203 103
+        Write-NativeFile $root 'api native collision.bin' 33 107
+        Write-NativeFile $root 'api native empty.bin' 0 0
+        [void][IO.Directory]::CreateDirectory((Native-Path $root 'API native directory'))
+        Write-NativeFile $root 'API native directory\child.bin' 87 109
+        $fragmented = [IO.File]::Open((Native-Path $root 'api native fragmented.bin'), [IO.FileMode]::CreateNew, [IO.FileAccess]::Write, [IO.FileShare]::None)
+        try {
+            $data = New-Pattern $cluster 149; $fragmented.Write($data, 0, $data.Length); $fragmented.Flush($true)
+            Write-NativeFile $root 'api native fragment blocker.bin' $cluster 151
+            $data = New-Pattern ($cluster * 2 + 99) (($cluster * 17 + 149) -band 255)
+            $fragmented.Write($data, 0, $data.Length); $fragmented.Flush($true)
+        } finally { $fragmented.Dispose() }
         Check-NativeVolume $imagePath "baseline-chkdsk-$case"
         Dismount-DiskImage -ImagePath $imagePath
 
         Set-Phase "library-exercise-$case"
         if ((Get-FixedFooter $imagePath) -ne $footer) { throw 'VHD footer changed before library access.' }
         [void](Invoke-CheckedCommand $binary @($imagePath, 'exercise', [string]$cluster) "library-exercise-$case")
+        [void](Invoke-CheckedCommand $binary @($imagePath, 'exercise-api', [string]$cluster) "library-api-$case")
         if ((Get-FixedFooter $imagePath) -ne $footer) { throw 'The library modified the VHD footer.' }
 
         Set-Phase "native-verify-$case"
@@ -250,17 +352,20 @@ try {
             }
         }
         Assert-NativeFile $root 'External directory\external child.bin' 91 49
+        Assert-NativeApi $root $cluster
 
         Set-Phase "native-roundtrip-$case"
         Write-NativeFile $root 'external roundtrip.bin' ($cluster + 93) 91
         $append = [IO.File]::Open((Native-Path $root 'library output.bin'), [IO.FileMode]::Append, [IO.FileAccess]::Write, [IO.FileShare]::None)
         try { $data = New-Pattern ($cluster + 93) 91; $append.Write($data, 0, $data.Length); $append.Flush($true) } finally { $append.Dispose() }
+        Write-NativeApiRoundtrip $root $cluster
         Check-NativeVolume $imagePath "after-native-write-chkdsk-$case"
         Dismount-DiskImage -ImagePath $imagePath
 
         Set-Phase "library-roundtrip-$case"
         [void](Get-FixedFooter $imagePath)
         [void](Invoke-CheckedCommand $binary @($imagePath, 'verify-roundtrip', [string]$cluster) "library-roundtrip-$case")
+        [void](Invoke-CheckedCommand $binary @($imagePath, 'verify-api-roundtrip', [string]$cluster) "library-api-roundtrip-$case")
         if ((Get-FixedFooter $imagePath) -ne $footer) { throw 'VHD footer changed during roundtrip.' }
         Mount-DiskImage -ImagePath $imagePath -StorageType VHD -Access ReadWrite -NoDriveLetter | Out-Null
         Check-NativeVolume $imagePath "final-chkdsk-$case"

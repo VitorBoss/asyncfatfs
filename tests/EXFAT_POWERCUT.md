@@ -39,6 +39,89 @@ roundtrips are supported; a dirty external session is not automatically repaired
 
 ## Executed checks
 
+### Request APIs: truncate, rename and expand (2026-11-09)
+
+The new `tests/exfat_api_powercut.py` matrix passed **1,119 operation cuts and
+224 additional cuts during undo replay**, across nine scenarios at cluster sizes
+512 and 4096 bytes. Every recovered image passed `fsck.exfat -n` with exit code 0
+and an explicit clean result. No repair command was used.
+
+| Scenario | Operation cuts, both cluster sizes | Replay cuts |
+| --- | ---: | ---: |
+| Cursor truncation, contiguous NoFatChain file | 158 | 32 |
+| Cursor truncation, fragmented FAT chain | 164 | 32 |
+| Cursor truncation, partly valid preallocated file | 158 | 32 |
+| Truncation to zero | 182 | 32 |
+| Truncation at EOF | 26 | 0 |
+| Rename to a 255-character filename | 149 | 32 |
+| Rename a nonempty directory | 92 | 32 |
+| Contiguous preallocation (`allocate=true`) | 164 | 32 |
+| Allocation hint (`allocate=false`) | 26 | 0 |
+
+The fixtures are externally formatted by FATtools, with the journal already
+provisioned, patterned unrelated files and a target entry at a sector boundary.
+An unused data area contains nonzero bytes. The partly valid fixture has a valid
+entry-set checksum and VDL smaller than its allocated/logical length; the
+fragmented fixture is independently checked to have a FAT chain.
+
+For every completed 512-byte write prefix, the next write is also cut after its
+first or last 256 bytes. A fresh process mounts the image and replays the journal.
+FATtools then compares the complete namespace, file contents, VDL, first cluster,
+contiguous flag, attributes, creation time, unaffected modification times and
+free-cluster count. Rename must expose exactly the original or renamed entry,
+including directory children; partial namespace changes are rejected. Expand
+must leave either the original empty file or the entire requested zero-valid-data
+extent, without bitmap leaks. Truncate must preserve the exact retained prefix.
+
+All recovered states matched the complete old or new state. **126 cuts at or
+after the request-completion checkpoint retained the new state**. In every one
+of the **224 interrupted undo replays**, recovery restored the old state and
+returned to writable mode. Cuts include log records, before-images, publication,
+metadata writes, commit and shutdown; repeated recovery is idempotent.
+
+There were **72 protected startup handoffs**, all before the filesystem completed
+mounting and before any API operation started. At these points the dirty marker
+may have persisted without a confirmed journal-ownership header. They correctly
+mounted read-only with `AFATFS_ERROR_RECOVERY_REQUIRED` and **zero writes**;
+fsck still found clean metadata and every original file remained intact. There
+were no read-only outcomes during the API operations or interrupted undo replay.
+An unowned dirty session is not guessed to belong to this library.
+
+No library incompatibility was found, so no cache, operation-machine, journal
+format or embedded RAM allocation changed. The C test probe now preserves the
+mount error when reporting a protected read-only result, so a later missing-name
+lookup cannot obscure the ownership diagnostic. The default, FAT-only and
+exFAT/freefile self-contained regressions also passed.
+
+Evidence:
+
+```text
+tests/build/api-powercut-current/report.json
+tests/build/api-powercut-current/audit.json
+tests/build/api-powercut-current.log
+tests/build/api-powercut-regression.log
+```
+
+The full matrix was executed through the Python command below. Afterward, the
+verifier was tightened to explicitly require the old state during undo replay;
+the supplementary audit applies that stricter condition to all 224 recorded
+replays, checks all fsck codes and completion checkpoints, and verifies unchanged
+library/binary hashes. An optional repeat through the updated PowerShell runner
+was not authorized, so it is not counted as another executed matrix.
+
+```powershell
+# Compiles and selects the new API matrix (also accepts -AddressSanitizer):
+./tests/run_exfat_powercut.ps1 -Api -Python python
+
+# Direct command used for the completed run, with the compiled harness:
+python tests/exfat_api_powercut.py --binary tests/build/test_exfat_api_powercut.exe --exfatprogs tests/build/external-tools/exfatprogs-1.3.2-1.exe --output tests/build/api-powercut-current
+```
+
+The Python command accepts `--cluster`, `--scenario` and `--no-replay` for focused
+checks. All images and trace files stay under `tests/build`; physical cards are
+not accessed. As in the external-format suite, this Windows exfatprogs build must
+run outside the restricted process sandbox for successful exits.
+
 The file-backed suite records completed 512-byte writes, then starts a fresh process
 on every durable prefix and on both 256-byte prefix/suffix tears of the next write.
 Fixtures are externally formatted by FATtools, include an untouched patterned file,

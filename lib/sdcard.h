@@ -4,19 +4,15 @@
 #include <stdbool.h>
 
 typedef struct sdcard_metadata_t {
-    uint8_t manufacturerID;
+    uint32_t productSerial;
+    uint32_t numBlocks; /* Card capacity in 512-byte blocks*/
     uint16_t oemID;
-
-    char productName[5];
-
+    uint16_t productionYear;
+    uint8_t manufacturerID;
     uint8_t productRevisionMajor;
     uint8_t productRevisionMinor;
-    uint32_t productSerial;
-
-    uint16_t productionYear;
     uint8_t productionMonth;
-
-    uint32_t numBlocks; /* Card capacity in 512-byte blocks*/
+    char productName[5];
 } sdcardMetadata_t;
 
 typedef enum {
@@ -32,9 +28,10 @@ typedef enum {
     SDCARD_OPERATION_FAILURE
 } sdcardOperationStatus_e;
 
-typedef void(*sdcard_operationCompleteCallback_c)(sdcardBlockOperation_e operation, uint32_t blockIndex, uint8_t *buffer, uint32_t callbackData);
+typedef void (*sdcard_operationCompleteCallback_c)(
+    sdcardBlockOperation_e operation, uint32_t blockIndex, uint8_t *buffer, uint32_t callbackData);
 
-typedef void(*sdcard_profilerCallback_c)(sdcardBlockOperation_e operation, uint32_t blockIndex, uint32_t duration);
+typedef void (*sdcard_profilerCallback_c)(sdcardBlockOperation_e operation, uint32_t blockIndex, uint32_t duration);
 // Synchronously cancel queued/in-flight I/O (including DMA and multi-block writes).
 // After return no old request may access a buffer or write to the medium, and reset
 // must not start new I/O. Late software completion notifications may still be delivered;
@@ -53,7 +50,8 @@ void sdcard_reset(void);
  *     true - The operation was successfully queued for later completion, your callback will be called later
  *     false - The operation could not be started due to the card being busy (try again later).
  */
-bool sdcard_readBlock(uint32_t blockIndex, uint8_t *buffer, sdcard_operationCompleteCallback_c callback, uint32_t callbackData);
+bool sdcard_readBlock(
+    uint32_t blockIndex, uint8_t *buffer, sdcard_operationCompleteCallback_c callback, uint32_t callbackData);
 
 /**
  * Write the 512-byte block from the given buffer into the block with the given index.
@@ -69,7 +67,8 @@ bool sdcard_readBlock(uint32_t blockIndex, uint8_t *buffer, sdcard_operationComp
  *     SDCARD_OPERATION_BUSY        - The card is already busy and cannot accept your write
  *     SDCARD_OPERATION_FAILURE     - Your write was rejected by the card, card will be reset
  */
-sdcardOperationStatus_e sdcard_writeBlock(uint32_t blockIndex, uint8_t *buffer, sdcard_operationCompleteCallback_c callback, uint32_t callbackData);
+sdcardOperationStatus_e sdcard_writeBlock(
+    uint32_t blockIndex, uint8_t *buffer, sdcard_operationCompleteCallback_c callback, uint32_t callbackData);
 
 /**
  * Will be called by afatfs_poll() periodically for the SD card to perform in-progress transfers.
