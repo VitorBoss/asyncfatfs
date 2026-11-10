@@ -115,6 +115,7 @@ static void drain(void)
     }
 }
 
+#ifndef AFATFS_TRACE_BACKEND_ONLY
 static bool probePattern(const char *name, unsigned count, unsigned tag)
 {
     afatfsFilePtr_t file = openFile(name, "r");
@@ -302,3 +303,4 @@ int main(int argc, char **argv)
     CHECK(fclose(out) == 0);
     return 0;
 }
+#endif

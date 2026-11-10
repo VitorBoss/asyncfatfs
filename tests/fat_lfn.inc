@@ -1,4 +1,95 @@
 // Run on FAT16 and FAT32, including fixed roots, cluster crossings and delayed I/O.
+#ifdef AFATFS_USE_FREEFILE
+static void lfnReservationOpened(afatfsFilePtr_t file, void *user)
+{
+    afatfsFilePtr_t *result = user;
+    assert(file);
+    *result = file;
+}
+
+static void exerciseFatJournalReservation(void)
+{
+    afatfsFilePtr_t writer = openFile("Journal freefile owner.bin", "as");
+    assert(writer);
+    uint8_t data[123];
+    memset(data, 0x6B, sizeof(data));
+    writeBytes(writer, data, sizeof(data));
+    afatfsFilePtr_t waiting = NULL;
+    assert(afatfs_fopen("Journal freefile waiting.bin", "as", lfnReservationOpened, &waiting));
+    for (unsigned retry = 0; retry < 100; retry++) {
+        pump();
+    }
+    assert(!waiting);
+    closeFile(writer);
+    for (unsigned retry = 0; !waiting; retry++) {
+        assert(retry < 200000);
+        pump();
+    }
+    writeBytes(waiting, data, sizeof(data));
+    closeFile(waiting);
+    unmount();
+    mount();
+    const char *names[] = {"Journal freefile owner.bin", "Journal freefile waiting.bin"};
+    for (unsigned index = 0; index < sizeof(names) / sizeof(names[0]); index++) {
+        afatfsFilePtr_t file = openFile(names[index], "r");
+        assert(file);
+        memset(data, 0, sizeof(data));
+        readBytes(file, data, sizeof(data));
+        for (unsigned offset = 0; offset < sizeof(data); offset++) {
+            assert(data[offset] == 0x6B);
+        }
+        closeFile(file);
+    }
+    puts("FAT32 journal: concurrent freefile reservation/close checkpoint passed");
+}
+#endif
+
+static void exerciseFatJournalFailures(uint32_t heap, unsigned sectorsPerCluster)
+{
+    mount();
+    afatfsFilePtr_t file = openFile("AFATFS.JNL", "r");
+    if (!file) {
+        unmount();
+        return; // Explicit journal opt-out configurations remain supported.
+    }
+    afatfsFileInfo_t info;
+    afatfsOperationStatus_e status;
+    for (unsigned retry = 0; (status = afatfs_fstat(file, &info)) == AFATFS_OPERATION_IN_PROGRESS; retry++) {
+        assert(retry < 200000);
+        pump();
+    }
+    assert(status == AFATFS_OPERATION_SUCCESS);
+    uint32_t sector = heap + (info.firstCluster - 2) * sectorsPerCluster;
+    uint32_t sectors = info.size / SECTOR;
+    closeFile(file);
+#ifdef AFATFS_USE_FREEFILE
+    exerciseFatJournalReservation();
+#endif
+    unmount();
+    static const struct {
+        backendFailure_e kind;
+        backendFailureTarget_e target;
+    } cases[] = {
+        {FAIL_READ_CALLBACK, TARGET_JOURNAL_READ},
+        {FAIL_READ_SUBMIT, TARGET_JOURNAL_READ},
+        {FAIL_WRITE_CALLBACK, TARGET_UNDO},
+        {FAIL_WRITE_SUBMIT, TARGET_UNDO},
+        {FAIL_WRITE_CALLBACK, TARGET_RECORD},
+        {FAIL_WRITE_SUBMIT, TARGET_RECORD},
+        {FAIL_WRITE_CALLBACK, TARGET_PUBLISH},
+        {FAIL_WRITE_SUBMIT, TARGET_PUBLISH},
+        {FAIL_WRITE_CALLBACK, TARGET_COMMIT},
+        {FAIL_WRITE_SUBMIT, TARGET_COMMIT},
+        {FAIL_WRITE_CALLBACK, TARGET_RELEASE},
+        {FAIL_WRITE_SUBMIT, TARGET_RELEASE},
+    };
+    for (unsigned index = 0; index < sizeof(cases) / sizeof(cases[0]); index++) {
+        mount();
+        exerciseBackendFailure(cases[index].kind, cases[index].target, sector, sectors);
+    }
+    puts("FAT32 journal backend failures: all pending phases blocked power-off and recovered after retries");
+}
+
 static void lfnSaveImage(const char *stage)
 {
     const char *directory = getenv("AFATFS_LFN_IMAGE_DIR");

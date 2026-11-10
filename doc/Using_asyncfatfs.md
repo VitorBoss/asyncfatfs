@@ -72,8 +72,8 @@ alias; Unicode API encoding is outside the current scope.
 Creation generates collision-checked numeric aliases when required, flushes LFN entries before publishing
 the short entry, and preserves the following directory end marker. Deletion makes the short entry durable
 before releasing its attached LFN slots. Rename uses the existing asynchronous copy/publish/delete flow.
-FAT has no persistent journal: these ordering barriers do not make FAT rename or a multi-sector update
-atomic under power loss. Existing 8.3 names and the raw `afatfs_findNext` interface remain supported;
+FAT32 with LFN now enables the metadata journal described below. FAT16 and builds with the FAT32
+journal disabled retain ordering barriers without atomic multi-sector recovery. Existing 8.3 names and the raw `afatfs_findNext` interface remain supported;
 use `afatfs_readdir`/`afatfs_findnext` for assembled long names.
 
 `afatfs_fstat` may yield while reading a long name. Retain the same output object until it completes;
@@ -85,6 +85,45 @@ round trips, Windows-generated aliases and read-only CHKDSK checks. Request-base
 directory handles returned by open, including root directories.
 exFAT names support 1 to 255 printable ASCII characters, excluding `" * / : < > ? \\ |`. The exFAT
 implementation uses the volume's up-case table for case-insensitive comparison and name hashes.
+
+#### FAT32 Metadata Journal
+
+`ASYNCFS_ENABLE_LFN` enables the FAT32 journal by default; define `AFATFS_DISABLE_FAT_JOURNAL` to
+retain the smaller implementation without persistent recovery. FAT16 remains unjournaled. exFAT
+remains disabled by default and retains its journal when explicitly enabled.
+
+The first clean FAT32 mount reserves a contiguous hidden/system/read-only `AFATFS.JNL` file. Its
+capacity is `2 * fatSectors + 64` distinct metadata sectors, stored as two alternating header sectors
+plus one descriptor and one before-image sector per record, rounded up to a cluster. This is about
+four times one FAT's size plus 65 KiB of disk space. Provisioning needs that much contiguous free
+space and zeroes it asynchronously before application operations are accepted. The journal name and
+allocation are reserved. Do not edit, delete, move or defragment it using another writer.
+
+FAT32 and exFAT share the same capture, CRC, I/O, checkpoint and recovery engine. It uses one aligned
+512-byte buffer and the retained original cache sector, with no heap or extra per-file state. The
+filesystem adapters handle discovery, extent allocation and dirty markers; their existing disk
+signatures remain distinct and the exFAT journal format remains compatible. FAT32 validates the
+entire contiguous journal chain in both FAT copies before reading or replaying its records.
+
+An interrupted metadata transaction is validated completely, then undone before the volume becomes
+writable. Recovery can itself be interrupted and restarted. A rename is recovered as its old or new
+name, without a duplicated entry or cross-linked chain in the tested fault model. `fsync`, close,
+rename and unlink wait for their metadata checkpoint. Open callbacks alone are not durability
+points. Concurrent handles may share a transaction, so keep polling all active work.
+Both FAT copies, cache writes, the empty checkpoint, clean markers and ownership release must be
+acknowledged before clean shutdown can authorize `afatfs_canPowerOff()`.
+
+Protection starts after the first successful journal provisioning. A cut during bootstrap can leave
+unclaimed allocations or divergent FATs; dirty volumes without a trustworthy owned log are mounted
+read-only with `AFATFS_ERROR_RECOVERY_REQUIRED`. Invalid headers, record/image CRCs or journal chains
+also block recovery writes. Preserve such media for external repair. After an interrupted library
+session, let this library recover before another driver writes to the volume. Use clean shutdown
+before handing it to Windows; Windows does not replay this private journal. Interrupted external
+writers are outside its recovery contract.
+
+This protects metadata, not in-place payload overwrites or unsynced data still in RAM. Backend write
+acknowledgments must represent durable, ordered writes. See the [FAT32 power-cut and shared-journal
+validation](../tests/FAT32_LFN_POWERCUT.md) for tested cuts, limits and measured RAM costs.
 
 #### exFAT Development Support
 
@@ -121,7 +160,8 @@ after file data and metadata have been flushed. `afatfs_destroy(true)` intention
 Clean shutdown retains ownership of the committed empty journal until the clean boot marker has been
 acknowledged, then releases the journal and waits for that acknowledgment before authorizing power-off.
 A removal during either write can therefore mount writable from a valid owned empty checkpoint, without
-replaying committed data. The journal header format and RAM requirements are unchanged.
+replaying committed data. The journal header format is unchanged; the shared engine now uses one
+sector buffer, reducing static RAM by 1,024 bytes compared with the previous exFAT journal.
 exFAT reserves a contiguous hidden/system/read-only `AFATFS.JNL` file on the first clean mount. Metadata
 before-images reach this undo log before FAT, bitmap or directory sectors can be modified. An interrupted
 transaction is validated completely and replayed before the mount becomes writable. Recovery can itself
@@ -338,7 +378,7 @@ journal validation error likewise blocks clean shutdown instead of discarding ac
 
 Observes the global library state without polling or performing I/O. Returns `false` during initialization,
 errors, shutdown, file/CWD/internal-file operations, cache reads (including prefetch), writes, dirty or
-locked cache pages, and pending exFAT journal work. Clean retained read sectors alone do not make the
+locked cache pages, and pending FAT32/exFAT journal work. Clean retained read sectors alone do not make the
 system busy. A successfully stopped filesystem is idle. This uses existing state without additional fields.
 
 Idle is an activity snapshot, not permission to cut power: a mounted volume can still have open handles,
@@ -379,9 +419,10 @@ application callbacks, clears volatile cached work and reports `REMOVED` / `AFAT
 Both `isIdle` and `canPowerOff` remain false. Merely reinserting a card does not resume old requests.
 
 After reinsertion, initialize the backend for that card, call `afatfs_init()`, and wait for `READY` before
-reopening handles. A new mount revalidates the volume and recovers an owned exFAT journal. Unsynced
-data lost at removal cannot be reconstructed; in-place overwrites and FAT16/FAT32 metadata do not gain
-transactional recovery. Legacy unowned-dirty volumes and mount-ownership gaps can still require repair.
+reopening handles. A new mount revalidates the volume and recovers a trustworthy owned FAT32/exFAT
+journal when enabled. Unsynced data lost at removal cannot be reconstructed; in-place overwrites and
+unjournaled FAT16/FAT32 metadata do not gain transactional recovery. Legacy unowned-dirty volumes and
+mount-ownership gaps can still require repair.
 After any unexpected removal, recover and cleanly unmount with this library before any external writer,
 even if the boot dirty bit was already cleared: journal ownership may still belong to the interrupted
 session. Normal completed clean shutdown leaves both a clean boot marker and an unowned empty journal.
@@ -493,7 +534,8 @@ Begin creating or opening a file or directory within the CWD. Note that path sep
 are NOT supported. Only files or directories immediately within the CWD may be opened. To access files within
 a subdirectory, use the `afatfs_chdir` or `afatfs_mkdir` commands to change the CWD.
 
-The `filename` argument must be an ASCII string. Use 8.3 names on FAT16/FAT32 or up to 255 characters on exFAT. If the special
+The `filename` argument must be an ASCII string. FAT16/FAT32 accept up to 255 characters with LFN
+enabled and otherwise use 8.3 names; exFAT accepts up to 255 characters. If the special
 filename string `"."` is passed, the CWD is opened. This is useful for the `afatfs_findFirst` directory
 listing command.
 
@@ -569,7 +611,7 @@ The fclose operation returns `true` if the close has been successfully queued, o
 not be queued due to the file being busy.
 
 For FAT16, FAT32 and exFAT, the close callback waits for the file's buffered data and directory metadata
-to be written and acknowledged by the backend. exFAT also waits for its journal checkpoint. Failed writes
+to be written and acknowledged by the backend. FAT32/exFAT also wait for their enabled journal checkpoint. Failed writes
 remain pending and are retried; the callback is not issued until synchronization succeeds. Other open
 writers may still have partially filled buffers, so closing one file does not authorize powering off the
 card. Use clean destruction and `afatfs_canPowerOff()` for that decision.

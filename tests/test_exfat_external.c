@@ -136,6 +136,12 @@ static void verifyFile(const char *name, uint32_t count, unsigned tag)
     uint32_t size;
     CHECK(afatfs_fGetSize(file, &size) && size == count);
     readPattern(file, count, tag);
+    uint32_t position;
+    for (unsigned retry = 0; !afatfs_ftell(file, &position); retry++) {
+        CHECK(retry < MAX_POLLS);
+        pump();
+    }
+    CHECK(position == count);
     CHECK(afatfs_feof(file));
     closeFile(file);
 }

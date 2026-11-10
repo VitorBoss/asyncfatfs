@@ -1,0 +1,560 @@
+{
+  "status": "passed",
+  "fat32_cuts": 4538,
+  "fat32_recovery_cuts": 2142,
+  "fat32_guards": 28,
+  "bootstrap_cuts": 3047,
+  "bootstrap_protected": 3027,
+  "exfat": {
+    "cuts": 1898,
+    "structural_errors": 440,
+    "unmarked_errors": 0,
+    "dirty_mounts_wrote": 0,
+    "keep_failures": 0,
+    "close_failures": 0,
+    "sync_failures": 0,
+    "premature_flush": 0,
+    "repair_checks": 0,
+    "repair_failures": 0,
+    "repair_target_prefix_lost": 0,
+    "recovery_failures": 0,
+    "recovery_fsck_errors": 0,
+    "recovery_target_prefix_lost": 0,
+    "protected_shutdown_cuts": 0,
+    "protected_startup_cuts": 56
+  },
+  "exfat_legacy_recovery": 44,
+  "exfat_legacy_guards": 8,
+  "memory": [
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": false,
+      "before_journal": 3544,
+      "separate_engines": 4140,
+      "shared_engine": 4140,
+      "unification_saved": 0,
+      "handle": 340,
+      "journal": 580
+    },
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": true,
+      "before_journal": 3524,
+      "separate_engines": 4128,
+      "shared_engine": 4120,
+      "unification_saved": 8,
+      "handle": 338,
+      "journal": 580
+    },
+    {
+      "configuration": "default",
+      "bits": 32,
+      "short_enums": false,
+      "before_journal": 3644,
+      "separate_engines": 4244,
+      "shared_engine": 4244,
+      "unification_saved": 0,
+      "handle": 356,
+      "journal": 584
+    },
+    {
+      "configuration": "default",
+      "bits": 64,
+      "short_enums": false,
+      "before_journal": 3728,
+      "separate_engines": 4328,
+      "shared_engine": 4328,
+      "unification_saved": 0,
+      "handle": 376,
+      "journal": 584
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": false,
+      "before_journal": 10448,
+      "separate_engines": 10448,
+      "shared_engine": 9424,
+      "unification_saved": 1024,
+      "handle": 1050,
+      "journal": 580
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": true,
+      "before_journal": 10444,
+      "separate_engines": 10444,
+      "shared_engine": 9412,
+      "unification_saved": 1032,
+      "handle": 1050,
+      "journal": 580
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 32,
+      "short_enums": false,
+      "before_journal": 10816,
+      "separate_engines": 10816,
+      "shared_engine": 9792,
+      "unification_saved": 1024,
+      "handle": 1104,
+      "journal": 584
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 64,
+      "short_enums": false,
+      "before_journal": 10968,
+      "separate_engines": 10968,
+      "shared_engine": 9944,
+      "unification_saved": 1024,
+      "handle": 1128,
+      "journal": 584
+    },
+    {
+      "configuration": "exfat_only",
+      "bits": 16,
+      "short_enums": false,
+      "before_journal": 9380,
+      "separate_engines": 9380,
+      "shared_engine": 8356,
+      "unification_saved": 1024,
+      "handle": 1050,
+      "journal": 580
+    },
+    {
+      "configuration": "exfat_only",
+      "bits": 16,
+      "short_enums": true,
+      "before_journal": 9376,
+      "separate_engines": 9376,
+      "shared_engine": 8344,
+      "unification_saved": 1032,
+      "handle": 1050,
+      "journal": 580
+    },
+    {
+      "configuration": "exfat_only",
+      "bits": 32,
+      "short_enums": false,
+      "before_journal": 9692,
+      "separate_engines": 9692,
+      "shared_engine": 8668,
+      "unification_saved": 1024,
+      "handle": 1104,
+      "journal": 584
+    },
+    {
+      "configuration": "exfat_only",
+      "bits": 64,
+      "short_enums": false,
+      "before_journal": 9824,
+      "separate_engines": 9824,
+      "shared_engine": 8800,
+      "unification_saved": 1024,
+      "handle": 1128,
+      "journal": 584
+    },
+    {
+      "configuration": "fat_lfn",
+      "bits": 16,
+      "short_enums": false,
+      "before_journal": 3544,
+      "separate_engines": 4140,
+      "shared_engine": 4140,
+      "unification_saved": 0,
+      "handle": 340,
+      "journal": 580
+    },
+    {
+      "configuration": "fat_lfn",
+      "bits": 16,
+      "short_enums": true,
+      "before_journal": 3524,
+      "separate_engines": 4128,
+      "shared_engine": 4120,
+      "unification_saved": 8,
+      "handle": 338,
+      "journal": 580
+    },
+    {
+      "configuration": "fat_lfn",
+      "bits": 32,
+      "short_enums": false,
+      "before_journal": 3644,
+      "separate_engines": 4244,
+      "shared_engine": 4244,
+      "unification_saved": 0,
+      "handle": 356,
+      "journal": 584
+    },
+    {
+      "configuration": "fat_lfn",
+      "bits": 64,
+      "short_enums": false,
+      "before_journal": 3728,
+      "separate_engines": 4328,
+      "shared_engine": 4328,
+      "unification_saved": 0,
+      "handle": 376,
+      "journal": 584
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 16,
+      "short_enums": false,
+      "before_journal": 2520,
+      "separate_engines": 2520,
+      "shared_engine": 2520,
+      "unification_saved": 0,
+      "handle": 84,
+      "journal": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 16,
+      "short_enums": true,
+      "before_journal": 2500,
+      "separate_engines": 2500,
+      "shared_engine": 2500,
+      "unification_saved": 0,
+      "handle": 82,
+      "journal": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 32,
+      "short_enums": false,
+      "before_journal": 2636,
+      "separate_engines": 2636,
+      "shared_engine": 2636,
+      "unification_saved": 0,
+      "handle": 104,
+      "journal": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 64,
+      "short_enums": false,
+      "before_journal": 2736,
+      "separate_engines": 2736,
+      "shared_engine": 2736,
+      "unification_saved": 0,
+      "handle": 128,
+      "journal": 0
+    },
+    {
+      "configuration": "lfn_exfat",
+      "bits": 16,
+      "short_enums": false,
+      "before_journal": 9560,
+      "separate_engines": 9560,
+      "shared_engine": 8536,
+      "unification_saved": 1024,
+      "handle": 1086,
+      "journal": 580
+    },
+    {
+      "configuration": "lfn_exfat",
+      "bits": 16,
+      "short_enums": true,
+      "before_journal": 9544,
+      "separate_engines": 9544,
+      "shared_engine": 8512,
+      "unification_saved": 1032,
+      "handle": 1084,
+      "journal": 580
+    },
+    {
+      "configuration": "lfn_exfat",
+      "bits": 32,
+      "short_enums": false,
+      "before_journal": 9872,
+      "separate_engines": 9872,
+      "shared_engine": 8848,
+      "unification_saved": 1024,
+      "handle": 1140,
+      "journal": 584
+    },
+    {
+      "configuration": "lfn_exfat",
+      "bits": 64,
+      "short_enums": false,
+      "before_journal": 10024,
+      "separate_engines": 10024,
+      "shared_engine": 9000,
+      "unification_saved": 1024,
+      "handle": 1168,
+      "journal": 584
+    }
+  ],
+  "cases": [
+    {
+      "cluster": 512,
+      "scenario": "create",
+      "writes": 58,
+      "cuts": 407,
+      "unclean": 0,
+      "final": {
+        "issues": [],
+        "lost_clusters": 0,
+        "keep": true,
+        "source": null,
+        "destination": null,
+        "created": 0
+      }
+    },
+    {
+      "cluster": 512,
+      "scenario": "create-data",
+      "writes": 84,
+      "cuts": 589,
+      "unclean": 0,
+      "final": {
+        "issues": [],
+        "lost_clusters": 0,
+        "keep": true,
+        "source": null,
+        "destination": null,
+        "created": 1703
+      }
+    },
+    {
+      "cluster": 512,
+      "scenario": "rename",
+      "writes": 54,
+      "cuts": 379,
+      "unclean": 0,
+      "final": {
+        "issues": [],
+        "lost_clusters": 0,
+        "keep": true,
+        "source": null,
+        "destination": 1703,
+        "created": null
+      }
+    },
+    {
+      "cluster": 512,
+      "scenario": "rename-empty",
+      "writes": 54,
+      "cuts": 379,
+      "unclean": 0,
+      "final": {
+        "issues": [],
+        "lost_clusters": 0,
+        "keep": true,
+        "source": null,
+        "destination": 0,
+        "created": null
+      }
+    },
+    {
+      "cluster": 512,
+      "scenario": "rename-same",
+      "writes": 30,
+      "cuts": 211,
+      "unclean": 0,
+      "final": {
+        "issues": [],
+        "lost_clusters": 0,
+        "keep": true,
+        "source": null,
+        "destination": 1703,
+        "created": null
+      }
+    },
+    {
+      "cluster": 512,
+      "scenario": "rename-same-empty",
+      "writes": 30,
+      "cuts": 211,
+      "unclean": 0,
+      "final": {
+        "issues": [],
+        "lost_clusters": 0,
+        "keep": true,
+        "source": null,
+        "destination": 0,
+        "created": null
+      }
+    },
+    {
+      "cluster": 512,
+      "scenario": "delete",
+      "writes": 45,
+      "cuts": 316,
+      "unclean": 0,
+      "final": {
+        "issues": [],
+        "lost_clusters": 0,
+        "keep": true,
+        "source": null,
+        "destination": null,
+        "created": null
+      }
+    },
+    {
+      "cluster": 512,
+      "scenario": "delete-empty",
+      "writes": 23,
+      "cuts": 162,
+      "unclean": 0,
+      "final": {
+        "issues": [],
+        "lost_clusters": 0,
+        "keep": true,
+        "source": null,
+        "destination": null,
+        "created": null
+      }
+    },
+    {
+      "cluster": 4096,
+      "scenario": "create",
+      "writes": 24,
+      "cuts": 169,
+      "unclean": 0,
+      "final": {
+        "issues": [],
+        "lost_clusters": 0,
+        "keep": true,
+        "source": null,
+        "destination": null,
+        "created": 0
+      }
+    },
+    {
+      "cluster": 4096,
+      "scenario": "create-data",
+      "writes": 46,
+      "cuts": 323,
+      "unclean": 0,
+      "final": {
+        "issues": [],
+        "lost_clusters": 0,
+        "keep": true,
+        "source": null,
+        "destination": null,
+        "created": 1703
+      }
+    },
+    {
+      "cluster": 4096,
+      "scenario": "rename",
+      "writes": 35,
+      "cuts": 246,
+      "unclean": 0,
+      "final": {
+        "issues": [],
+        "lost_clusters": 0,
+        "keep": true,
+        "source": null,
+        "destination": 1703,
+        "created": null
+      }
+    },
+    {
+      "cluster": 4096,
+      "scenario": "rename-empty",
+      "writes": 35,
+      "cuts": 246,
+      "unclean": 0,
+      "final": {
+        "issues": [],
+        "lost_clusters": 0,
+        "keep": true,
+        "source": null,
+        "destination": 0,
+        "created": null
+      }
+    },
+    {
+      "cluster": 4096,
+      "scenario": "rename-same",
+      "writes": 30,
+      "cuts": 211,
+      "unclean": 0,
+      "final": {
+        "issues": [],
+        "lost_clusters": 0,
+        "keep": true,
+        "source": null,
+        "destination": 1703,
+        "created": null
+      }
+    },
+    {
+      "cluster": 4096,
+      "scenario": "rename-same-empty",
+      "writes": 30,
+      "cuts": 211,
+      "unclean": 0,
+      "final": {
+        "issues": [],
+        "lost_clusters": 0,
+        "keep": true,
+        "source": null,
+        "destination": 0,
+        "created": null
+      }
+    },
+    {
+      "cluster": 4096,
+      "scenario": "delete",
+      "writes": 45,
+      "cuts": 316,
+      "unclean": 0,
+      "final": {
+        "issues": [],
+        "lost_clusters": 0,
+        "keep": true,
+        "source": null,
+        "destination": null,
+        "created": null
+      }
+    },
+    {
+      "cluster": 4096,
+      "scenario": "delete-empty",
+      "writes": 23,
+      "cuts": 162,
+      "unclean": 0,
+      "final": {
+        "issues": [],
+        "lost_clusters": 0,
+        "keep": true,
+        "source": null,
+        "destination": null,
+        "created": null
+      }
+    }
+  ],
+  "source_sha256": {
+    "lib/asyncfatfs.c": "2f83b5b5ad09573b43ac11940ab17545b3843b13a4a2849247681fe19b70f504",
+    "lib/asyncfatfs.h": "3091ca85c6ab7a2255210c2766682a0e9015465bf33092e2d764799db6d0c16a",
+    "lib/asyncfatfs_api.inc": "8d8a539114ed07d66b49e047b98464f366823b3b924640e1b09149139dc0dce7",
+    "lib/asyncfatfs_exfatjournal.inc": "e67fd804f011f261182aee64ff46289c963b332b105489faa30936334d41426f",
+    "lib/asyncfatfs_fatjournal.inc": "b5cf45b0e8b4825406740f93b08efa2a1d50f90330107edf881396e39c7864dd",
+    "lib/asyncfatfs_format.inc": "64158fe17360962dd7920c6b6c69daee9e34bc96d789ffec2432784a761af26b",
+    "lib/asyncfatfs_journal.h": "394cb67e4bd85c403f8a744be8e2f9d6d60da5d5604f03696a5b203ba3d7d168",
+    "lib/asyncfatfs_journal.inc": "6563daee30f05a9a932db8bf2df10d7bad2cfe734d72530ced2f80ccae614a01",
+    "lib/asyncfatfs_lfn.inc": "31a98ad7c3b63225ea9afa6c4b22cb3fbfeb26e62f4f5010c5196a8b4941eedd",
+    "lib/builddefs.h": "a934b93a8aaea355e83f39ff1bb18188bece7c023d6ca45d0373d261b5eae623",
+    "lib/fat_standard.c": "68b93d04744f34374988dbafc91d7315c25a1e14c1fb1f609581f1efd3220f40",
+    "lib/fat_standard.h": "f1be485a582e50a75faa62897eb75672514b8e5ab066f17f36f44e75d68bab99",
+    "lib/sdcard.h": "9f8a380378011a98461dc7ba3545da9219389b6dc1350d16337f4510ff636955"
+  },
+  "evidence_sha256": {
+    "tests/build/fat-lfn-powercut/shared-torn/report.json": "886d61f0483266f767cba3cd49d0df8887e3b6cc9d7b4e19d650757b7a86220f",
+    "tests/build/fat-lfn-powercut/shared-recovery/report.json": "af4e0373bee7437ab1bcc277d207394ca7e7e4d4ccbd8351dd64a6a43c13a86f",
+    "tests/build/fat-lfn-powercut/shared-guards/report.json": "b5ee59516103575354b4f9658f9d1c8f9b76cddac1a43eb36eb1265ec169c63a",
+    "tests/build/fat-lfn-powercut/shared-provision/report.json": "a816a730e0e2e32f43bc030a1883b3e112c1c1a20e3d12c75ff0a039a4e04d51",
+    "tests/build/fat-lfn-powercut/shared-exfat/report.json": "ee87af9e268396eb1a3136419b8aa8acee538f6d7c40a254e28ff5cbeb688211",
+    "tests/build/fat-lfn-powercut/shared-exfat-legacy-recovery/report.json": "0037ee3cadbbfa40b0d1079a598bff3fa4a938fb2c7e5c903814ba61762412dd",
+    "tests/build/fat-lfn-powercut/shared-layout/report.json": "583e471de80b788ff6fe9224f40382b8dab51c3f7f3d1fe73481f346539b871d"
+  }
+}

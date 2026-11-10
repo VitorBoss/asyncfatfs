@@ -1,5 +1,8 @@
 # LFN/FAT32 com o driver nativo do Windows
 
+Esta validação é anterior ao diário FAT32. A implementação e a validação posterior por imagens estão
+em [FAT32_LFN_POWERCUT.md](FAT32_LFN_POWERCUT.md); a nova rodada nativa não foi executada.
+
 Validação em 09/11/2026 com VHDs fixos de 512 MiB, MBR, formatados pelo Windows em FAT32. A biblioteca foi compilada com LFN habilitado e exFAT desabilitado, usando o backend original de arquivos de imagem e suas operações assíncronas.
 
 Windows: `Microsoft Windows NT 10.0.26300.0`. Driver `fastfat.sys`: `10.0.26100.9711 (WinBuild.160101.0800)`.

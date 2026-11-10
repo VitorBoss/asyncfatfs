@@ -1,5 +1,8 @@
 # Validação de LFN em FAT16/FAT32
 
+Este relatório registra a etapa anterior ao diário FAT32. Os resultados atuais de recuperação,
+unificação dos diários e memória estão em [FAT32_LFN_POWERCUT.md](FAT32_LFN_POWERCUT.md).
+
 O padrão agora habilita `ASYNCFS_ENABLE_LFN` e desabilita `ASYNCFS_ENABLE_EXFAT`. Os resultados abaixo usam quatro setores de cache e três arquivos públicos, sem freefile.
 
 ## Memória

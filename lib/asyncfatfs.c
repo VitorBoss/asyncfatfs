@@ -38,6 +38,14 @@
 #include "afatfs_config.h"
 #endif
 
+#if defined(ASYNCFS_ENABLE_LFN) && !defined(AFATFS_DISABLE_FAT_JOURNAL)
+#define AFATFS_ENABLE_FAT_JOURNAL
+#endif
+
+#if defined(ASYNCFS_ENABLE_EXFAT) || defined(AFATFS_ENABLE_FAT_JOURNAL)
+#define AFATFS_ENABLE_JOURNAL
+#endif
+
 #ifdef ASYNCFS_ENABLE_LBA64
 #error "ASYNCFS_ENABLE_LBA64 requires a 64-bit storage backend and finder API; the current interfaces use uint32_t."
 #endif
@@ -121,7 +129,7 @@ typedef uint64_t LBA_t;
 typedef uint32_t LBA_t;
 #endif
 
-#ifdef ASYNCFS_ENABLE_EXFAT
+#ifdef AFATFS_ENABLE_JOURNAL
 #include "asyncfatfs_journal.h"
 #endif
 
@@ -181,9 +189,6 @@ typedef union afatfsFATSector_t {
 
 typedef struct afatfsCacheBlockDescriptor_t {
     afatfsCacheBlockState_e state;
-#ifdef ASYNCFS_ENABLE_EXFAT
-    uint32_t journalEpoch;
-#endif
 
     /*
      * The state of this block must not transition (do not flush to disk, do not discard). This is useful for a sector
@@ -220,6 +225,9 @@ typedef struct afatfsCacheBlockDescriptor_t {
 
     // This is the last time the sector was accessed
     uint32_t accessTimestamp;
+#ifdef AFATFS_ENABLE_JOURNAL
+    uint32_t journalEpoch;
+#endif
 
     /* This is set to non-zero when we expect to write a consecutive series of this many blocks (including this block),
      * so we will tell the SD-card to pre-erase those blocks.
@@ -321,6 +329,7 @@ typedef enum {
     AFATFS_APPEND_FREE_CLUSTER_PHASE_FAT_DURABLE,
     AFATFS_APPEND_FREE_CLUSTER_PHASE_BITMAP_DURABLE,
     AFATFS_APPEND_FREE_CLUSTER_PHASE_UPDATE_FAT1,
+    AFATFS_APPEND_FREE_CLUSTER_PHASE_NEW_CLUSTER_DURABLE,
     AFATFS_APPEND_FREE_CLUSTER_PHASE_UPDATE_FAT2,
     AFATFS_APPEND_FREE_CLUSTER_PHASE_UPDATE_FILE_DIRECTORY,
     AFATFS_APPEND_FREE_CLUSTER_PHASE_COMPLETE,
@@ -550,6 +559,9 @@ typedef enum {
 #endif
     AFATFS_INITIALIZATION_READ_VOLUME_ID,
     AFATFS_INITIALIZATION_READ_ROOT,
+#ifdef AFATFS_ENABLE_FAT_JOURNAL
+    AFATFS_INITIALIZATION_FAT_JOURNAL,
+#endif
 
 #ifdef AFATFS_USE_FREEFILE
     AFATFS_INITIALIZATION_FREEFILE_CREATE,
@@ -594,7 +606,7 @@ typedef struct afatfsGpt_t {
 
 typedef struct afatfs_t {
     AFATFS_ALIGNED uint8_t cache[AFATFS_SECTOR_SIZE * AFATFS_NUM_CACHE_SECTORS];
-#ifdef ASYNCFS_ENABLE_EXFAT
+#ifdef AFATFS_ENABLE_JOURNAL
     afatfsJournal_t journal;
 #endif
     afatfsFile_t openFiles[AFATFS_MAX_OPEN_FILES];
@@ -744,16 +756,14 @@ static void afatfs_resetMediaSession(afatfsFilesystemState_e state)
     afatfs.fileSystemState = state;
 }
 
-#ifdef ASYNCFS_ENABLE_EXFAT
+#ifdef AFATFS_ENABLE_JOURNAL
 static afatfsOperationStatus_e afatfs_journalBeforeWrite(int index);
 static void afatfs_journalPoll(void);
 static bool afatfs_journalCommitted(void);
-static bool afatfs_journalUnresolvedError(void)
-{
-    // A runtime validation error must not discard accepted application writes.
-    // A read-only mount of an already-invalid volume has no accepted writes.
-    return afatfs.journal.ready && afatfs.journal.phase == AFATFS_JOURNAL_ERROR;
-}
+static bool afatfs_journalUnresolvedError(void);
+#endif
+#ifdef AFATFS_ENABLE_FAT_JOURNAL
+static bool afatfs_fatJournalShutdown(void);
 #endif
 
 static void afatfs_fileOperationContinue(afatfsFile_t *file);
@@ -914,7 +924,7 @@ static void afatfs_cacheSectorMarkDirty(afatfsCacheBlockDescriptor_t *descriptor
 
 static void afatfs_cacheSectorInit(afatfsCacheBlockDescriptor_t *descriptor, LBA_t sectorIndex, bool locked)
 {
-#ifdef ASYNCFS_ENABLE_EXFAT
+#if defined(ASYNCFS_ENABLE_EXFAT) || defined(AFATFS_ENABLE_FAT_JOURNAL)
     descriptor->journalEpoch = 0;
 #endif
     descriptor->sectorIndex = sectorIndex;
@@ -1136,7 +1146,7 @@ static bool afatfs_flushCache()
     if (!afatfs_mediaSessionActive()) {
         return afatfs.fileSystemState == AFATFS_FILESYSTEM_STATE_STOPPED;
     }
-#ifdef ASYNCFS_ENABLE_EXFAT
+#ifdef AFATFS_ENABLE_JOURNAL
     if (afatfs_journalUnresolvedError()) {
         return false;
     }
@@ -1176,7 +1186,7 @@ bool afatfs_flush(void)
     if (!afatfs_flushCache()) {
         return false;
     }
-#ifdef ASYNCFS_ENABLE_EXFAT
+#ifdef AFATFS_ENABLE_JOURNAL
     if (!afatfs_journalCommitted()) {
         return false;
     }
@@ -1262,6 +1272,16 @@ static afatfsOperationStatus_e afatfs_cacheSector(
     if (!afatfs_assert((sectorFlags & AFATFS_CACHE_WRITE) == 0 || physicalSectorIndex != 0)) {
         return AFATFS_OPERATION_FAILURE;
     }
+#ifdef AFATFS_ENABLE_FAT_JOURNAL
+    if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_FAT32 && afatfs.journal.ready &&
+        (sectorFlags & AFATFS_CACHE_WRITE)) {
+        uint32_t journalStart = afatfs_fileClusterToPhysical(afatfs.journal.firstCluster, 0);
+        if (physicalSectorIndex >= journalStart && physicalSectorIndex - journalStart < afatfs.journal.sectors) {
+            afatfs.lastError = AFATFS_ERROR_DENIED;
+            return AFATFS_OPERATION_FAILURE;
+        }
+    }
+#endif
 
     int cacheSectorIndex = afatfs_allocateCacheSector(physicalSectorIndex);
 
@@ -1270,13 +1290,13 @@ static afatfsOperationStatus_e afatfs_cacheSector(
         return AFATFS_OPERATION_IN_PROGRESS;
     }
 
-#ifdef ASYNCFS_ENABLE_EXFAT
+#ifdef AFATFS_ENABLE_JOURNAL
     if ((sectorFlags & (AFATFS_CACHE_METADATA | AFATFS_CACHE_WRITE)) == (AFATFS_CACHE_METADATA | AFATFS_CACHE_WRITE) &&
         afatfs.journal.ready) {
-        afatfsCacheBlockDescriptor_t *cacheDescriptor = &afatfs.cacheDescriptor[cacheSectorIndex];
-        if (cacheDescriptor->state == AFATFS_CACHE_STATE_EMPTY) {
+        afatfsCacheBlockDescriptor_t *descriptor = &afatfs.cacheDescriptor[cacheSectorIndex];
+        if (descriptor->state == AFATFS_CACHE_STATE_EMPTY) {
             sectorFlags |= AFATFS_CACHE_READ;
-        } else if (cacheDescriptor->state != AFATFS_CACHE_STATE_READING) {
+        } else if (descriptor->state != AFATFS_CACHE_STATE_READING) {
             afatfsOperationStatus_e status = afatfs_journalBeforeWrite(cacheSectorIndex);
             if (status != AFATFS_OPERATION_SUCCESS) {
                 return status;
@@ -1344,7 +1364,7 @@ static afatfsOperationStatus_e afatfs_cacheSector(
     }
 }
 
-#ifdef ASYNCFS_ENABLE_EXFAT
+#if defined(ASYNCFS_ENABLE_EXFAT) || defined(AFATFS_ENABLE_FAT_JOURNAL)
 // CRC-32/ISO-HDLC, reflected polynomial 0xEDB88320; initial/final XOR stay with callers.
 // Constant byte lookup table: 1 KiB of read-only storage, no runtime initialization.
 static const uint32_t afatfs_crc32Table[256] = {
@@ -1614,6 +1634,8 @@ static uint32_t afatfs_crc32Update(uint32_t crc, const uint8_t *bytes, unsigned 
     return crc;
 }
 
+#endif
+#ifdef ASYNCFS_ENABLE_EXFAT
 static uint32_t afatfs_gptGet32(const uint8_t *buffer)
 {
     return buffer[0] | (uint32_t)buffer[1] << 8 | (uint32_t)buffer[2] << 16 | (uint32_t)buffer[3] << 24;
@@ -2027,19 +2049,45 @@ static afatfsOperationStatus_e afatfs_FATGetNextCluster(int fatIndex, LBA_t clus
 }
 
 /**
- * Set the cluster number that follows the given cluster. Pass 0xFFFFFFFF for nextCluster to terminate the FAT chain.
+ * Acquire writable FAT cache sectors. On FAT16/FAT32, callers update the primary
+ * sector and copy it to the returned mirror only after both acquisitions succeed.
  *
  * Returns:
  *     AFATFS_OPERATION_SUCCESS     - On success
  *     AFATFS_OPERATION_IN_PROGRESS - Card is busy, call again later
  *     AFATFS_OPERATION_FAILURE     - When the filesystem encounters a fatal error
  */
+static afatfsOperationStatus_e afatfs_FATWriteSector(
+    LBA_t fatSectorIndex, afatfsFATSector_t *sector, uint8_t **mirror, uint8_t flags, uint32_t eraseCount)
+{
+    *mirror = NULL;
+    afatfsOperationStatus_e status = afatfs_cacheSector(
+        afatfs_fatSectorToPhysical(0, fatSectorIndex), &sector->bytes, flags | AFATFS_CACHE_METADATA, eraseCount);
+    if (status == AFATFS_OPERATION_SUCCESS && afatfs.fileSystemType != FAT_FILESYSTEM_TYPE_EXFAT) {
+        // Acquire both existing cache entries before changing either copy. A cache miss must not advance the caller.
+        status = afatfs_cacheSector(afatfs_fatSectorToPhysical(1, fatSectorIndex), mirror,
+            AFATFS_CACHE_WRITE | AFATFS_CACHE_METADATA | (flags & AFATFS_CACHE_DISCARDABLE), eraseCount);
+    }
+    return status;
+}
+
 static afatfsOperationStatus_e afatfs_FATSetNextCluster(LBA_t startCluster, LBA_t nextCluster)
 {
+#ifdef AFATFS_ENABLE_FAT_JOURNAL
+    if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_FAT32 && afatfs.journal.ready &&
+        startCluster >= afatfs.journal.firstCluster &&
+        startCluster - afatfs.journal.firstCluster < afatfs.journal.sectors / afatfs.sectorsPerCluster) {
+        afatfs.lastError = AFATFS_ERROR_DENIED;
+        return AFATFS_OPERATION_FAILURE;
+    }
+    if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_FAT32 && afatfs.journal.ready && !nextCluster) {
+        afatfs.journal.blockAllocation = true;
+    }
+#endif
     afatfsFATSector_t sector;
+    uint8_t *mirror;
     LBA_t fatSectorIndex;
     LBA_t fatSectorEntryIndex;
-    LBA_t fatPhysicalSector;
     afatfsOperationStatus_e result;
 
     if (!afatfs_assert(startCluster >= FAT_SMALLEST_LEGAL_CLUSTER_NUMBER)) {
@@ -2048,16 +2096,20 @@ static afatfsOperationStatus_e afatfs_FATSetNextCluster(LBA_t startCluster, LBA_
 
     afatfs_getFATPositionForCluster(startCluster, &fatSectorIndex, &fatSectorEntryIndex);
 
-    fatPhysicalSector = afatfs_fatSectorToPhysical(0, fatSectorIndex);
-
-    result = afatfs_cacheSector(
-        fatPhysicalSector, &sector.bytes, AFATFS_CACHE_READ | AFATFS_CACHE_WRITE | AFATFS_CACHE_METADATA, 0);
+    result = afatfs_FATWriteSector(
+        fatSectorIndex, &sector, &mirror, AFATFS_CACHE_READ | AFATFS_CACHE_WRITE | AFATFS_CACHE_METADATA, 0);
 
     if (result == AFATFS_OPERATION_SUCCESS) {
         if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_FAT16) {
             sector.fat16[fatSectorEntryIndex] = nextCluster;
+        } else if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_FAT32) {
+            sector.fat32[fatSectorEntryIndex] =
+                (sector.fat32[fatSectorEntryIndex] & 0xF0000000) | (nextCluster & 0x0FFFFFFF);
         } else {
             sector.fat32[fatSectorEntryIndex] = nextCluster;
+        }
+        if (mirror) {
+            memcpy(mirror, sector.bytes, AFATFS_SECTOR_SIZE);
         }
     }
 
@@ -2195,6 +2247,38 @@ static void afatfs_fileUnlockCacheSector(afatfsFilePtr_t file)
  *     AFATFS_FIND_CLUSTER_NOT_FOUND   - The entire device was searched without finding a suitable cluster (the
  *                                       *cluster points to just beyond the final cluster).
  */
+static bool afatfs_fileReservesCluster(afatfsFilePtr_t file, uint32_t cluster)
+{
+    return (file->operation.active == AFATFS_FILE_OPERATION_APPEND_FREE_CLUSTER ||
+               file->operation.active == AFATFS_FILE_OPERATION_EXTEND_SUBDIRECTORY) &&
+        file->operation.state.appendFreeCluster.phase > AFATFS_APPEND_FREE_CLUSTER_PHASE_FIND_FREESPACE &&
+        file->operation.state.appendFreeCluster.phase < AFATFS_APPEND_FREE_CLUSTER_PHASE_COMPLETE &&
+        file->operation.state.appendFreeCluster.searchCluster == cluster;
+}
+
+static bool afatfs_clusterIsReserved(uint32_t cluster)
+{
+    if (afatfs_fileReservesCluster(&afatfs.currentDirectory, cluster)) {
+        return true;
+    }
+    for (unsigned index = 0; index < AFATFS_MAX_OPEN_FILES; index++) {
+        if (afatfs_fileReservesCluster(&afatfs.openFiles[index], cluster)) {
+            return true;
+        }
+    }
+#ifdef AFATFS_USE_FREEFILE
+    if (afatfs_fileReservesCluster(&afatfs.freeFile, cluster)) {
+        return true;
+    }
+#endif
+#ifdef AFATFS_USE_INTROSPECTIVE_LOGGING
+    if (afatfs_fileReservesCluster(&afatfs.introSpecLog, cluster)) {
+        return true;
+    }
+#endif
+    return false;
+}
+
 static afatfsFindClusterStatus_e afatfs_findClusterWithCondition(
     afatfsClusterSearchCondition_e condition, LBA_t *cluster, uint32_t searchLimit)
 {
@@ -2285,7 +2369,7 @@ static afatfsFindClusterStatus_e afatfs_findClusterWithCondition(
                             return AFATFS_FIND_CLUSTER_FATAL;
                     }
 
-                    if (fat_isFreeSpace(clusterNumber) == lookingForFree) {
+                    if ((fat_isFreeSpace(clusterNumber) && !afatfs_clusterIsReserved(*cluster)) == lookingForFree) {
                         /*
                          * The final FAT sector may have fewer than fatEntriesPerSector entries in it, so we need to
                          * check the cluster number is valid here before we report a bogus success!
@@ -2382,9 +2466,9 @@ static afatfsOperationStatus_e afatfs_FATFillWithPattern(
     afatfsFATPattern_e pattern, LBA_t *startCluster, LBA_t endCluster)
 {
     afatfsFATSector_t sector;
+    uint8_t *mirror;
     LBA_t fatSectorIndex;
     LBA_t firstEntryIndex;
-    LBA_t fatPhysicalSector;
     uint8_t fatEntrySize;
     LBA_t nextCluster;
     afatfsOperationStatus_e result;
@@ -2392,8 +2476,6 @@ static afatfsOperationStatus_e afatfs_FATFillWithPattern(
 
     // Find the position of the initial cluster to begin our fill
     afatfs_getFATPositionForCluster(*startCluster, &fatSectorIndex, &firstEntryIndex);
-
-    fatPhysicalSector = afatfs_fatSectorToPhysical(0, fatSectorIndex);
 
     // How many consecutive FAT sectors will we be overwriting?
     eraseSectorCount = (endCluster - *startCluster + firstEntryIndex + afatfs_fatEntriesPerSector() - 1) /
@@ -2405,12 +2487,13 @@ static afatfsOperationStatus_e afatfs_FATFillWithPattern(
 
         uint8_t cacheFlags = AFATFS_CACHE_WRITE | AFATFS_CACHE_DISCARDABLE;
 
-        if (firstEntryIndex > 0 || lastEntryIndex < afatfs_fatEntriesPerSector()) {
+        if (firstEntryIndex > 0 || lastEntryIndex < afatfs_fatEntriesPerSector() ||
+            afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_FAT32) {
             // We're not overwriting the entire FAT sector so we must read the existing contents
             cacheFlags |= AFATFS_CACHE_READ;
         }
 
-        result = afatfs_cacheSector(fatPhysicalSector, &sector.bytes, cacheFlags, eraseSectorCount);
+        result = afatfs_FATWriteSector(fatSectorIndex, &sector, &mirror, cacheFlags, eraseSectorCount);
 
         if (result != AFATFS_OPERATION_SUCCESS) {
             return result;
@@ -2419,10 +2502,10 @@ static afatfsOperationStatus_e afatfs_FATFillWithPattern(
 #ifdef AFATFS_DEBUG_VERBOSE
         if (pattern == AFATFS_FAT_PATTERN_FREE) {
             fprintf(stderr, "Marking cluster %u to %u as free in FAT sector %u...\n", *startCluster, endCluster,
-                fatPhysicalSector);
+                afatfs_fatSectorToPhysical(0, fatSectorIndex));
         } else {
             fprintf(stderr, "Writing FAT chain from cluster %u to %u in FAT sector %u...\n", *startCluster, endCluster,
-                fatPhysicalSector);
+                afatfs_fatSectorToPhysical(0, fatSectorIndex));
         }
 #endif
 
@@ -2437,7 +2520,7 @@ static afatfsOperationStatus_e afatfs_FATFillWithPattern(
                     }
                 } else {
                     for (uint32_t i = firstEntryIndex; i < lastEntryIndex; i++, nextCluster++) {
-                        sector.fat32[i] = nextCluster;
+                        sector.fat32[i] = (sector.fat32[i] & 0xF0000000) | (nextCluster & 0x0FFFFFFF);
                     }
                 }
 
@@ -2448,7 +2531,7 @@ static afatfsOperationStatus_e afatfs_FATFillWithPattern(
                     if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_FAT16) {
                         sector.fat16[lastEntryIndex - 1] = 0xFFFF;
                     } else {
-                        sector.fat32[lastEntryIndex - 1] = 0xFFFFFFFF;
+                        sector.fat32[lastEntryIndex - 1] |= 0x0FFFFFFF;
                     }
                     break;
                 }
@@ -2456,14 +2539,23 @@ static afatfsOperationStatus_e afatfs_FATFillWithPattern(
             case AFATFS_FAT_PATTERN_FREE:
                 fatEntrySize = afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_FAT16 ? sizeof(uint16_t) : sizeof(uint32_t);
 
-                memset(sector.bytes + firstEntryIndex * fatEntrySize, 0,
-                    (lastEntryIndex - firstEntryIndex) * fatEntrySize);
+                if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_FAT32) {
+                    for (uint32_t index = firstEntryIndex; index < lastEntryIndex; index++) {
+                        sector.fat32[index] &= 0xF0000000;
+                    }
+                } else {
+                    memset(sector.bytes + firstEntryIndex * fatEntrySize, 0,
+                        (lastEntryIndex - firstEntryIndex) * fatEntrySize);
+                }
 
                 *startCluster += lastEntryIndex - firstEntryIndex;
                 break;
         }
 
-        fatPhysicalSector++;
+        if (mirror) {
+            memcpy(mirror, sector.bytes, AFATFS_SECTOR_SIZE);
+        }
+        fatSectorIndex++;
         eraseSectorCount--;
         firstEntryIndex = 0;
     }
@@ -2547,8 +2639,8 @@ static afatfsOperationStatus_e afatfs_saveDirectoryEntry(afatfsFilePtr_t file, a
     }
 #endif
 
-    result = afatfs_cacheSector(
-        file->directoryEntryPos.sectorNumberPhysical, &sector, AFATFS_CACHE_READ | AFATFS_CACHE_WRITE, 0);
+    result = afatfs_cacheSector(file->directoryEntryPos.sectorNumberPhysical, &sector,
+        AFATFS_CACHE_READ | AFATFS_CACHE_WRITE | AFATFS_CACHE_METADATA, 0);
 
 #ifdef AFATFS_DEBUG_VERBOSE
     fprintf(stderr, "Saving directory entry to sector %u...\n", file->directoryEntryPos.sectorNumberPhysical);
@@ -2625,6 +2717,12 @@ static afatfsOperationStatus_e afatfs_appendRegularFreeClusterContinue(afatfsFil
 {
     afatfsAppendFreeCluster_t *opState = &file->operation.state.appendFreeCluster;
     afatfsOperationStatus_e status;
+#ifdef AFATFS_ENABLE_FAT_JOURNAL
+    if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_FAT32 && afatfs.journal.blockAllocation &&
+        opState->phase == AFATFS_APPEND_FREE_CLUSTER_PHASE_FIND_FREESPACE) {
+        return AFATFS_OPERATION_IN_PROGRESS;
+    }
+#endif
 #ifdef ASYNCFS_ENABLE_EXFAT
     if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_EXFAT) {
         if (afatfs.journal.blockAllocation) {
@@ -2708,11 +2806,12 @@ doMore:
                 file->exfatNoFatChain = false;
             }
 #endif
-            opState->phase = AFATFS_APPEND_FREE_CLUSTER_PHASE_ZERO_DIRECTORY;
+            opState->phase = afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_EXFAT
+                ? AFATFS_APPEND_FREE_CLUSTER_PHASE_ZERO_DIRECTORY
+                : AFATFS_APPEND_FREE_CLUSTER_PHASE_UPDATE_FAT1;
             goto doMore;
         case AFATFS_APPEND_FREE_CLUSTER_PHASE_ZERO_DIRECTORY:
-#ifdef ASYNCFS_ENABLE_EXFAT
-            if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_EXFAT && file->type == AFATFS_FILE_TYPE_DIRECTORY) {
+            if (file->type == AFATFS_FILE_TYPE_DIRECTORY) {
                 while (opState->zeroSector < afatfs.sectorsPerCluster) {
                     uint8_t *sector;
                     status =
@@ -2728,15 +2827,19 @@ doMore:
                     return AFATFS_OPERATION_IN_PROGRESS;
                 }
             }
-#endif
-            opState->phase = AFATFS_APPEND_FREE_CLUSTER_PHASE_UPDATE_FAT1;
+            opState->phase = afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_EXFAT
+                ? AFATFS_APPEND_FREE_CLUSTER_PHASE_UPDATE_FAT1
+                : opState->previousCluster ? AFATFS_APPEND_FREE_CLUSTER_PHASE_UPDATE_FAT2
+                                           : AFATFS_APPEND_FREE_CLUSTER_PHASE_FAT_DURABLE;
             goto doMore;
         case AFATFS_APPEND_FREE_CLUSTER_PHASE_UPDATE_FAT1:
             // Terminate the new cluster
             status = afatfs_FATSetNextCluster(opState->searchCluster, 0xFFFFFFFF);
 
             if (status == AFATFS_OPERATION_SUCCESS) {
-                if (opState->previousCluster) {
+                if (afatfs.fileSystemType != FAT_FILESYSTEM_TYPE_EXFAT) {
+                    opState->phase = AFATFS_APPEND_FREE_CLUSTER_PHASE_NEW_CLUSTER_DURABLE;
+                } else if (opState->previousCluster) {
                     opState->phase = AFATFS_APPEND_FREE_CLUSTER_PHASE_UPDATE_FAT2;
                 } else {
                     opState->phase = AFATFS_APPEND_FREE_CLUSTER_PHASE_FAT_DURABLE;
@@ -2745,6 +2848,12 @@ doMore:
                 goto doMore;
             }
             break;
+        case AFATFS_APPEND_FREE_CLUSTER_PHASE_NEW_CLUSTER_DURABLE:
+            if (!afatfs_flushCache()) {
+                return AFATFS_OPERATION_IN_PROGRESS;
+            }
+            opState->phase = AFATFS_APPEND_FREE_CLUSTER_PHASE_ZERO_DIRECTORY;
+            goto doMore;
         case AFATFS_APPEND_FREE_CLUSTER_PHASE_UPDATE_FAT2:
             // Add the new cluster to the pre-existing chain
             status = afatfs_FATSetNextCluster(opState->previousCluster, opState->searchCluster);
@@ -2755,11 +2864,11 @@ doMore:
             }
             break;
         case AFATFS_APPEND_FREE_CLUSTER_PHASE_FAT_DURABLE:
+            if (!afatfs_flushCache()) {
+                return AFATFS_OPERATION_IN_PROGRESS;
+            }
 #ifdef ASYNCFS_ENABLE_EXFAT
             if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_EXFAT) {
-                if (!afatfs_flushCache()) {
-                    return AFATFS_OPERATION_IN_PROGRESS;
-                }
                 opState->phase = AFATFS_APPEND_FREE_CLUSTER_PHASE_BITMAP;
                 goto doMore;
             }
@@ -4068,7 +4177,8 @@ static bool afatfs_truncateTo(afatfsFilePtr_t file, uint32_t size, afatfsFileCal
         return false;
     }
 #ifdef ASYNCFS_ENABLE_EXFAT
-    if (afatfs.journal.ready && file->firstCluster == afatfs.journal.firstCluster) {
+    if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_EXFAT && afatfs.journal.ready &&
+        file->firstCluster == afatfs.journal.firstCluster) {
         return false;
     }
 #endif
@@ -4379,7 +4489,14 @@ static bool afatfs_fileOpenAllowed(afatfsFilePtr_t file)
     if (file->firstCluster >= 2 &&
         (file->mode & (AFATFS_FILE_MODE_WRITE | AFATFS_FILE_MODE_APPEND | AFATFS_FILE_MODE_METADATA))) {
 #ifdef ASYNCFS_ENABLE_EXFAT
-        if (afatfs.journal.ready && file != &afatfs.journalFile && file->firstCluster == afatfs.journal.firstCluster) {
+        if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_EXFAT && afatfs.journal.ready && file != &afatfs.journalFile &&
+            file->firstCluster == afatfs.journal.firstCluster) {
+            return false;
+        }
+#endif
+#ifdef AFATFS_ENABLE_FAT_JOURNAL
+        if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_FAT32 && afatfs.journal.ready &&
+            file->firstCluster == afatfs.journal.firstCluster) {
             return false;
         }
 #endif
@@ -4866,6 +4983,26 @@ static afatfsFilePtr_t afatfs_createFile(
         }
         return file;
     }
+#ifdef AFATFS_ENABLE_FAT_JOURNAL
+    if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_FAT32 &&
+        (fileMode &
+            (AFATFS_FILE_MODE_CREATE | AFATFS_FILE_MODE_WRITE | AFATFS_FILE_MODE_APPEND | AFATFS_FILE_MODE_METADATA)) &&
+        !(afatfs.fileSystemState == AFATFS_FILESYSTEM_STATE_INITIALIZATION && afatfs.journal.provision &&
+            file == &afatfs.openFiles[0])) {
+        const char *reserved = AFATFS_JOURNAL_NAME;
+        unsigned index = 0;
+        while (name[index] && reserved[index] && afatfs_lfnUpper((uint8_t)name[index]) == (uint8_t)reserved[index]) {
+            index++;
+        }
+        if (!name[index] && !reserved[index]) {
+            afatfs_fileError(file, AFATFS_ERROR_DENIED);
+            if (callback) {
+                callback(NULL, user);
+            }
+            return file;
+        }
+    }
+#endif
 #ifdef ASYNCFS_ENABLE_LFN
     if (afatfs.fileSystemType != FAT_FILESYSTEM_TYPE_EXFAT && strcmp(name, ".") && !afatfs_lfnValidName(name)) {
         afatfs_fileError(file, AFATFS_ERROR_INVALID_NAME);
@@ -5089,11 +5226,13 @@ static afatfsOperationStatus_e afatfs_syncFileContinue(afatfsFilePtr_t file, uin
     if (!afatfs_flushCache()) {
         return AFATFS_OPERATION_IN_PROGRESS;
     }
+#ifdef AFATFS_ENABLE_JOURNAL
+    if (!afatfs_journalCommitted()) {
+        return AFATFS_OPERATION_IN_PROGRESS;
+    }
+#endif
 #ifdef ASYNCFS_ENABLE_EXFAT
     if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_EXFAT) {
-        if (!afatfs_journalCommitted()) {
-            return AFATFS_OPERATION_IN_PROGRESS;
-        }
         file->committedDataLength = MIN(file->logicalSize, file->validDataLength);
         file->dataDirty = false;
     }
@@ -5894,8 +6033,14 @@ static void afatfs_introspecLogCreated(afatfsFile_t *file, void *user)
 
 #endif
 
-#ifdef ASYNCFS_ENABLE_EXFAT
+#ifdef AFATFS_ENABLE_JOURNAL
 #include "asyncfatfs_journal.inc"
+#endif
+#ifdef AFATFS_ENABLE_FAT_JOURNAL
+#include "asyncfatfs_fatjournal.inc"
+#endif
+#ifdef ASYNCFS_ENABLE_EXFAT
+#include "asyncfatfs_exfatjournal.inc"
 static afatfsOperationStatus_e afatfs_exfatMountContinue(void)
 {
     uint8_t *sector;
@@ -5954,15 +6099,15 @@ static afatfsOperationStatus_e afatfs_exfatMountContinue(void)
                 if (!journal->found) {
                     afatfsFile_t *fileHandle = &afatfs.journalFile;
                     if (type == EXFAT_DIR_FILEDIR) {
-                        journal->foundEntries = raw[1] == 2 ? 1 : 0;
-                    } else if (journal->foundEntries && journal->foundEntries < 3) {
-                        journal->foundEntries++;
+                        journal->mount.foundEntries = raw[1] == 2 ? 1 : 0;
+                    } else if (journal->mount.foundEntries && journal->mount.foundEntries < 3) {
+                        journal->mount.foundEntries++;
                     }
-                    if (journal->foundEntries) {
-                        unsigned n = journal->foundEntries - 1;
+                    if (journal->mount.foundEntries) {
+                        unsigned n = journal->mount.foundEntries - 1;
                         memcpy(fileHandle->exfatEntries + n * FAT_DIRECTORY_ENTRY_SIZE, raw, FAT_DIRECTORY_ENTRY_SIZE);
                         fileHandle->exfatPositions[n] = afatfs.mountFinder;
-                        if (journal->foundEntries == 3) {
+                        if (journal->mount.foundEntries == 3) {
                             bool match = type == EXFAT_DIR_FILENAME;
                             for (unsigned k = 0; k < sizeof(AFATFS_JOURNAL_NAME) - 1; k++) {
                                 unsigned ch = raw[2 + k * 2];
@@ -5974,7 +6119,7 @@ static afatfsOperationStatus_e afatfs_exfatMountContinue(void)
                                 }
                             }
                             journal->found = match;
-                            journal->foundEntries = 0;
+                            journal->mount.foundEntries = 0;
                         }
                     }
                 }
@@ -6135,6 +6280,18 @@ doMore:
             afatfs.initPhase++;
             break;
 
+#ifdef AFATFS_ENABLE_FAT_JOURNAL
+        case AFATFS_INITIALIZATION_FAT_JOURNAL:
+            if (afatfs.fileSystemType != FAT_FILESYSTEM_TYPE_FAT32 ||
+                afatfs_fatJournalMount() == AFATFS_OPERATION_SUCCESS) {
+                afatfs.initPhase++;
+                if (afatfs.readOnly) {
+                    afatfs.initPhase = AFATFS_INITIALIZATION_DONE;
+                }
+            }
+            break;
+#endif
+
 #ifdef AFATFS_USE_FREEFILE
         case AFATFS_INITIALIZATION_FREEFILE_CREATE:
             afatfs.initPhase = AFATFS_INITIALIZATION_FREEFILE_CREATING;
@@ -6251,7 +6408,7 @@ void afatfs_poll()
     }
     // Only attempt to continue FS operations if the card is present & ready, otherwise we would just be wasting time
     if (sdcard_poll()) {
-#ifdef ASYNCFS_ENABLE_EXFAT
+#ifdef AFATFS_ENABLE_JOURNAL
         afatfs_journalPoll();
 #endif
         afatfs_flushCache();
@@ -6364,6 +6521,15 @@ bool afatfs_isIdle(void)
         afatfs.cacheFlushInProgress || afatfs.cwdWalkMutex) {
         return false;
     }
+#ifdef AFATFS_ENABLE_JOURNAL
+    {
+        const afatfsJournal_t *state = &afatfs.journal;
+        if (state->ioPending || state->ioDone || state->ioFailed || state->active || state->provision ||
+            state->headerPrepared || state->blockAllocation || state->phase != AFATFS_JOURNAL_IDLE) {
+            return false;
+        }
+    }
+#endif
 
     if (afatfs_fileHasPendingWork(&afatfs.currentDirectory)) {
         return false;
@@ -6392,10 +6558,7 @@ bool afatfs_isIdle(void)
     }
 #ifdef ASYNCFS_ENABLE_EXFAT
     if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_EXFAT) {
-        const afatfsJournal_t *journal = &afatfs.journal;
-        if (afatfs.allocationOwner || afatfs_fileHasPendingWork(&afatfs.journalFile) || journal->ioPending ||
-            journal->ioDone || journal->ioFailed || journal->active || journal->provision || journal->headerPrepared ||
-            journal->blockAllocation || journal->phase != AFATFS_JOURNAL_IDLE) {
+        if (afatfs.allocationOwner || afatfs_fileHasPendingWork(&afatfs.journalFile)) {
             return false;
         }
     }
@@ -6510,7 +6673,7 @@ bool afatfs_destroy(bool dirty)
         }
         return false;
     }
-#ifdef ASYNCFS_ENABLE_EXFAT
+#ifdef AFATFS_ENABLE_JOURNAL
     if (!dirty && afatfs_journalUnresolvedError()) {
         return false;
     }
@@ -6574,6 +6737,11 @@ bool afatfs_destroy(bool dirty)
         if (!afatfs_syncFsInfo()) {
             return false;
         }
+#ifdef AFATFS_ENABLE_FAT_JOURNAL
+        if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_FAT32 && !afatfs_fatJournalShutdown()) {
+            return false;
+        }
+#endif
 
 #ifdef ASYNCFS_ENABLE_EXFAT
         if (afatfs.fileSystemType == FAT_FILESYSTEM_TYPE_EXFAT && !afatfs.readOnly) {

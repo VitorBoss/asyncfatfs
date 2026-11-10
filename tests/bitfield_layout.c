@@ -45,11 +45,11 @@ LAYOUT_ASSERT(check_16bit_int, sizeof(int) == 2);
 #endif
 #ifdef ASYNCFS_ENABLE_EXFAT
 LAYOUT_ASSERT(check_valid_length, MEMBER_ALIGNED(afatfsFile_t, validDataLength, uint32_t));
+#endif
+#ifdef AFATFS_ENABLE_JOURNAL
 LAYOUT_ASSERT(check_journal_member, MEMBER_ALIGNED(afatfs_t, journal, afatfsJournal_t));
 LAYOUT_ASSERT(check_journal_alignment, TYPE_ALIGNMENT(afatfsJournal_t) >= 4);
 LAYOUT_ASSERT(check_journal_io, offsetof(afatfsJournal_t, io) % 4 == 0);
-LAYOUT_ASSERT(check_journal_before, offsetof(afatfsJournal_t, before) % 4 == 0);
-LAYOUT_ASSERT(check_journal_header, offsetof(afatfsJournal_t, header) % 4 == 0);
 LAYOUT_ASSERT(check_journal_cluster, MEMBER_ALIGNED(afatfsJournal_t, firstCluster, uint32_t));
 #endif
 
@@ -76,18 +76,6 @@ LAYOUT_ASSERT(check_journal_cluster, MEMBER_ALIGNED(afatfsJournal_t, firstCluste
 #define GPT_FLAGS(APPLY)                                                                                               \
     APPLY(readOnly)                                                                                                    \
     APPLY(backupKnown)
-#define JOURNAL_FLAGS(APPLY)                                                                                           \
-    APPLY(ready)                                                                                                       \
-    APPLY(provision)                                                                                                   \
-    APPLY(found)                                                                                                       \
-    APPLY(owned)                                                                                                       \
-    APPLY(active)                                                                                                      \
-    APPLY(ioPending)                                                                                                   \
-    APPLY(ioDone)                                                                                                      \
-    APPLY(ioFailed)                                                                                                    \
-    APPLY(headerPrepared)                                                                                              \
-    APPLY(startupDirty)                                                                                                \
-    APPLY(blockAllocation)
 #define FILESYSTEM_FLAGS(APPLY)                                                                                        \
     APPLY(cacheFlushInProgress)                                                                                        \
     APPLY(filesystemFull)                                                                                              \
@@ -167,12 +155,27 @@ DEFINE_FLAG_TEST(check_truncate_flags, afatfsTruncateFile_t, TRUNCATE_FLAGS)
 DEFINE_FLAG_TEST(check_create_flags, afatfsCreateFile_t, CREATE_FLAGS)
 DEFINE_FLAG_TEST(check_file_flags, afatfsFile_t, FILE_FLAGS)
 DEFINE_FLAG_TEST(check_filesystem_flags, afatfs_t, FILESYSTEM_FLAGS)
+#ifdef AFATFS_ENABLE_JOURNAL
+#define JOURNAL_FLAGS(APPLY)                                                                                           \
+    APPLY(ready)                                                                                                       \
+    APPLY(active)                                                                                                      \
+    APPLY(owned)                                                                                                       \
+    APPLY(found)                                                                                                       \
+    APPLY(validHeader)                                                                                                 \
+    APPLY(headerPrepared)                                                                                              \
+    APPLY(ioPending)                                                                                                   \
+    APPLY(ioDone)                                                                                                      \
+    APPLY(ioFailed)                                                                                                    \
+    APPLY(startupDirty)                                                                                                \
+    APPLY(provision)                                                                                                   \
+    APPLY(blockAllocation)
+DEFINE_FLAG_TEST(check_shared_journal_flags, afatfsJournal_t, JOURNAL_FLAGS)
+#endif
 #ifdef ASYNCFS_ENABLE_LFN
 DEFINE_FLAG_TEST(check_longname_flags, afatfsLongNameState_t, LONGNAME_FLAGS)
 #endif
 #ifdef ASYNCFS_ENABLE_EXFAT
 DEFINE_FLAG_TEST(check_gpt_flags, afatfsGpt_t, GPT_FLAGS)
-DEFINE_FLAG_TEST(check_journal_flags, afatfsJournal_t, JOURNAL_FLAGS)
 #endif
 
 // XC16 -S exposes these compile-time values as .word records, without hardware I/O.
@@ -184,11 +187,11 @@ const uint16_t afatfs_layout_sizes[] = {
     sizeof(afatfsRequest_t),
     sizeof(afatfsDirectory_t),
     sizeof(afatfsTruncateFile_t),
-#ifdef ASYNCFS_ENABLE_EXFAT
+#ifdef AFATFS_ENABLE_JOURNAL
     sizeof(afatfsJournal_t),
     offsetof(afatfsJournal_t, io),
-    offsetof(afatfsJournal_t, before),
-    offsetof(afatfsJournal_t, header),
+    0, // Removed before-image buffer; keep the historical metric columns.
+    0, // Removed header buffer.
 #endif
 };
 
@@ -201,12 +204,14 @@ int main(void)
     result |= check_create_flags();
     result |= check_file_flags();
     result |= check_filesystem_flags();
+#ifdef AFATFS_ENABLE_JOURNAL
+    result |= check_shared_journal_flags();
+#endif
 #ifdef ASYNCFS_ENABLE_LFN
     result |= check_longname_flags();
 #endif
 #ifdef ASYNCFS_ENABLE_EXFAT
     result |= check_gpt_flags();
-    result |= check_journal_flags();
 #endif
     if (result) {
         fprintf(stderr, "Boolean conversion or flag isolation failed at line %d\n", result);

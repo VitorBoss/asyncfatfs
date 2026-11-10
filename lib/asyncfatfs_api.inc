@@ -1149,6 +1149,10 @@ static void afatfs_apiRename(afatfsRequest_t *request)
             memcpy(entry, request->scratch, 32);
             memcpy(entry, name, 11);
             entry[12] = caseFlags;
+            if (source->directoryEntryPos.sectorNumberPhysical == target->directoryEntryPos.sectorNumberPhysical) {
+                // Publish and retire both short entries in the same atomic-sector write.
+                buffer[source->directoryEntryPos.entryIndex * 32] = FAT_DELETED_FILE_MARKER;
+            }
         }
         request->phase = 4;
     }

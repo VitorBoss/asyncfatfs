@@ -80,15 +80,16 @@ static bool injectBackendFailure(backendFailure_e kind, uint32_t block, const ui
             match = journal;
             break;
         case TARGET_UNDO:
-            match = journal && bytes && memcmp(bytes, "AFJNL002", 8) && memcmp(bytes, "AFUNDO02", 8);
+            match = journal && bytes && memcmp(bytes, "AFJNL002", 8) && memcmp(bytes, "AFUNDO02", 8) &&
+                memcmp(bytes, "AFJFT001", 8) && memcmp(bytes, "AFFUNDO1", 8);
             break;
         case TARGET_RECORD:
-            match = journal && bytes && !memcmp(bytes, "AFUNDO02", 8);
+            match = journal && bytes && (!memcmp(bytes, "AFUNDO02", 8) || !memcmp(bytes, "AFFUNDO1", 8));
             break;
         case TARGET_PUBLISH:
         case TARGET_COMMIT:
         case TARGET_RELEASE:
-            if (journal && bytes && !memcmp(bytes, "AFJNL002", 8)) {
+            if (journal && bytes && (!memcmp(bytes, "AFJNL002", 8) || !memcmp(bytes, "AFJFT001", 8))) {
                 uint32_t active = bytes[20];
                 uint32_t owned = bytes[24];
                 match = backendFailure.target == TARGET_PUBLISH ? active && (bytes[16] || bytes[17])
@@ -985,7 +986,7 @@ static void exerciseBackendFailure(
     closeFile(other);
     unmount();
     printf("backend failure (%s, kind %u, target %u): %u failures blocked power-off; retry and remount passed\n",
-        journalSectors ? "exFAT" : "FAT", (unsigned)kind, (unsigned)target, hits);
+        journalSectors ? "journaled" : "FAT", (unsigned)kind, (unsigned)target, hits);
 }
 
 static void exerciseFailedPrefetch(const char *source)
@@ -2594,6 +2595,11 @@ static void exerciseFat(bool fat32, unsigned sectorsPerCluster)
     exerciseBackendFailure(FAIL_END_WRITE, TARGET_STOP, 0, 0);
     mount();
     exerciseFailedPrefetch("PWRREAD.BIN");
+#ifdef TEST_LFN
+    if (fat32) {
+        exerciseFatJournalFailures(heap, sectorsPerCluster);
+    }
+#endif
     exerciseFatMediaRemoval();
     printf("FAT%u regression (%u sectors/cluster): passed\n", fat32 ? 32 : 16, sectorsPerCluster);
 }

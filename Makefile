@@ -9,7 +9,7 @@ CFLAGS = -O0 \
 	-Ilib/
 
 AFATFS_SOURCE = lib/fat_standard.c lib/asyncfatfs.c
-AFATFS_HEADERS = lib/asyncfatfs.h lib/fat_standard.h lib/sdcard.h lib/builddefs.h lib/asyncfatfs_journal.h lib/asyncfatfs_journal.inc lib/asyncfatfs_lfn.inc lib/asyncfatfs_api.inc lib/asyncfatfs_format.inc
+AFATFS_HEADERS = lib/asyncfatfs.h lib/fat_standard.h lib/sdcard.h lib/builddefs.h lib/asyncfatfs_journal.h lib/asyncfatfs_journal.inc lib/asyncfatfs_exfatjournal.inc lib/asyncfatfs_fatjournal.inc lib/asyncfatfs_lfn.inc lib/asyncfatfs_api.inc lib/asyncfatfs_format.inc
 TEST_SOURCE = tests/sdcard_sim.c tests/common.c
 SDCARD_TEMP_FILE = tests/sdcard_temp.dmg
 
