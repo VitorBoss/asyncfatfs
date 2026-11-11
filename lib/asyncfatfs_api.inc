@@ -726,7 +726,7 @@ static void afatfs_apiLabel(afatfsRequest_t *request)
             }
 #ifdef ASYNCFS_ENABLE_EXFAT
             else {
-                info->serial = afatfs.volumeSerial;
+                info->serial = afatfs.journal.serial;
             }
 #endif
             info->clusterSize = afatfs_clusterSize();

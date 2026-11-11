@@ -22,7 +22,10 @@ try {
     if ($LASTEXITCODE) {
         throw 'FAT32 power-cut harness compilation failed.'
     }
-    $cutOptions = if ($Torn) { @('--torn') } else { @() }
+    [string[]]$cutOptions = @()
+    if ($Torn) {
+        $cutOptions = @('--torn')
+    }
     & $Python tests/fat_lfn_powercut.py --binary $binary --output $OutputDirectory @cutOptions
     if ($LASTEXITCODE) {
         throw 'FAT32 operation power-cut validation failed.'

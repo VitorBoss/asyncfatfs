@@ -2315,6 +2315,14 @@ static void exerciseAccessProtection(bool exfat)
         exfat ? "exFAT" : "FAT");
 }
 
+static void closeConflictOpened(afatfsFilePtr_t file, void *user)
+{
+    // A cold directory may require I/O before checking identity. A successful
+    // reopen is only allowed after the original close callback has completed.
+    assert(!file || completed);
+    concurrentOpen(file, user);
+}
+
 static void exerciseCloseDurability(void)
 {
     const backendFailure_e failures[] = {FAIL_NONE, FAIL_WRITE_SUBMIT, FAIL_WRITE_CALLBACK, FAIL_END_WRITE};
@@ -2331,12 +2339,12 @@ static void exerciseCloseDurability(void)
         completed = false;
         assert(afatfs_fclose(file, done, &callbackContext));
         pendingOpen_t conflict = {0};
-        assert(afatfs_fopen("CLOSE.BIN", "r+", concurrentOpen, &conflict));
+        assert(afatfs_fopen("CLOSE.BIN", "r+", closeConflictOpened, &conflict));
         for (unsigned p = 0; p < 32; p++) {
             pump();
             assert(!completed && !afatfs_canPowerOff());
         }
-        assert(conflict.done && !conflict.file);
+        assert(!conflict.file);
         holdIO = false;
         if (failures[f] != FAIL_NONE) {
             for (unsigned p = 0; backendFailure.hits < 3; p++) {

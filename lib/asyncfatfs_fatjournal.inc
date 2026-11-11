@@ -14,24 +14,24 @@ static afatfsOperationStatus_e afatfs_fjDirty(bool dirty)
 
 static afatfsOperationStatus_e afatfs_fatJournalMount(void)
 {
-    afatfsJournal_t *state = &afatfs.journal;
+    afatfsJournal_t *journalState = &afatfs.journal;
     afatfsFilePtr_t file = &afatfs.openFiles[0];
     uint8_t *buffer;
     uint32_t value;
     afatfsOperationStatus_e status;
-    if (state->phase == AFATFS_JOURNAL_ERROR) {
+    if (journalState->phase == AFATFS_JOURNAL_ERROR) {
         afatfs_findLast(&afatfs.currentDirectory);
         afatfs_initFileHandle(file);
         afatfs_chdir(NULL);
         return AFATFS_OPERATION_SUCCESS;
     }
-    switch (state->initPhase) {
-        case 0:
+    switch (journalState->lifecycle.initPhase) {
+        case AFATFS_JOURNAL_INIT_PREPARE:
             status = afatfs_cacheSector(afatfs.partitionStartSector, &buffer, AFATFS_CACHE_READ, 0);
             if (status != AFATFS_OPERATION_SUCCESS) {
                 return status;
             }
-            state->serial = ((fatVolumeID_t *)buffer)->fat.fatDescriptor.fat32.volumeID;
+            journalState->serial = ((fatVolumeID_t *)buffer)->fat.fatDescriptor.fat32.volumeID;
             uint64_t capacity = (uint64_t)2 * afatfs.fatSectors + 64;
             uint64_t sectors =
                 (2 + 2 * capacity + afatfs.sectorsPerCluster - 1) / afatfs.sectorsPerCluster * afatfs.sectorsPerCluster;
@@ -39,23 +39,26 @@ static afatfsOperationStatus_e afatfs_fatJournalMount(void)
                 afatfs_jfail();
                 break;
             }
-            state->capacity = (uint32_t)capacity;
-            state->sectors = (uint32_t)sectors;
-            state->pendingCache = -1;
-            state->initPhase = 1;
+            journalState->capacity = (uint32_t)capacity;
+            journalState->sectors = (uint32_t)sectors;
+            journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_FAT_READ_PRIMARY_STATUS;
             break;
-        case 1:
-        case 2:
-            status = afatfs_FATGetNextCluster(state->initPhase - 1, 1, &value);
+        case AFATFS_JOURNAL_INIT_FAT_READ_PRIMARY_STATUS:
+        case AFATFS_JOURNAL_INIT_FAT_READ_MIRROR_STATUS:
+            status = afatfs_FATGetNextCluster(
+                journalState->lifecycle.initPhase == AFATFS_JOURNAL_INIT_FAT_READ_PRIMARY_STATUS ? 0 : 1, 1, &value);
             if (status != AFATFS_OPERATION_SUCCESS) {
                 return status;
             }
-            state->startupDirty |= !(value & 0x08000000U);
-            if (++state->initPhase == 3) {
+            journalState->startupDirty |= !(value & 0x08000000U);
+            if (journalState->lifecycle.initPhase == AFATFS_JOURNAL_INIT_FAT_READ_PRIMARY_STATUS) {
+                journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_FAT_READ_MIRROR_STATUS;
+            } else {
+                journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_FAT_FIND_FILE;
                 afatfs_findFirst(&afatfs.currentDirectory, &file->directoryEntryPos);
             }
             break;
-        case 3: {
+        case AFATFS_JOURNAL_INIT_FAT_FIND_FILE: {
             fatDirectoryEntry_t *entry;
             status = afatfs_findNext(&afatfs.currentDirectory, &file->directoryEntryPos, &entry);
             if (status != AFATFS_OPERATION_SUCCESS) {
@@ -63,113 +66,122 @@ static afatfsOperationStatus_e afatfs_fatJournalMount(void)
             }
             if (entry && !fat_isDirectoryEntryEmpty(entry) && !memcmp(entry->fileName, "AFATFS  JNL", 11)) {
                 afatfs_fileLoadDirectoryEntry(file, entry);
-                if (file->type != AFATFS_FILE_TYPE_NORMAL || file->logicalSize != state->sectors * 512 ||
+                if (file->type != AFATFS_FILE_TYPE_NORMAL || file->logicalSize != journalState->sectors * 512 ||
                     (file->attrib & 7) != 7 || file->firstCluster < 2 ||
-                    file->firstCluster - 2 + state->sectors / afatfs.sectorsPerCluster > afatfs.numClusters) {
+                    file->firstCluster - 2 + journalState->sectors / afatfs.sectorsPerCluster > afatfs.numClusters) {
                     afatfs_jfail();
                     break;
                 }
-                state->firstCluster = file->firstCluster;
-                state->found = true;
+                journalState->firstCluster = file->firstCluster;
+                journalState->found = true;
                 afatfs_findLast(&afatfs.currentDirectory);
-                state->progress = 0;
-                state->initPhase = 50;
+                journalState->work.setup.progress = 0;
+                journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_FAT_VALIDATE_PRIMARY_CHAIN;
             } else if (!entry || fat_isDirectoryEntryTerminator(entry)) {
                 afatfs_findLast(&afatfs.currentDirectory);
-                if (state->startupDirty) {
+                if (journalState->startupDirty) {
                     afatfs_jfail();
                 } else {
-                    state->provision = true;
-                    state->initPhase = 30;
+                    journalState->provision = true;
+                    journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_PROVISION_MARK_DIRTY;
                 }
             }
             break;
         }
-        case 50:
-        case 51:
-            status = afatfs_FATGetNextCluster(state->initPhase - 50, state->firstCluster + state->progress, &value);
+        case AFATFS_JOURNAL_INIT_FAT_VALIDATE_PRIMARY_CHAIN:
+        case AFATFS_JOURNAL_INIT_FAT_VALIDATE_MIRROR_CHAIN:
+            status = afatfs_FATGetNextCluster(
+                journalState->lifecycle.initPhase == AFATFS_JOURNAL_INIT_FAT_VALIDATE_PRIMARY_CHAIN ? 0 : 1,
+                journalState->firstCluster + journalState->work.setup.progress, &value);
             if (status != AFATFS_OPERATION_SUCCESS) {
                 return status;
             }
-            if (state->progress + 1 == state->sectors / afatfs.sectorsPerCluster
+            if (journalState->work.setup.progress + 1 == journalState->sectors / afatfs.sectorsPerCluster
                     ? !afatfs_FATIsEndOfChainMarker(value)
-                    : value != state->firstCluster + state->progress + 1) {
+                    : value != journalState->firstCluster + journalState->work.setup.progress + 1) {
                 afatfs_jfail();
                 break;
             }
-            if (state->initPhase == 50) {
-                state->initPhase = 51;
-            } else if (++state->progress == state->sectors / afatfs.sectorsPerCluster) {
-                state->initPhase = 4;
+            if (journalState->lifecycle.initPhase == AFATFS_JOURNAL_INIT_FAT_VALIDATE_PRIMARY_CHAIN) {
+                journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_FAT_VALIDATE_MIRROR_CHAIN;
             } else {
-                state->initPhase = 50;
-            }
-            break;
-        case 4:
-        case 5:
-            if (afatfs_jio(false, afatfs_jsector(state->initPhase - 4))) {
-                afatfs_jselectHeader(state->initPhase - 4);
-                if (++state->initPhase == 6) {
-                    if (!state->validHeader || (state->startupDirty && !state->owned) ||
-                        (!state->startupDirty && state->active)) {
-                        afatfs_jfail();
-                    } else {
-                        state->scan = 0;
-                        state->initPhase = 7;
-                    }
+                journalState->work.setup.progress++;
+                if (journalState->work.setup.progress == journalState->sectors / afatfs.sectorsPerCluster) {
+                    journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_READ_PRIMARY_HEADER;
+                } else {
+                    journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_FAT_VALIDATE_PRIMARY_CHAIN;
                 }
             }
             break;
-        case 7:
-            if (afatfs_journalRecover() == AFATFS_OPERATION_SUCCESS) {
-                state->owned = true;
-                state->initPhase = 13;
+        case AFATFS_JOURNAL_INIT_READ_PRIMARY_HEADER:
+        case AFATFS_JOURNAL_INIT_READ_SECONDARY_HEADER:
+            if (afatfs_jio(false,
+                    afatfs_jsector(
+                        journalState->lifecycle.initPhase == AFATFS_JOURNAL_INIT_READ_PRIMARY_HEADER ? 0 : 1))) {
+                afatfs_jselectHeader(
+                    journalState->lifecycle.initPhase == AFATFS_JOURNAL_INIT_READ_PRIMARY_HEADER ? 0 : 1);
+                if (journalState->lifecycle.initPhase == AFATFS_JOURNAL_INIT_READ_SECONDARY_HEADER) {
+                    if (!journalState->validHeader || (journalState->startupDirty && !journalState->owned) ||
+                        (!journalState->startupDirty && journalState->active)) {
+                        afatfs_jfail();
+                    } else {
+                        journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_RECOVER;
+                    }
+                } else {
+                    journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_READ_SECONDARY_HEADER;
+                }
             }
             break;
-        case 13:
+        case AFATFS_JOURNAL_INIT_RECOVER:
+            if (afatfs_journalRecover() == AFATFS_OPERATION_SUCCESS) {
+                journalState->owned = true;
+                journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_RECOVERY_CHECKPOINT;
+            }
+            break;
+        case AFATFS_JOURNAL_INIT_RECOVERY_CHECKPOINT:
             if (afatfs_jwriteHeader()) {
                 memset(afatfs.cacheDescriptor, 0, sizeof(afatfs.cacheDescriptor));
                 afatfs.cacheDirtyEntries = 0;
                 afatfs.cacheFlushInProgress = false;
                 afatfs_initFileHandle(file);
                 afatfs_chdir(NULL);
-                state->initPhase = 14;
+                journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_MARK_DIRTY;
             }
             break;
-        case 14:
+        case AFATFS_JOURNAL_INIT_MARK_DIRTY:
             if (afatfs_fjDirty(true) == AFATFS_OPERATION_SUCCESS) {
-                state->initPhase = 15;
+                journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_FLUSH_DIRTY;
             }
             break;
-        case 15:
+        case AFATFS_JOURNAL_INIT_FLUSH_DIRTY:
             if (afatfs_flushCache()) {
-                state->owned = true;
-                state->initPhase = 16;
+                journalState->owned = true;
+                journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_CLAIM_OWNERSHIP;
             }
             break;
-        case 16:
+        case AFATFS_JOURNAL_INIT_CLAIM_OWNERSHIP:
             if (afatfs_jwriteHeader()) {
-                state->ready = true;
-                state->provision = false;
-                state->phase = AFATFS_JOURNAL_IDLE;
-                state->pendingCache = -1;
+                journalState->work.capture.pendingCache = -1;
+                journalState->ready = true;
+                journalState->provision = false;
+                journalState->phase = AFATFS_JOURNAL_IDLE;
                 return AFATFS_OPERATION_SUCCESS;
             }
             break;
-        case 30:
+        case AFATFS_JOURNAL_INIT_PROVISION_MARK_DIRTY:
             if (afatfs_fjDirty(true) == AFATFS_OPERATION_SUCCESS) {
-                state->initPhase = 31;
+                journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_PROVISION_CREATE_FILE;
             }
             break;
-        case 31:
+        case AFATFS_JOURNAL_INIT_PROVISION_CREATE_FILE:
             if (!afatfs_flushCache()) {
                 break;
             }
             afatfs_createFile(
                 file, AFATFS_JOURNAL_NAME, 7, AFATFS_FILE_MODE_CREATE | AFATFS_FILE_MODE_READ, NULL, NULL);
-            state->initPhase = 32;
+            journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_PROVISION_WAIT_FILE;
             break;
-        case 32:
+        case AFATFS_JOURNAL_INIT_PROVISION_WAIT_FILE:
             afatfs_fileOperationContinue(&afatfs.currentDirectory);
             afatfs_fileOperationContinue(file);
             if (file->operation.active != AFATFS_FILE_OPERATION_NONE) {
@@ -179,86 +191,89 @@ static afatfsOperationStatus_e afatfs_fatJournalMount(void)
                 afatfs_jfail();
                 break;
             }
-            state->candidate = 2;
-            state->runLength = 0;
-            state->initPhase = 33;
+            journalState->work.setup.candidate = 2;
+            journalState->work.setup.runLength = 0;
+            journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_PROVISION_FIND_EXTENT;
             break;
-        case 33:
-            if (state->candidate - 2 >= afatfs.numClusters) {
+        case AFATFS_JOURNAL_INIT_PROVISION_FIND_EXTENT:
+            if (journalState->work.setup.candidate - 2 >= afatfs.numClusters) {
                 afatfs_jfail();
                 break;
             }
-            status = afatfs_FATGetNextCluster(0, state->candidate, &value);
+            status = afatfs_FATGetNextCluster(0, journalState->work.setup.candidate, &value);
             if (status != AFATFS_OPERATION_SUCCESS) {
                 return status;
             }
-            state->runLength = value ? 0 : state->runLength + 1;
-            state->candidate++;
-            if (state->runLength == state->sectors / afatfs.sectorsPerCluster) {
-                state->firstCluster = state->candidate - state->runLength;
-                state->progress = 0;
-                state->initPhase = 34;
+            journalState->work.setup.runLength = value ? 0 : journalState->work.setup.runLength + 1;
+            journalState->work.setup.candidate++;
+            if (journalState->work.setup.runLength == journalState->sectors / afatfs.sectorsPerCluster) {
+                journalState->firstCluster = journalState->work.setup.candidate - journalState->work.setup.runLength;
+                journalState->work.setup.progress = 0;
+                journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_PROVISION_ZERO_EXTENT;
             }
             break;
-        case 34:
-            if (state->progress == state->sectors) {
-                state->progress = 0;
-                state->initPhase = 35;
+        case AFATFS_JOURNAL_INIT_PROVISION_ZERO_EXTENT:
+            if (journalState->work.setup.progress == journalState->sectors) {
+                journalState->work.setup.progress = 0;
+                journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_PROVISION_ALLOCATE_EXTENT;
             } else {
-                if (!state->ioPending && !state->ioDone) {
-                    memset(state->io, 0, 512);
+                if (!journalState->ioPending && !journalState->ioDone) {
+                    memset(journalState->io, 0, 512);
                 }
-                if (afatfs_jio(true, afatfs_jsector(state->progress))) {
-                    state->progress++;
+                if (afatfs_jio(true, afatfs_jsector(journalState->work.setup.progress))) {
+                    journalState->work.setup.progress++;
                 }
             }
             break;
-        case 35:
-            if (state->progress == state->sectors / afatfs.sectorsPerCluster) {
-                state->initPhase = 36;
+        case AFATFS_JOURNAL_INIT_PROVISION_ALLOCATE_EXTENT:
+            if (journalState->work.setup.progress == journalState->sectors / afatfs.sectorsPerCluster) {
+                journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_PROVISION_FLUSH_ALLOCATION;
             } else {
-                value = state->firstCluster + state->progress;
-                status = afatfs_FATSetNextCluster(
-                    value, state->progress + 1 == state->sectors / afatfs.sectorsPerCluster ? UINT32_MAX : value + 1);
+                value = journalState->firstCluster + journalState->work.setup.progress;
+                status = afatfs_FATSetNextCluster(value,
+                    journalState->work.setup.progress + 1 == journalState->sectors / afatfs.sectorsPerCluster
+                        ? UINT32_MAX
+                        : value + 1);
                 if (status != AFATFS_OPERATION_SUCCESS) {
                     return status;
                 }
-                state->progress++;
+                journalState->work.setup.progress++;
             }
             break;
-        case 36:
+        case AFATFS_JOURNAL_INIT_PROVISION_FLUSH_ALLOCATION:
             if (afatfs_flushCache()) {
-                file->firstCluster = state->firstCluster;
-                file->physicalSize = state->sectors * 512;
+                file->firstCluster = journalState->firstCluster;
+                file->physicalSize = journalState->sectors * 512;
                 file->logicalSize = file->physicalSize;
-                state->initPhase = 37;
+                journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_PROVISION_PUBLISH_FILE;
             }
             break;
-        case 37:
+        case AFATFS_JOURNAL_INIT_PROVISION_PUBLISH_FILE:
             status = afatfs_saveDirectoryEntry(file, AFATFS_SAVE_DIRECTORY_FOR_CLOSE);
             if (status == AFATFS_OPERATION_SUCCESS) {
-                state->initPhase = 38;
+                journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_PROVISION_FLUSH_FILE;
             }
             break;
-        case 38:
+        case AFATFS_JOURNAL_INIT_PROVISION_FLUSH_FILE:
             if (afatfs_flushCache()) {
-                state->epoch = 1;
-                state->owned = true;
-                state->initPhase = 39;
+                journalState->epoch = 1;
+                journalState->owned = true;
+                journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_PROVISION_FIRST_HEADER;
             }
             break;
-        case 39:
+        case AFATFS_JOURNAL_INIT_PROVISION_FIRST_HEADER:
             if (afatfs_jwriteHeader()) {
-                state->initPhase = 40;
+                journalState->lifecycle.initPhase = AFATFS_JOURNAL_INIT_PROVISION_SECOND_HEADER;
             }
             break;
-        case 40:
+        case AFATFS_JOURNAL_INIT_PROVISION_SECOND_HEADER:
             if (afatfs_jwriteHeader()) {
                 afatfs_initFileHandle(file);
                 afatfs_chdir(NULL);
-                state->ready = true;
-                state->provision = false;
-                state->phase = AFATFS_JOURNAL_IDLE;
+                journalState->work.capture.pendingCache = -1;
+                journalState->ready = true;
+                journalState->provision = false;
+                journalState->phase = AFATFS_JOURNAL_IDLE;
                 return AFATFS_OPERATION_SUCCESS;
             }
             break;
@@ -271,37 +286,38 @@ static afatfsOperationStatus_e afatfs_fatJournalMount(void)
 
 static bool afatfs_fatJournalShutdown(void)
 {
-    afatfsJournal_t *state = &afatfs.journal;
-    if (afatfs.readOnly || !state->firstCluster) {
+    afatfsJournal_t *journalState = &afatfs.journal;
+    if (afatfs.readOnly || !journalState->firstCluster) {
         return true;
     }
-    switch (state->shutdownPhase) {
-        case 0:
+    switch (journalState->lifecycle.shutdownPhase) {
+        case AFATFS_JOURNAL_SHUTDOWN_WAIT_COMMIT:
             if (!afatfs_journalCommitted()) {
                 return false;
             }
-            state->ready = false;
-            state->shutdownPhase = 1;
+            journalState->ready = false;
+            journalState->lifecycle.shutdownPhase = AFATFS_JOURNAL_SHUTDOWN_MARK_CLEAN;
             // Fall through
-        case 1:
+        case AFATFS_JOURNAL_SHUTDOWN_MARK_CLEAN:
             if (afatfs_fjDirty(false) != AFATFS_OPERATION_SUCCESS) {
                 return false;
             }
-            state->shutdownPhase = 2;
+            journalState->lifecycle.shutdownPhase = AFATFS_JOURNAL_SHUTDOWN_FLUSH_CLEAN;
             return false;
-        case 2:
+        case AFATFS_JOURNAL_SHUTDOWN_FLUSH_CLEAN:
             if (!afatfs_flushCache()) {
                 return false;
             }
-            state->owned = false;
-            state->shutdownPhase = 3;
+            journalState->owned = false;
+            journalState->lifecycle.shutdownPhase = AFATFS_JOURNAL_SHUTDOWN_RELEASE_OWNERSHIP;
             // Fall through
-        case 3:
+        case AFATFS_JOURNAL_SHUTDOWN_RELEASE_OWNERSHIP:
             if (!afatfs_jwriteHeader()) {
                 return false;
             }
-            state->shutdownPhase = 4;
+            journalState->lifecycle.shutdownPhase = AFATFS_JOURNAL_SHUTDOWN_COMPLETE;
             return true;
+        case AFATFS_JOURNAL_SHUTDOWN_COMPLETE:
         default:
             return true;
     }

@@ -1,5 +1,8 @@
 # FAT32/LFN: quedas de energia e diário compartilhado
 
+As medições deste relatório antecedem as otimizações posteriores de memória e agrupamento de
+metadados, registradas em [MEMORY_IO_OPTIMIZATION.md](MEMORY_IO_OPTIMIZATION.md).
+
 O diário FAT32 foi implementado e seu motor foi unificado com o exFAT. A configuração padrão continua com LFN habilitado e exFAT desabilitado.
 
 ## Resultado

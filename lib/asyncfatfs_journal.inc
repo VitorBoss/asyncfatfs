@@ -258,9 +258,9 @@ static afatfsOperationStatus_e afatfs_journalBeforeWrite(int index)
     } else {
         state->phase = AFATFS_JOURNAL_INDEX_READ;
     }
-    state->pendingCache = index;
-    state->pendingSector = entry->sectorIndex;
-    state->scan = 0;
+    state->work.capture.pendingCache = index;
+    state->work.capture.pendingSector = entry->sectorIndex;
+    state->work.capture.record.scan = 0;
     entry->retainCount++;
     return AFATFS_OPERATION_IN_PROGRESS;
 }
@@ -284,23 +284,23 @@ static void afatfs_journalPoll(void)
             }
             break;
         case AFATFS_JOURNAL_INDEX_READ:
-            if (state->scan == state->count) {
+            if (state->work.capture.record.scan == state->count) {
                 if (state->count == state->capacity) {
                     afatfs_jfail();
                     break;
                 }
-                memcpy(state->io, afatfs_cacheSectorGetMemory(state->pendingCache), 512);
-                state->imageCRC = afatfs_jcrc(state->io, 512);
+                memcpy(state->io, afatfs_cacheSectorGetMemory(state->work.capture.pendingCache), 512);
+                state->work.capture.record.imageCRC = afatfs_jcrc(state->io, 512);
                 state->phase = AFATFS_JOURNAL_IMAGE_WRITE;
-            } else if (afatfs_jio(false, afatfs_jsector(2 + 2 * state->scan))) {
+            } else if (afatfs_jio(false, afatfs_jsector(2 + 2 * state->work.capture.record.scan))) {
                 if (!afatfs_jrecord()) {
                     afatfs_jfail();
                     break;
                 }
-                if (afatfs_jget(state->io + 12) == state->pendingSector) {
+                if (afatfs_jget(state->io + 12) == state->work.capture.pendingSector) {
                     state->phase = AFATFS_JOURNAL_CAPTURE_DONE;
                 } else {
-                    state->scan++;
+                    state->work.capture.record.scan++;
                 }
             }
             break;
@@ -309,8 +309,8 @@ static void afatfs_journalPoll(void)
                 memset(state->io, 0, 512);
                 memcpy(state->io, afatfs_jmagic(true), 8);
                 afatfs_jput(state->io + 8, state->epoch);
-                afatfs_jput(state->io + 12, state->pendingSector);
-                afatfs_jput(state->io + 16, state->imageCRC);
+                afatfs_jput(state->io + 12, state->work.capture.pendingSector);
+                afatfs_jput(state->io + 16, state->work.capture.record.imageCRC);
                 afatfs_jput(state->io + 508, afatfs_jcrc(state->io, 508));
                 state->phase = AFATFS_JOURNAL_RECORD_WRITE;
             }
@@ -327,9 +327,9 @@ static void afatfs_journalPoll(void)
             }
             break;
         case AFATFS_JOURNAL_CAPTURE_DONE:
-            afatfs.cacheDescriptor[state->pendingCache].journalEpoch = state->epoch;
-            afatfs.cacheDescriptor[state->pendingCache].retainCount--;
-            state->pendingCache = -1;
+            afatfs.cacheDescriptor[state->work.capture.pendingCache].journalEpoch = state->epoch;
+            afatfs.cacheDescriptor[state->work.capture.pendingCache].retainCount--;
+            state->work.capture.pendingCache = -1;
             state->phase = AFATFS_JOURNAL_IDLE;
             break;
         case AFATFS_JOURNAL_COMMIT:
@@ -349,62 +349,62 @@ static afatfsOperationStatus_e afatfs_journalRecover(void)
 {
     afatfsJournal_t *state = &afatfs.journal;
     switch (state->mount.recoveryPhase) {
-        case 0:
-            state->progress = state->active ? state->count : 0;
-            state->mount.recoveryPhase = 1;
+        case AFATFS_JOURNAL_RECOVERY_PREPARE:
+            state->work.recovery.progress = state->active ? state->count : 0;
+            state->mount.recoveryPhase = AFATFS_JOURNAL_RECOVERY_VALIDATE_RECORD;
             break;
-        case 1:
-            if (!state->progress) {
-                state->progress = state->active ? state->count : 0;
-                state->mount.recoveryPhase = 3;
-            } else if (afatfs_jio(false, afatfs_jsector(2 + 2 * (state->progress - 1)))) {
+        case AFATFS_JOURNAL_RECOVERY_VALIDATE_RECORD:
+            if (!state->work.recovery.progress) {
+                state->work.recovery.progress = state->active ? state->count : 0;
+                state->mount.recoveryPhase = AFATFS_JOURNAL_RECOVERY_REPLAY_READ_RECORD;
+            } else if (afatfs_jio(false, afatfs_jsector(2 + 2 * (state->work.recovery.progress - 1)))) {
                 if (!afatfs_jrecord()) {
                     afatfs_jfail();
                     break;
                 }
-                state->imageCRC = afatfs_jget(state->io + 16);
-                state->mount.recoveryPhase = 2;
+                state->work.recovery.imageCRC = afatfs_jget(state->io + 16);
+                state->mount.recoveryPhase = AFATFS_JOURNAL_RECOVERY_VALIDATE_IMAGE;
             }
             break;
-        case 2:
-            if (afatfs_jio(false, afatfs_jsector(3 + 2 * (state->progress - 1)))) {
-                if (afatfs_jcrc(state->io, 512) != state->imageCRC) {
+        case AFATFS_JOURNAL_RECOVERY_VALIDATE_IMAGE:
+            if (afatfs_jio(false, afatfs_jsector(3 + 2 * (state->work.recovery.progress - 1)))) {
+                if (afatfs_jcrc(state->io, 512) != state->work.recovery.imageCRC) {
                     afatfs_jfail();
                 } else {
-                    state->progress--;
-                    state->mount.recoveryPhase = 1;
+                    state->work.recovery.progress--;
+                    state->mount.recoveryPhase = AFATFS_JOURNAL_RECOVERY_VALIDATE_RECORD;
                 }
             }
             break;
-        case 3:
-            if (!state->progress) {
+        case AFATFS_JOURNAL_RECOVERY_REPLAY_READ_RECORD:
+            if (!state->work.recovery.progress) {
                 state->active = false;
                 state->count = 0;
                 return AFATFS_OPERATION_SUCCESS;
             }
-            if (afatfs_jio(false, afatfs_jsector(2 + 2 * (state->progress - 1)))) {
+            if (afatfs_jio(false, afatfs_jsector(2 + 2 * (state->work.recovery.progress - 1)))) {
                 if (!afatfs_jrecord()) {
                     afatfs_jfail();
                     break;
                 }
-                state->target = afatfs_jget(state->io + 12);
-                state->imageCRC = afatfs_jget(state->io + 16);
-                state->mount.recoveryPhase = 4;
+                state->work.recovery.target = afatfs_jget(state->io + 12);
+                state->work.recovery.imageCRC = afatfs_jget(state->io + 16);
+                state->mount.recoveryPhase = AFATFS_JOURNAL_RECOVERY_REPLAY_READ_IMAGE;
             }
             break;
-        case 4:
-            if (afatfs_jio(false, afatfs_jsector(3 + 2 * (state->progress - 1)))) {
-                if (afatfs_jcrc(state->io, 512) != state->imageCRC) {
+        case AFATFS_JOURNAL_RECOVERY_REPLAY_READ_IMAGE:
+            if (afatfs_jio(false, afatfs_jsector(3 + 2 * (state->work.recovery.progress - 1)))) {
+                if (afatfs_jcrc(state->io, 512) != state->work.recovery.imageCRC) {
                     afatfs_jfail();
                 } else {
-                    state->mount.recoveryPhase = 5;
+                    state->mount.recoveryPhase = AFATFS_JOURNAL_RECOVERY_REPLAY_WRITE_IMAGE;
                 }
             }
             break;
-        case 5:
-            if (afatfs_jio(true, state->target)) {
-                state->progress--;
-                state->mount.recoveryPhase = 3;
+        case AFATFS_JOURNAL_RECOVERY_REPLAY_WRITE_IMAGE:
+            if (afatfs_jio(true, state->work.recovery.target)) {
+                state->work.recovery.progress--;
+                state->mount.recoveryPhase = AFATFS_JOURNAL_RECOVERY_REPLAY_READ_RECORD;
             }
             break;
         default:

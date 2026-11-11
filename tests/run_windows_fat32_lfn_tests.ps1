@@ -3,6 +3,7 @@ param(
     [ValidateSet('all', '512', '4096', 'default')][string]$Cases = 'all',
     [switch]$ElevatedWorker,
     [switch]$NoWait,
+    [switch]$CompileOnly,
     [string]$RunName = ('run-' + [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 8))
 )
 $ErrorActionPreference = 'Stop'
@@ -204,12 +205,16 @@ if (!$ElevatedWorker) {
     $vcvars = Join-Path $visualStudio 'VC/Auxiliary/Build/vcvars64.bat'
     Push-Location $repository
     try {
-        & cmd /c "`"$vcvars`" >nul && cl /nologo /std:c11 /W3 /WX /D_CRT_SECURE_NO_WARNINGS /DTEST_NATIVE_LFN /Ilib /Itests tests\test_exfat_external.c tests\sdcard_sim.c lib\asyncfatfs.c lib\fat_standard.c /Fo`"$runDirectory\\`" /Fe`"$binary`" /link /INCREMENTAL:NO"
+        & cmd /c "`"$vcvars`" >nul && cl /nologo /std:c11 /W3 /WX /D_CRT_SECURE_NO_WARNINGS /DTEST_NATIVE_LFN /DSDCARD_SIM_TRACK_BATCHES /Ilib /Itests tests\test_exfat_external.c tests\sdcard_sim.c lib\asyncfatfs.c lib\fat_standard.c /Fo`"$runDirectory\\`" /Fe`"$binary`" /link /INCREMENTAL:NO"
         if ($LASTEXITCODE) {
             throw 'FAT32/LFN workload compilation failed.'
         }
     } finally {
         Pop-Location
+    }
+    if ($CompileOnly) {
+        [ordered]@{ binary = $binary; report = $reportPath } | ConvertTo-Json
+        return
     }
     $shell = (Get-Process -Id $PID).Path
     $arguments = @('-NoProfile', '-File', ('"' + $PSCommandPath + '"'), '-ElevatedWorker', '-RunName', $RunName, '-Cases', $Cases)
@@ -282,6 +287,34 @@ public static class Fat32NativeNames {
         string result = output.ToString();
         return result.Substring(result.LastIndexOf('\\') + 1);
     }
+    public static void WriteConcurrent(string root, bool roundtrip) {
+        using (var barrier = new System.Threading.Barrier(2)) {
+            var tasks = new System.Threading.Tasks.Task[2];
+            for (int index = 0; index < tasks.Length; index++) {
+                int selected = index;
+                tasks[index] = System.Threading.Tasks.Task.Factory.StartNew(() => {
+                    string name = roundtrip
+                        ? String.Format("Concurrent library collision filename number {0:D2}.bin", selected)
+                        : (selected == 0 ? "Windows concurrent seed first.bin" : "Windows concurrent seed second.bin");
+                    int size = roundtrip ? (selected == 0 ? 6101 : 8103) : (selected == 0 ? 33001 : 49003);
+                    int tag = roundtrip ? 91 + selected : (selected == 0 ? 71 : 81);
+                    byte[] data = new byte[size];
+                    for (int offset = 0; offset < size; offset++) {
+                        data[offset] = (byte)(offset * 17 + tag);
+                    }
+                    barrier.SignalAndWait();
+                    using (var stream = new System.IO.FileStream(System.IO.Path.Combine(root, name),
+                        System.IO.FileMode.Create, System.IO.FileAccess.Write, System.IO.FileShare.None)) {
+                        for (int offset = 0; offset < size; offset += 512) {
+                            stream.Write(data, offset, Math.Min(512, size - offset));
+                        }
+                        stream.Flush(true);
+                    }
+                }, System.Threading.Tasks.TaskCreationOptions.LongRunning);
+            }
+            System.Threading.Tasks.Task.WaitAll(tasks);
+        }
+    }
 }
 '@
     $selected = if ($Cases -eq 'all') { @('512', '4096', 'default') } else { @($Cases) }
@@ -337,6 +370,9 @@ public static class Fat32NativeNames {
         Write-NativeFile $root 'external fragmented.bin' ($cluster * 3) 37
         [void][IO.Directory]::CreateDirectory((Native-Path $root 'External directory'))
         Write-NativeFile $root 'External directory\external child.bin' 91 49
+        [Fat32NativeNames]::WriteConcurrent($root, $false)
+        Assert-NativeFile $root 'Windows concurrent seed first.bin' 33001 71
+        Assert-NativeFile $root 'Windows concurrent seed second.bin' 49003 81
         $manifest = [Collections.Generic.List[string]]::new()
         $nativeNames = @('Windows mixed Case long filename.txt', 'Windows truncate long filename.bin',
             'Windows delete by alias long filename.bin', 'lower.txt', (('w' * 251) + '.bin'))
@@ -362,6 +398,19 @@ public static class Fat32NativeNames {
         }
         [void](Invoke-CheckedCommand $binary @($imagePath, 'exercise', [string]$cluster) "library-generic-$case")
         [void](Invoke-CheckedCommand $binary @($imagePath, 'exercise-lfn', [string]$cluster, $manifestPath) "library-lfn-$case")
+        $batchOutput = Invoke-CheckedCommand $binary @($imagePath, 'exercise-lfn-concurrent', [string]$cluster) "library-concurrent-$case"
+        $batchMatch = [regex]::Match($batchOutput, 'NATIVE_BATCH,exercise-lfn-concurrent,(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)')
+        if (!$batchMatch.Success -or [uint32]$batchMatch.Groups[3].Value -eq 0 -or [uint32]$batchMatch.Groups[4].Value -eq 0) {
+            throw 'Concurrent workload did not exercise multi-block writes.'
+        }
+        $caseResult.batching = [ordered]@{
+            reads = [uint32]$batchMatch.Groups[1].Value
+            writes = [uint32]$batchMatch.Groups[2].Value
+            multiSessions = [uint32]$batchMatch.Groups[3].Value
+            multiBlocks = [uint32]$batchMatch.Groups[4].Value
+            readInterrupts = [uint32]$batchMatch.Groups[5].Value
+            addressInterrupts = [uint32]$batchMatch.Groups[6].Value
+        }
         if ((Get-FixedFooter $imagePath) -ne $footer) {
             throw 'The library modified the VHD footer.'
         }
@@ -377,6 +426,12 @@ public static class Fat32NativeNames {
         Assert-NativeFile $root '1234567890123' 27 210
         Assert-NativeFile $root '12345678901234567890123456' 27 211
         Assert-NativeFile $root 'Library nested directory\Library child directory\Child long filename.bin' ($cluster + 13) 221
+        Assert-NativeFile $root 'Concurrent library collision filename number 00.bin' 65536 41
+        Assert-NativeFile $root 'Concurrent library collision filename number 01.bin' (32768 + 333) 77
+        Assert-NativeFile $root 'Concurrent library renamed while writers pending.bin' 2300 183
+        if ([IO.File]::Exists((Native-Path $root 'Concurrent library collision filename number 02.bin'))) {
+            throw 'Concurrent rename left its source visible.'
+        }
         if (![IO.Directory]::Exists((Native-Path $root 'Library renamed empty directory'))) {
             throw 'Renamed empty directory is not visible.'
         }
@@ -397,6 +452,7 @@ public static class Fat32NativeNames {
             throw 'Case-only rename was not preserved by the native driver.'
         }
         Set-Phase "native-roundtrip-$case"
+        [Fat32NativeNames]::WriteConcurrent($root, $true)
         Write-NativeFile $root 'library output.bin' 731 231
         [IO.File]::Move((Native-Path $root 'library output.bin'), (Native-Path $root 'Windows renamed library output.data'))
         [IO.File]::Move((Native-Path $root (('n' * 251) + '.bin')), (Native-Path $root 'Windows renamed maximum filename.bin'))
@@ -408,12 +464,14 @@ public static class Fat32NativeNames {
         Set-Phase "library-roundtrip-$case"
         [void](Get-FixedFooter $imagePath)
         [void](Invoke-CheckedCommand $binary @($imagePath, 'verify-lfn-roundtrip', [string]$cluster) "library-lfn-roundtrip-$case")
+        [void](Invoke-CheckedCommand $binary @($imagePath, 'verify-lfn-concurrent-roundtrip', [string]$cluster) "library-concurrent-roundtrip-$case")
         if ((Get-FixedFooter $imagePath) -ne $footer) {
             throw 'VHD footer changed during roundtrip.'
         }
         Mount-DiskImage -ImagePath $imagePath -StorageType VHD -Access ReadWrite -NoDriveLetter | Out-Null
         $root = (Get-TestVolume $imagePath).Path
         Assert-NativeFile $root 'Windows renamed nested directory\Library child directory\Library final native roundtrip.bin' 701 239
+        Assert-NativeFile $root 'Concurrent library final roundtrip.bin' 731 94
         Check-NativeVolume $imagePath "final-chkdsk-$case"
         Dismount-DiskImage -ImagePath $imagePath
         $caseResult.status = 'passed'

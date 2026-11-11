@@ -5,6 +5,9 @@
 #include <string.h>
 #include "asyncfatfs.h"
 #include "sdcard_sim.h"
+#ifndef MIN
+#define MIN(first, second) ((first) < (second) ? (first) : (second))
+#endif
 
 #define CHECK(test)                                                                                                    \
     do {                                                                                                               \
@@ -257,6 +260,10 @@ int main(int argc, char **argv)
         exerciseNativeLfn(clusterSize, argv[4]);
     } else if (strcmp(argv[2], "verify-lfn-roundtrip") == 0) {
         verifyNativeLfnRoundtrip();
+    } else if (strcmp(argv[2], "exercise-lfn-concurrent") == 0) {
+        exerciseNativeLfnConcurrent();
+    } else if (strcmp(argv[2], "verify-lfn-concurrent-roundtrip") == 0) {
+        verifyNativeLfnConcurrentRoundtrip();
     } else
 #endif
         if (strcmp(argv[2], "exercise") == 0) {
@@ -277,6 +284,13 @@ int main(int argc, char **argv)
         closeFile(file);
     }
     unmountImage();
+    CHECK(afatfs_canPowerOff());
+#ifdef SDCARD_SIM_TRACK_BATCHES
+    sdcardSimStats_t stats;
+    sdcard_sim_getStats(&stats);
+    printf("NATIVE_BATCH,%s,%u,%u,%u,%u,%u,%u\n", argv[2], stats.reads, stats.writes, stats.multiSessions,
+        stats.multiBlocks, stats.readInterrupts, stats.addressInterrupts);
+#endif
     sdcard_sim_destroy();
     printf("PASS external exFAT %s (cluster size %u)\n", argv[2], clusterSize);
     return 0;

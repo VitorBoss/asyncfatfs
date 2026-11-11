@@ -1,0 +1,1045 @@
+{
+  "status": "passed",
+  "native_report": "tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\report.json",
+  "native_report_sha256": "81724ace3e5299bc5cee12404e0de8fea62391f7118ec6b3a768e837469a0df7",
+  "native": {
+    "status": "passed",
+    "phase": "completed",
+    "startedUtc": "2026-11-11T01:15:55.2979912Z",
+    "updatedUtc": "2026-11-11T01:17:01.8871465Z",
+    "windowsVersion": "Microsoft Windows NT 10.0.26300.0",
+    "fatDriverVersion": "10.0.26100.9711 (WinBuild.160101.0800)",
+    "binarySha256": "6DB23DF31F3218E57BAA1199CDD762F7FB2C82C4B7217D4FB627FE1014D4A168",
+    "sourceSha256": {
+      "lib\\builddefs.h": "A934B93A8AAEA355E83F39FF1BB18188BECE7C023D6CA45D0373D261B5EAE623",
+      "lib\\asyncfatfs_exfatjournal.inc": "EAD2ACA6D28B9D0F8E72C7EA4725FF3F30696B5C08568859A1A5AE1BFB906CEC",
+      "tests\\sdcard_sim.c": "66E6A13278700ED2286704584C3C48F4C8080257D6D96C3E9FC1C68B525DDFCD",
+      "lib\\asyncfatfs_format.inc": "64158FE17360962DD7920C6B6C69DAEE9E34BC96D789FFEC2432784A761AF26B",
+      "lib\\asyncfatfs.c": "41E3DA3777E7AAB246A8D7C62068FC93EBC7F7BE84929D4CAD4564D0D0C94F41",
+      "lib\\asyncfatfs.h": "3091CA85C6AB7A2255210C2766682A0E9015465BF33092E2D764799DB6D0C16A",
+      "lib\\fat_standard.h": "F1BE485A582E50A75FAA62897EB75672514B8E5AB066F17F36F44E75D68BAB99",
+      "tests\\run_windows_fat32_lfn_tests.ps1": "D9CAF2E31C9E521B8CEC6A76EB823B456B9F6353C823792C5286D4895AB98FD9",
+      "tests\\test_exfat_external.c": "82AE66F7818D2833E04BEAAB03EE3C1AC022B05326302EDDAC3630FD5E0EC8AA",
+      "tests\\exfat_native_api.inc": "087E0857E22A83F7DF37F933DACD18C821CE1541E2F76187C006E51D1A2BB295",
+      "lib\\asyncfatfs_lfn.inc": "B61BA9DAC8F9DA58874C563260BD5EC1609DCBF24B79F1A05ABF87B92B59025E",
+      "tests\\fat_lfn_native.inc": "C8B23E9EA97006F2AB54B71101C05F3A8190E9C8F2EF4CBB57F20BC640D240EF",
+      "lib\\asyncfatfs_journal.inc": "AD20BA1F9F97992632225676CDB8116E2F481ADE2709AAD0F546B89AE4B95A62",
+      "lib\\asyncfatfs_api.inc": "8319B3584917B80C514F02DC97F5C4430F60F4D797346358728C568DC1EB67F3",
+      "lib\\asyncfatfs_fatjournal.inc": "1C2078E0458013F3C88BA4AE113AE3ADA8AA2E22138934500D0F723196506492",
+      "lib\\sdcard.h": "9F8A380378011A98461DC7BA3545DA9219389B6DC1350D16337F4510FF636955",
+      "lib\\asyncfatfs_journal.h": "DCAF6259F125A8D3FD763E91FDA42D1AD20035B714ADB06247C1CA7BC5E22028",
+      "lib\\fat_standard.c": "68B93D04744F34374988DBAFC91D7315C25A1E14C1FB1F609581F1EFD3220F40"
+    },
+    "cases": [
+      {
+        "name": "512",
+        "clusterSize": 512,
+        "image": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-512.vhd",
+        "volumePath": "\\\\?\\Volume{46f6a214-0000-0000-0000-010000000000}\\",
+        "footerSha256": "242D8B3917C7C36746CFD18C092DD2D681A76A9B2BE585C758FB1BCF11B70CAF",
+        "aliases": [
+          {
+            "name": "Windows mixed Case long filename.txt",
+            "alias": "WINDOW~1.TXT",
+            "size": 1203,
+            "tag": 110
+          },
+          {
+            "name": "Windows truncate long filename.bin",
+            "alias": "WINDOW~3.BIN",
+            "size": 1204,
+            "tag": 111
+          },
+          {
+            "name": "Windows delete by alias long filename.bin",
+            "alias": "WINDOW~4.BIN",
+            "size": 1205,
+            "tag": 112
+          },
+          {
+            "name": "lower.txt",
+            "alias": "lower.txt",
+            "size": 1206,
+            "tag": 113
+          },
+          {
+            "name": "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.bin",
+            "alias": "WWWWWW~1.BIN",
+            "size": 1207,
+            "tag": 114
+          },
+          {
+            "name": "Collision native filename number 00.bin",
+            "alias": "COLLIS~1.BIN",
+            "size": 1208,
+            "tag": 115
+          },
+          {
+            "name": "Collision native filename number 01.bin",
+            "alias": "COLLIS~2.BIN",
+            "size": 1209,
+            "tag": 116
+          },
+          {
+            "name": "Collision native filename number 02.bin",
+            "alias": "COLLIS~3.BIN",
+            "size": 1210,
+            "tag": 117
+          },
+          {
+            "name": "Collision native filename number 03.bin",
+            "alias": "COLLIS~4.BIN",
+            "size": 1211,
+            "tag": 118
+          },
+          {
+            "name": "Collision native filename number 04.bin",
+            "alias": "CO483D~1.BIN",
+            "size": 1212,
+            "tag": 119
+          },
+          {
+            "name": "Collision native filename number 05.bin",
+            "alias": "COF209~1.BIN",
+            "size": 1213,
+            "tag": 120
+          },
+          {
+            "name": "Collision native filename number 06.bin",
+            "alias": "COADC4~1.BIN",
+            "size": 1214,
+            "tag": 121
+          },
+          {
+            "name": "Collision native filename number 07.bin",
+            "alias": "COB76F~1.BIN",
+            "size": 1215,
+            "tag": 122
+          },
+          {
+            "name": "Collision native filename number 08.bin",
+            "alias": "CO036C~1.BIN",
+            "size": 1216,
+            "tag": 123
+          },
+          {
+            "name": "Collision native filename number 09.bin",
+            "alias": "CO52D7~1.BIN",
+            "size": 1217,
+            "tag": 124
+          },
+          {
+            "name": "Collision native filename number 10.bin",
+            "alias": "CO17AD~1.BIN",
+            "size": 1218,
+            "tag": 125
+          },
+          {
+            "name": "Collision native filename number 11.bin",
+            "alias": "COA32E~1.BIN",
+            "size": 1219,
+            "tag": 126
+          },
+          {
+            "name": "Collision native filename number 12.bin",
+            "alias": "COB116~1.BIN",
+            "size": 1220,
+            "tag": 127
+          },
+          {
+            "name": "Collision native filename number 13.bin",
+            "alias": "CO074A~1.BIN",
+            "size": 1221,
+            "tag": 128
+          },
+          {
+            "name": "Collision library filename number 00.bin",
+            "alias": "COLLIS~5.BIN"
+          },
+          {
+            "name": "Collision library filename number 01.bin",
+            "alias": "COLLIS~6.BIN"
+          },
+          {
+            "name": "Collision library filename number 02.bin",
+            "alias": "COLLIS~7.BIN"
+          },
+          {
+            "name": "Collision library filename number 03.bin",
+            "alias": "COLLIS~8.BIN"
+          },
+          {
+            "name": "Collision library filename number 04.bin",
+            "alias": "COLLIS~9.BIN"
+          },
+          {
+            "name": "Collision library filename number 05.bin",
+            "alias": "COLLI~10.BIN"
+          },
+          {
+            "name": "Collision library filename number 06.bin",
+            "alias": "COLLI~11.BIN"
+          },
+          {
+            "name": "Collision library filename number 07.bin",
+            "alias": "COLLI~12.BIN"
+          },
+          {
+            "name": "Collision library filename number 08.bin",
+            "alias": "COLLI~13.BIN"
+          },
+          {
+            "name": "Collision library filename number 09.bin",
+            "alias": "COLLI~14.BIN"
+          },
+          {
+            "name": "Collision library filename number 10.bin",
+            "alias": "COLLI~15.BIN"
+          },
+          {
+            "name": "Collision library filename number 11.bin",
+            "alias": "COLLI~16.BIN"
+          },
+          {
+            "name": "Collision library filename number 12.bin",
+            "alias": "COLLI~17.BIN"
+          },
+          {
+            "name": "Collision library filename number 13.bin",
+            "alias": "COLLI~18.BIN"
+          }
+        ],
+        "status": "passed",
+        "batching": {
+          "reads": 2808,
+          "writes": 647,
+          "multiSessions": 43,
+          "multiBlocks": 128,
+          "readInterrupts": 0,
+          "addressInterrupts": 0
+        }
+      },
+      {
+        "name": "4096",
+        "clusterSize": 4096,
+        "image": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-4096.vhd",
+        "volumePath": "\\\\?\\Volume{46f6a4a6-0000-0000-0000-010000000000}\\",
+        "footerSha256": "2BA8D1FD0D2EB437E985212EEE1AFB1C88CF6BD72D5248B19BD5FE6007603188",
+        "aliases": [
+          {
+            "name": "Windows mixed Case long filename.txt",
+            "alias": "WINDOW~1.TXT",
+            "size": 1203,
+            "tag": 110
+          },
+          {
+            "name": "Windows truncate long filename.bin",
+            "alias": "WINDOW~3.BIN",
+            "size": 1204,
+            "tag": 111
+          },
+          {
+            "name": "Windows delete by alias long filename.bin",
+            "alias": "WINDOW~4.BIN",
+            "size": 1205,
+            "tag": 112
+          },
+          {
+            "name": "lower.txt",
+            "alias": "lower.txt",
+            "size": 1206,
+            "tag": 113
+          },
+          {
+            "name": "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.bin",
+            "alias": "WWWWWW~1.BIN",
+            "size": 1207,
+            "tag": 114
+          },
+          {
+            "name": "Collision native filename number 00.bin",
+            "alias": "COLLIS~1.BIN",
+            "size": 1208,
+            "tag": 115
+          },
+          {
+            "name": "Collision native filename number 01.bin",
+            "alias": "COLLIS~2.BIN",
+            "size": 1209,
+            "tag": 116
+          },
+          {
+            "name": "Collision native filename number 02.bin",
+            "alias": "COLLIS~3.BIN",
+            "size": 1210,
+            "tag": 117
+          },
+          {
+            "name": "Collision native filename number 03.bin",
+            "alias": "COLLIS~4.BIN",
+            "size": 1211,
+            "tag": 118
+          },
+          {
+            "name": "Collision native filename number 04.bin",
+            "alias": "CO483D~1.BIN",
+            "size": 1212,
+            "tag": 119
+          },
+          {
+            "name": "Collision native filename number 05.bin",
+            "alias": "COF209~1.BIN",
+            "size": 1213,
+            "tag": 120
+          },
+          {
+            "name": "Collision native filename number 06.bin",
+            "alias": "COADC4~1.BIN",
+            "size": 1214,
+            "tag": 121
+          },
+          {
+            "name": "Collision native filename number 07.bin",
+            "alias": "COB76F~1.BIN",
+            "size": 1215,
+            "tag": 122
+          },
+          {
+            "name": "Collision native filename number 08.bin",
+            "alias": "CO036C~1.BIN",
+            "size": 1216,
+            "tag": 123
+          },
+          {
+            "name": "Collision native filename number 09.bin",
+            "alias": "CO52D7~1.BIN",
+            "size": 1217,
+            "tag": 124
+          },
+          {
+            "name": "Collision native filename number 10.bin",
+            "alias": "CO17AD~1.BIN",
+            "size": 1218,
+            "tag": 125
+          },
+          {
+            "name": "Collision native filename number 11.bin",
+            "alias": "COA32E~1.BIN",
+            "size": 1219,
+            "tag": 126
+          },
+          {
+            "name": "Collision native filename number 12.bin",
+            "alias": "COB116~1.BIN",
+            "size": 1220,
+            "tag": 127
+          },
+          {
+            "name": "Collision native filename number 13.bin",
+            "alias": "CO074A~1.BIN",
+            "size": 1221,
+            "tag": 128
+          },
+          {
+            "name": "Collision library filename number 00.bin",
+            "alias": "COLLIS~5.BIN"
+          },
+          {
+            "name": "Collision library filename number 01.bin",
+            "alias": "COLLIS~6.BIN"
+          },
+          {
+            "name": "Collision library filename number 02.bin",
+            "alias": "COLLIS~7.BIN"
+          },
+          {
+            "name": "Collision library filename number 03.bin",
+            "alias": "COLLIS~8.BIN"
+          },
+          {
+            "name": "Collision library filename number 04.bin",
+            "alias": "COLLIS~9.BIN"
+          },
+          {
+            "name": "Collision library filename number 05.bin",
+            "alias": "COLLI~10.BIN"
+          },
+          {
+            "name": "Collision library filename number 06.bin",
+            "alias": "COLLI~11.BIN"
+          },
+          {
+            "name": "Collision library filename number 07.bin",
+            "alias": "COLLI~12.BIN"
+          },
+          {
+            "name": "Collision library filename number 08.bin",
+            "alias": "COLLI~13.BIN"
+          },
+          {
+            "name": "Collision library filename number 09.bin",
+            "alias": "COLLI~14.BIN"
+          },
+          {
+            "name": "Collision library filename number 10.bin",
+            "alias": "COLLI~15.BIN"
+          },
+          {
+            "name": "Collision library filename number 11.bin",
+            "alias": "COLLI~16.BIN"
+          },
+          {
+            "name": "Collision library filename number 12.bin",
+            "alias": "COLLI~17.BIN"
+          },
+          {
+            "name": "Collision library filename number 13.bin",
+            "alias": "COLLI~18.BIN"
+          }
+        ],
+        "status": "passed",
+        "batching": {
+          "reads": 1037,
+          "writes": 343,
+          "multiSessions": 73,
+          "multiBlocks": 197,
+          "readInterrupts": 0,
+          "addressInterrupts": 0
+        }
+      },
+      {
+        "name": "default",
+        "clusterSize": 4096,
+        "image": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-default.vhd",
+        "volumePath": "\\\\?\\Volume{46f6a6a7-0000-0000-0000-010000000000}\\",
+        "footerSha256": "B9025044FD4AB365EBCDCAB3CCFCDC2FF5EBAFB5D0303D8CFC613996EDB4E19F",
+        "aliases": [
+          {
+            "name": "Windows mixed Case long filename.txt",
+            "alias": "WINDOW~1.TXT",
+            "size": 1203,
+            "tag": 110
+          },
+          {
+            "name": "Windows truncate long filename.bin",
+            "alias": "WINDOW~3.BIN",
+            "size": 1204,
+            "tag": 111
+          },
+          {
+            "name": "Windows delete by alias long filename.bin",
+            "alias": "WINDOW~4.BIN",
+            "size": 1205,
+            "tag": 112
+          },
+          {
+            "name": "lower.txt",
+            "alias": "lower.txt",
+            "size": 1206,
+            "tag": 113
+          },
+          {
+            "name": "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.bin",
+            "alias": "WWWWWW~1.BIN",
+            "size": 1207,
+            "tag": 114
+          },
+          {
+            "name": "Collision native filename number 00.bin",
+            "alias": "COLLIS~1.BIN",
+            "size": 1208,
+            "tag": 115
+          },
+          {
+            "name": "Collision native filename number 01.bin",
+            "alias": "COLLIS~2.BIN",
+            "size": 1209,
+            "tag": 116
+          },
+          {
+            "name": "Collision native filename number 02.bin",
+            "alias": "COLLIS~3.BIN",
+            "size": 1210,
+            "tag": 117
+          },
+          {
+            "name": "Collision native filename number 03.bin",
+            "alias": "COLLIS~4.BIN",
+            "size": 1211,
+            "tag": 118
+          },
+          {
+            "name": "Collision native filename number 04.bin",
+            "alias": "CO483D~1.BIN",
+            "size": 1212,
+            "tag": 119
+          },
+          {
+            "name": "Collision native filename number 05.bin",
+            "alias": "COF209~1.BIN",
+            "size": 1213,
+            "tag": 120
+          },
+          {
+            "name": "Collision native filename number 06.bin",
+            "alias": "COADC4~1.BIN",
+            "size": 1214,
+            "tag": 121
+          },
+          {
+            "name": "Collision native filename number 07.bin",
+            "alias": "COB76F~1.BIN",
+            "size": 1215,
+            "tag": 122
+          },
+          {
+            "name": "Collision native filename number 08.bin",
+            "alias": "CO036C~1.BIN",
+            "size": 1216,
+            "tag": 123
+          },
+          {
+            "name": "Collision native filename number 09.bin",
+            "alias": "CO52D7~1.BIN",
+            "size": 1217,
+            "tag": 124
+          },
+          {
+            "name": "Collision native filename number 10.bin",
+            "alias": "CO17AD~1.BIN",
+            "size": 1218,
+            "tag": 125
+          },
+          {
+            "name": "Collision native filename number 11.bin",
+            "alias": "COA32E~1.BIN",
+            "size": 1219,
+            "tag": 126
+          },
+          {
+            "name": "Collision native filename number 12.bin",
+            "alias": "COB116~1.BIN",
+            "size": 1220,
+            "tag": 127
+          },
+          {
+            "name": "Collision native filename number 13.bin",
+            "alias": "CO074A~1.BIN",
+            "size": 1221,
+            "tag": 128
+          },
+          {
+            "name": "Collision library filename number 00.bin",
+            "alias": "COLLIS~5.BIN"
+          },
+          {
+            "name": "Collision library filename number 01.bin",
+            "alias": "COLLIS~6.BIN"
+          },
+          {
+            "name": "Collision library filename number 02.bin",
+            "alias": "COLLIS~7.BIN"
+          },
+          {
+            "name": "Collision library filename number 03.bin",
+            "alias": "COLLIS~8.BIN"
+          },
+          {
+            "name": "Collision library filename number 04.bin",
+            "alias": "COLLIS~9.BIN"
+          },
+          {
+            "name": "Collision library filename number 05.bin",
+            "alias": "COLLI~10.BIN"
+          },
+          {
+            "name": "Collision library filename number 06.bin",
+            "alias": "COLLI~11.BIN"
+          },
+          {
+            "name": "Collision library filename number 07.bin",
+            "alias": "COLLI~12.BIN"
+          },
+          {
+            "name": "Collision library filename number 08.bin",
+            "alias": "COLLI~13.BIN"
+          },
+          {
+            "name": "Collision library filename number 09.bin",
+            "alias": "COLLI~14.BIN"
+          },
+          {
+            "name": "Collision library filename number 10.bin",
+            "alias": "COLLI~15.BIN"
+          },
+          {
+            "name": "Collision library filename number 11.bin",
+            "alias": "COLLI~16.BIN"
+          },
+          {
+            "name": "Collision library filename number 12.bin",
+            "alias": "COLLI~17.BIN"
+          },
+          {
+            "name": "Collision library filename number 13.bin",
+            "alias": "COLLI~18.BIN"
+          }
+        ],
+        "status": "passed",
+        "batching": {
+          "reads": 1037,
+          "writes": 343,
+          "multiSessions": 73,
+          "multiBlocks": 197,
+          "readInterrupts": 0,
+          "addressInterrupts": 0
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "create-vhd-512",
+        "program": "C:\\WINDOWS\\System32\\diskpart.exe",
+        "arguments": [
+          "/s",
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\create-512.txt"
+        ],
+        "exitCode": 0,
+        "output": "\r\nMicrosoft DiskPart vers\u00e3o 10.0.26100.1150\r\n\r\nCopyright (C) Microsoft Corporation.\r\nNo computador: ASUSTUF\r\n\r\n\r\n    0 por cento conclu\u00eddo\r\n    0 por cento conclu\u00eddo\r\n  100 por cento conclu\u00eddo\r\n\r\n\r\nO DiskPart criou com \u00eaxito o arquivo de disco virtual.\r\n\r\nSaindo do Diskpart...\r\n"
+      },
+      {
+        "name": "baseline-chkdsk-512",
+        "program": "C:\\WINDOWS\\System32\\chkdsk.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\mount-fat32-512\\"
+        ],
+        "exitCode": 0,
+        "output": "O tipo do sistema de arquivos \u00da FAT32.\r\nArmazenamento insuficiente dispon\u00ddvel para criar o arquivo de armazenamento de c\u00bepias de sombra ou outros dados de c\u00bepias de sombra.\r\n\r\nO volume AFATFS_TEST criou 10/11/2026 \u00d3s 22:16\r\nO N\u00b7mero de S\u00darie do Volume \u00da 4839-0A79\r\nO Windows est\u00df verificando os arquivos e pastas...\r\n0 por cento conclu\u00dddo.                \r\n14 por cento conclu\u00dddo..               \r\n15 por cento conclu\u00dddo...              \r\n16 por cento conclu\u00dddo....             \r\n17 por cento conclu\u00dddo.....            \r\n41 por cento conclu\u00dddo......           \r\n76 por cento conclu\u00dddo.                \r\n77 por cento conclu\u00dddo..               \r\n78 por cento conclu\u00dddo...              \r\n79 por cento conclu\u00dddo....             \r\n80 por cento conclu\u00dddo.....            \r\n81 por cento conclu\u00dddo......           \r\n82 por cento conclu\u00dddo.                \r\n83 por cento conclu\u00dddo..               \r\n84 por cento conclu\u00dddo...              \r\n85 por cento conclu\u00dddo....             \r\n86 por cento conclu\u00dddo.....            \r\n88 por cento conclu\u00dddo......           \r\n89 por cento conclu\u00dddo.                \r\n90 por cento conclu\u00dddo..               \r\n91 por cento conclu\u00dddo...              \r\n92 por cento conclu\u00dddo....             \r\n93 por cento conclu\u00dddo.....            \r\n94 por cento conclu\u00dddo......           \r\n95 por cento conclu\u00dddo.                \r\n96 por cento conclu\u00dddo..               \r\n97 por cento conclu\u00dddo...              \r\n100 por cento conclu\u00dddo....             \r\nVerifica\u00fe\u00d2o de arquivos e pastas conclu\u00ddda.\r\n\r\nN\u00d2o h\u00df problemas no sistema de arquivos.\r\nNenhuma a\u00fe\u00d2o necess\u00dfria.\r\n\r\n  527.368.192 bytes de espa\u00feo total em disco.\r\n          512 bytes em 1 pastas.\r\n      136.192 bytes em 27 arquivos.\r\n  527.227.392 bytes dispon\u00ddveis em disco.\r\n\r\n          512 bytes em cada unidade de aloca\u00fe\u00d2o.\r\nTotal de     1.030.016 unidades de aloca\u00fe\u00d2o no disco.\r\n    1.029.741 unidades de aloca\u00fe\u00d2o dispon\u00ddveis em disco.\r\n"
+      },
+      {
+        "name": "library-generic-512",
+        "program": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\workload.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-512.vhd",
+          "exercise",
+          "512"
+        ],
+        "exitCode": 0,
+        "output": "NATIVE_BATCH,exercise,2428,33976,4,8,0,0\r\nPASS external exFAT exercise (cluster size 512)\r\n"
+      },
+      {
+        "name": "library-lfn-512",
+        "program": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\workload.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-512.vhd",
+          "exercise-lfn",
+          "512",
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\aliases-512.txt"
+        ],
+        "exitCode": 0,
+        "output": "PASS native FAT32 LFN: Windows aliases, native collisions, long-name truncate/rename, case, directories and enumeration\r\nNATIVE_BATCH,exercise-lfn,3807,562,5,10,0,0\r\nPASS external exFAT exercise-lfn (cluster size 512)\r\n"
+      },
+      {
+        "name": "library-concurrent-512",
+        "program": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\workload.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-512.vhd",
+          "exercise-lfn-concurrent",
+          "512"
+        ],
+        "exitCode": 0,
+        "output": "PASS concurrent native LFN: 3 pending creates/closes, 2 writers, prefetch reader, rename overlap 803 polls\r\nNATIVE_BATCH,exercise-lfn-concurrent,2808,647,43,128,0,0\r\nPASS external exFAT exercise-lfn-concurrent (cluster size 512)\r\n"
+      },
+      {
+        "name": "after-library-chkdsk-512",
+        "program": "C:\\WINDOWS\\System32\\chkdsk.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\mount-fat32-512\\"
+        ],
+        "exitCode": 0,
+        "output": "O tipo do sistema de arquivos \u00da FAT32.\r\nArmazenamento insuficiente dispon\u00ddvel para criar o arquivo de armazenamento de c\u00bepias de sombra ou outros dados de c\u00bepias de sombra.\r\n\r\nO volume AFATFS_TEST criou 10/11/2026 \u00d3s 22:16\r\nO N\u00b7mero de S\u00darie do Volume \u00da 4839-0A79\r\nO Windows est\u00df verificando os arquivos e pastas...\r\n0 por cento conclu\u00dddo.                \r\n99 por cento conclu\u00dddo..               \r\n100 por cento conclu\u00dddo...              \r\nVerifica\u00fe\u00d2o de arquivos e pastas conclu\u00ddda.\r\n\r\nN\u00d2o h\u00df problemas no sistema de arquivos.\r\nNenhuma a\u00fe\u00d2o necess\u00dfria.\r\n\r\n  527.368.192 bytes de espa\u00feo total em disco.\r\n   16.549.376 bytes em 2 arquivos ocultos.\r\n        7.680 bytes em 9 pastas.\r\n      272.896 bytes em 99 arquivos.\r\n  510.530.048 bytes dispon\u00ddveis em disco.\r\n\r\n          512 bytes em cada unidade de aloca\u00fe\u00d2o.\r\nTotal de     1.030.016 unidades de aloca\u00fe\u00d2o no disco.\r\n      997.129 unidades de aloca\u00fe\u00d2o dispon\u00ddveis em disco.\r\n"
+      },
+      {
+        "name": "after-native-write-chkdsk-512",
+        "program": "C:\\WINDOWS\\System32\\chkdsk.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\mount-fat32-512\\"
+        ],
+        "exitCode": 0,
+        "output": "O tipo do sistema de arquivos \u00da FAT32.\r\nArmazenamento insuficiente dispon\u00ddvel para criar o arquivo de armazenamento de c\u00bepias de sombra ou outros dados de c\u00bepias de sombra.\r\n\r\nO volume AFATFS_TEST criou 10/11/2026 \u00d3s 22:16\r\nO N\u00b7mero de S\u00darie do Volume \u00da 4839-0A79\r\nO Windows est\u00df verificando os arquivos e pastas...\r\n0 por cento conclu\u00dddo.                \r\n99 por cento conclu\u00dddo..               \r\n100 por cento conclu\u00dddo...              \r\nVerifica\u00fe\u00d2o de arquivos e pastas conclu\u00ddda.\r\n\r\nN\u00d2o h\u00df problemas no sistema de arquivos.\r\nNenhuma a\u00fe\u00d2o necess\u00dfria.\r\n\r\n  527.368.192 bytes de espa\u00feo total em disco.\r\n   16.549.376 bytes em 2 arquivos ocultos.\r\n        7.680 bytes em 9 pastas.\r\n      187.904 bytes em 99 arquivos.\r\n  510.614.528 bytes dispon\u00ddveis em disco.\r\n\r\n          512 bytes em cada unidade de aloca\u00fe\u00d2o.\r\nTotal de     1.030.016 unidades de aloca\u00fe\u00d2o no disco.\r\n      997.294 unidades de aloca\u00fe\u00d2o dispon\u00ddveis em disco.\r\n"
+      },
+      {
+        "name": "library-lfn-roundtrip-512",
+        "program": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\workload.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-512.vhd",
+          "verify-lfn-roundtrip",
+          "512"
+        ],
+        "exitCode": 0,
+        "output": "PASS native FAT32 LFN roundtrip: Windows rename/delete, maximum name, nested path and final library write\r\nNATIVE_BATCH,verify-lfn-roundtrip,702,46,0,0,0,0\r\nPASS external exFAT verify-lfn-roundtrip (cluster size 512)\r\n"
+      },
+      {
+        "name": "library-concurrent-roundtrip-512",
+        "program": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\workload.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-512.vhd",
+          "verify-lfn-concurrent-roundtrip",
+          "512"
+        ],
+        "exitCode": 0,
+        "output": "PASS concurrent native LFN roundtrip: Windows parallel overwrites and final library write\r\nNATIVE_BATCH,verify-lfn-concurrent-roundtrip,714,32,0,0,0,0\r\nPASS external exFAT verify-lfn-concurrent-roundtrip (cluster size 512)\r\n"
+      },
+      {
+        "name": "final-chkdsk-512",
+        "program": "C:\\WINDOWS\\System32\\chkdsk.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\mount-fat32-512\\"
+        ],
+        "exitCode": 0,
+        "output": "O tipo do sistema de arquivos \u00da FAT32.\r\nArmazenamento insuficiente dispon\u00ddvel para criar o arquivo de armazenamento de c\u00bepias de sombra ou outros dados de c\u00bepias de sombra.\r\n\r\nO volume AFATFS_TEST criou 10/11/2026 \u00d3s 22:16\r\nO N\u00b7mero de S\u00darie do Volume \u00da 4839-0A79\r\nO Windows est\u00df verificando os arquivos e pastas...\r\n0 por cento conclu\u00dddo.                \r\n99 por cento conclu\u00dddo..               \r\n100 por cento conclu\u00dddo...              \r\nVerifica\u00fe\u00d2o de arquivos e pastas conclu\u00ddda.\r\n\r\nN\u00d2o h\u00df problemas no sistema de arquivos.\r\nNenhuma a\u00fe\u00d2o necess\u00dfria.\r\n\r\n  527.368.192 bytes de espa\u00feo total em disco.\r\n   16.549.376 bytes em 2 arquivos ocultos.\r\n        7.680 bytes em 9 pastas.\r\n      189.952 bytes em 101 arquivos.\r\n  510.612.480 bytes dispon\u00ddveis em disco.\r\n\r\n          512 bytes em cada unidade de aloca\u00fe\u00d2o.\r\nTotal de     1.030.016 unidades de aloca\u00fe\u00d2o no disco.\r\n      997.290 unidades de aloca\u00fe\u00d2o dispon\u00ddveis em disco.\r\n"
+      },
+      {
+        "name": "create-vhd-4096",
+        "program": "C:\\WINDOWS\\System32\\diskpart.exe",
+        "arguments": [
+          "/s",
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\create-4096.txt"
+        ],
+        "exitCode": 0,
+        "output": "\r\nMicrosoft DiskPart vers\u00e3o 10.0.26100.1150\r\n\r\nCopyright (C) Microsoft Corporation.\r\nNo computador: ASUSTUF\r\n\r\n\r\n    0 por cento conclu\u00eddo\r\n    0 por cento conclu\u00eddo\r\n  100 por cento conclu\u00eddo\r\n\r\n\r\nO DiskPart criou com \u00eaxito o arquivo de disco virtual.\r\n\r\nSaindo do Diskpart...\r\n"
+      },
+      {
+        "name": "baseline-chkdsk-4096",
+        "program": "C:\\WINDOWS\\System32\\chkdsk.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\mount-fat32-4096\\"
+        ],
+        "exitCode": 0,
+        "output": "O tipo do sistema de arquivos \u00da FAT32.\r\nArmazenamento insuficiente dispon\u00ddvel para criar o arquivo de armazenamento de c\u00bepias de sombra ou outros dados de c\u00bepias de sombra.\r\n\r\nO volume AFATFS_TEST criou 10/11/2026 \u00d3s 22:16\r\nO N\u00b7mero de S\u00darie do Volume \u00da 1245-9D22\r\nO Windows est\u00df verificando os arquivos e pastas...\r\n0 por cento conclu\u00dddo.                \r\n9 por cento conclu\u00dddo..               \r\n12 por cento conclu\u00dddo...              \r\n16 por cento conclu\u00dddo....             \r\n21 por cento conclu\u00dddo.....            \r\n23 por cento conclu\u00dddo......           \r\n40 por cento conclu\u00dddo.                \r\n61 por cento conclu\u00dddo..               \r\n63 por cento conclu\u00dddo...              \r\n65 por cento conclu\u00dddo....             \r\n67 por cento conclu\u00dddo.....            \r\n69 por cento conclu\u00dddo......           \r\n70 por cento conclu\u00dddo.                \r\n72 por cento conclu\u00dddo..               \r\n74 por cento conclu\u00dddo...              \r\n76 por cento conclu\u00dddo....             \r\n78 por cento conclu\u00dddo.....            \r\n80 por cento conclu\u00dddo......           \r\n81 por cento conclu\u00dddo.                \r\n83 por cento conclu\u00dddo..               \r\n85 por cento conclu\u00dddo...              \r\n87 por cento conclu\u00dddo....             \r\n89 por cento conclu\u00dddo.....            \r\n90 por cento conclu\u00dddo......           \r\n92 por cento conclu\u00dddo.                \r\n94 por cento conclu\u00dddo..               \r\n96 por cento conclu\u00dddo...              \r\n98 por cento conclu\u00dddo....             \r\n100 por cento conclu\u00dddo.....            \r\nVerifica\u00fe\u00d2o de arquivos e pastas conclu\u00ddda.\r\n\r\nN\u00d2o h\u00df problemas no sistema de arquivos.\r\nNenhuma a\u00fe\u00d2o necess\u00dfria.\r\n\r\n  531.562.496 bytes de espa\u00feo total em disco.\r\n        4.096 bytes em 1 pastas.\r\n      217.088 bytes em 27 arquivos.\r\n  531.337.216 bytes dispon\u00ddveis em disco.\r\n\r\n        4.096 bytes em cada unidade de aloca\u00fe\u00d2o.\r\nTotal de       129.776 unidades de aloca\u00fe\u00d2o no disco.\r\n      129.721 unidades de aloca\u00fe\u00d2o dispon\u00ddveis em disco.\r\n"
+      },
+      {
+        "name": "library-generic-4096",
+        "program": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\workload.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-4096.vhd",
+          "exercise",
+          "4096"
+        ],
+        "exitCode": 0,
+        "output": "NATIVE_BATCH,exercise,8950,6802,31,85,3,0\r\nPASS external exFAT exercise (cluster size 4096)\r\n"
+      },
+      {
+        "name": "library-lfn-4096",
+        "program": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\workload.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-4096.vhd",
+          "exercise-lfn",
+          "4096",
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\aliases-4096.txt"
+        ],
+        "exitCode": 0,
+        "output": "PASS native FAT32 LFN: Windows aliases, native collisions, long-name truncate/rename, case, directories and enumeration\r\nNATIVE_BATCH,exercise-lfn,2924,607,19,55,0,0\r\nPASS external exFAT exercise-lfn (cluster size 4096)\r\n"
+      },
+      {
+        "name": "library-concurrent-4096",
+        "program": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\workload.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-4096.vhd",
+          "exercise-lfn-concurrent",
+          "4096"
+        ],
+        "exitCode": 0,
+        "output": "PASS concurrent native LFN: 3 pending creates/closes, 2 writers, prefetch reader, rename overlap 722 polls\r\nNATIVE_BATCH,exercise-lfn-concurrent,1037,343,73,197,0,0\r\nPASS external exFAT exercise-lfn-concurrent (cluster size 4096)\r\n"
+      },
+      {
+        "name": "after-library-chkdsk-4096",
+        "program": "C:\\WINDOWS\\System32\\chkdsk.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\mount-fat32-4096\\"
+        ],
+        "exitCode": 0,
+        "output": "O tipo do sistema de arquivos \u00da FAT32.\r\nArmazenamento insuficiente dispon\u00ddvel para criar o arquivo de armazenamento de c\u00bepias de sombra ou outros dados de c\u00bepias de sombra.\r\n\r\nO volume AFATFS_TEST criou 10/11/2026 \u00d3s 22:16\r\nO N\u00b7mero de S\u00darie do Volume \u00da 1245-9D22\r\nO Windows est\u00df verificando os arquivos e pastas...\r\n0 por cento conclu\u00dddo.                \r\n1 por cento conclu\u00dddo..               \r\n2 por cento conclu\u00dddo...              \r\n3 por cento conclu\u00dddo....             \r\n4 por cento conclu\u00dddo.....            \r\n5 por cento conclu\u00dddo......           \r\n6 por cento conclu\u00dddo.                \r\n7 por cento conclu\u00dddo..               \r\n76 por cento conclu\u00dddo...              \r\n77 por cento conclu\u00dddo....             \r\n78 por cento conclu\u00dddo.....            \r\n80 por cento conclu\u00dddo......           \r\n82 por cento conclu\u00dddo.                \r\n83 por cento conclu\u00dddo..               \r\n84 por cento conclu\u00dddo...              \r\n85 por cento conclu\u00dddo....             \r\n86 por cento conclu\u00dddo.....            \r\n87 por cento conclu\u00dddo......           \r\n88 por cento conclu\u00dddo.                \r\n89 por cento conclu\u00dddo..               \r\n90 por cento conclu\u00dddo...              \r\n91 por cento conclu\u00dddo....             \r\n92 por cento conclu\u00dddo.....            \r\n93 por cento conclu\u00dddo......           \r\n94 por cento conclu\u00dddo.                \r\n95 por cento conclu\u00dddo..               \r\n96 por cento conclu\u00dddo...              \r\n97 por cento conclu\u00dddo....             \r\n98 por cento conclu\u00dddo.....            \r\n99 por cento conclu\u00dddo......           \r\n100 por cento conclu\u00dddo.                \r\nVerifica\u00fe\u00d2o de arquivos e pastas conclu\u00ddda.\r\n\r\nN\u00d2o h\u00df problemas no sistema de arquivos.\r\nNenhuma a\u00fe\u00d2o necess\u00dfria.\r\n\r\n  531.562.496 bytes de espa\u00feo total em disco.\r\n    2.150.400 bytes em 2 arquivos ocultos.\r\n       40.960 bytes em 9 pastas.\r\n      921.600 bytes em 173 arquivos.\r\n  528.441.344 bytes dispon\u00ddveis em disco.\r\n\r\n        4.096 bytes em cada unidade de aloca\u00fe\u00d2o.\r\nTotal de       129.776 unidades de aloca\u00fe\u00d2o no disco.\r\n      129.014 unidades de aloca\u00fe\u00d2o dispon\u00ddveis em disco.\r\n"
+      },
+      {
+        "name": "after-native-write-chkdsk-4096",
+        "program": "C:\\WINDOWS\\System32\\chkdsk.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\mount-fat32-4096\\"
+        ],
+        "exitCode": 0,
+        "output": "O tipo do sistema de arquivos \u00da FAT32.\r\nArmazenamento insuficiente dispon\u00ddvel para criar o arquivo de armazenamento de c\u00bepias de sombra ou outros dados de c\u00bepias de sombra.\r\n\r\nO volume AFATFS_TEST criou 10/11/2026 \u00d3s 22:16\r\nO N\u00b7mero de S\u00darie do Volume \u00da 1245-9D22\r\nO Windows est\u00df verificando os arquivos e pastas...\r\n0 por cento conclu\u00dddo.                \r\n1 por cento conclu\u00dddo..               \r\n2 por cento conclu\u00dddo...              \r\n4 por cento conclu\u00dddo....             \r\n5 por cento conclu\u00dddo.....            \r\n6 por cento conclu\u00dddo......           \r\n7 por cento conclu\u00dddo.                \r\n78 por cento conclu\u00dddo..               \r\n79 por cento conclu\u00dddo...              \r\n80 por cento conclu\u00dddo....             \r\n81 por cento conclu\u00dddo.....            \r\n82 por cento conclu\u00dddo......           \r\n83 por cento conclu\u00dddo.                \r\n84 por cento conclu\u00dddo..               \r\n85 por cento conclu\u00dddo...              \r\n86 por cento conclu\u00dddo....             \r\n87 por cento conclu\u00dddo.....            \r\n88 por cento conclu\u00dddo......           \r\n89 por cento conclu\u00dddo.                \r\n90 por cento conclu\u00dddo..               \r\n91 por cento conclu\u00dddo...              \r\n92 por cento conclu\u00dddo....             \r\n93 por cento conclu\u00dddo.....            \r\n94 por cento conclu\u00dddo......           \r\n95 por cento conclu\u00dddo.                \r\n96 por cento conclu\u00dddo..               \r\n97 por cento conclu\u00dddo...              \r\n98 por cento conclu\u00dddo....             \r\n99 por cento conclu\u00dddo.....            \r\n100 por cento conclu\u00dddo......           \r\nVerifica\u00fe\u00d2o de arquivos e pastas conclu\u00ddda.\r\n\r\nN\u00d2o h\u00df problemas no sistema de arquivos.\r\nNenhuma a\u00fe\u00d2o necess\u00dfria.\r\n\r\n  531.562.496 bytes de espa\u00feo total em disco.\r\n    2.150.400 bytes em 2 arquivos ocultos.\r\n       40.960 bytes em 9 pastas.\r\n      823.296 bytes em 173 arquivos.\r\n  528.535.552 bytes dispon\u00ddveis em disco.\r\n\r\n        4.096 bytes em cada unidade de aloca\u00fe\u00d2o.\r\nTotal de       129.776 unidades de aloca\u00fe\u00d2o no disco.\r\n      129.037 unidades de aloca\u00fe\u00d2o dispon\u00ddveis em disco.\r\n"
+      },
+      {
+        "name": "library-lfn-roundtrip-4096",
+        "program": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\workload.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-4096.vhd",
+          "verify-lfn-roundtrip",
+          "4096"
+        ],
+        "exitCode": 0,
+        "output": "PASS native FAT32 LFN roundtrip: Windows rename/delete, maximum name, nested path and final library write\r\nNATIVE_BATCH,verify-lfn-roundtrip,190,30,0,0,0,0\r\nPASS external exFAT verify-lfn-roundtrip (cluster size 4096)\r\n"
+      },
+      {
+        "name": "library-concurrent-roundtrip-4096",
+        "program": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\workload.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-4096.vhd",
+          "verify-lfn-concurrent-roundtrip",
+          "4096"
+        ],
+        "exitCode": 0,
+        "output": "PASS concurrent native LFN roundtrip: Windows parallel overwrites and final library write\r\nNATIVE_BATCH,verify-lfn-concurrent-roundtrip,206,30,1,2,0,0\r\nPASS external exFAT verify-lfn-concurrent-roundtrip (cluster size 4096)\r\n"
+      },
+      {
+        "name": "final-chkdsk-4096",
+        "program": "C:\\WINDOWS\\System32\\chkdsk.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\mount-fat32-4096\\"
+        ],
+        "exitCode": 0,
+        "output": "O tipo do sistema de arquivos \u00da FAT32.\r\nArmazenamento insuficiente dispon\u00ddvel para criar o arquivo de armazenamento de c\u00bepias de sombra ou outros dados de c\u00bepias de sombra.\r\n\r\nO volume AFATFS_TEST criou 10/11/2026 \u00d3s 22:16\r\nO N\u00b7mero de S\u00darie do Volume \u00da 1245-9D22\r\nO Windows est\u00df verificando os arquivos e pastas...\r\n0 por cento conclu\u00dddo.                \r\n1 por cento conclu\u00dddo..               \r\n2 por cento conclu\u00dddo...              \r\n4 por cento conclu\u00dddo....             \r\n5 por cento conclu\u00dddo.....            \r\n6 por cento conclu\u00dddo......           \r\n7 por cento conclu\u00dddo.                \r\n77 por cento conclu\u00dddo..               \r\n78 por cento conclu\u00dddo...              \r\n79 por cento conclu\u00dddo....             \r\n80 por cento conclu\u00dddo.....            \r\n81 por cento conclu\u00dddo......           \r\n82 por cento conclu\u00dddo.                \r\n83 por cento conclu\u00dddo..               \r\n84 por cento conclu\u00dddo...              \r\n85 por cento conclu\u00dddo....             \r\n86 por cento conclu\u00dddo.....            \r\n87 por cento conclu\u00dddo......           \r\n88 por cento conclu\u00dddo.                \r\n89 por cento conclu\u00dddo..               \r\n90 por cento conclu\u00dddo...              \r\n91 por cento conclu\u00dddo....             \r\n92 por cento conclu\u00dddo.....            \r\n93 por cento conclu\u00dddo......           \r\n94 por cento conclu\u00dddo.                \r\n95 por cento conclu\u00dddo..               \r\n96 por cento conclu\u00dddo...              \r\n97 por cento conclu\u00dddo....             \r\n98 por cento conclu\u00dddo.....            \r\n99 por cento conclu\u00dddo......           \r\n100 por cento conclu\u00dddo.                \r\nVerifica\u00fe\u00d2o de arquivos e pastas conclu\u00ddda.\r\n\r\nN\u00d2o h\u00df problemas no sistema de arquivos.\r\nNenhuma a\u00fe\u00d2o necess\u00dfria.\r\n\r\n  531.562.496 bytes de espa\u00feo total em disco.\r\n    2.150.400 bytes em 2 arquivos ocultos.\r\n       40.960 bytes em 9 pastas.\r\n      831.488 bytes em 175 arquivos.\r\n  528.527.360 bytes dispon\u00ddveis em disco.\r\n\r\n        4.096 bytes em cada unidade de aloca\u00fe\u00d2o.\r\nTotal de       129.776 unidades de aloca\u00fe\u00d2o no disco.\r\n      129.035 unidades de aloca\u00fe\u00d2o dispon\u00ddveis em disco.\r\n"
+      },
+      {
+        "name": "create-vhd-default",
+        "program": "C:\\WINDOWS\\System32\\diskpart.exe",
+        "arguments": [
+          "/s",
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\create-default.txt"
+        ],
+        "exitCode": 0,
+        "output": "\r\nMicrosoft DiskPart vers\u00e3o 10.0.26100.1150\r\n\r\nCopyright (C) Microsoft Corporation.\r\nNo computador: ASUSTUF\r\n\r\n\r\n    0 por cento conclu\u00eddo\r\n    0 por cento conclu\u00eddo\r\n  100 por cento conclu\u00eddo\r\n\r\n\r\nO DiskPart criou com \u00eaxito o arquivo de disco virtual.\r\n\r\nSaindo do Diskpart...\r\n"
+      },
+      {
+        "name": "baseline-chkdsk-default",
+        "program": "C:\\WINDOWS\\System32\\chkdsk.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\mount-fat32-default\\"
+        ],
+        "exitCode": 0,
+        "output": "O tipo do sistema de arquivos \u00da FAT32.\r\nArmazenamento insuficiente dispon\u00ddvel para criar o arquivo de armazenamento de c\u00bepias de sombra ou outros dados de c\u00bepias de sombra.\r\n\r\nO volume AFATFS_TEST criou 10/11/2026 \u00d3s 22:16\r\nO N\u00b7mero de S\u00darie do Volume \u00da F452-2BD2\r\nO Windows est\u00df verificando os arquivos e pastas...\r\n0 por cento conclu\u00dddo.                \r\n9 por cento conclu\u00dddo..               \r\n12 por cento conclu\u00dddo...              \r\n16 por cento conclu\u00dddo....             \r\n21 por cento conclu\u00dddo.....            \r\n23 por cento conclu\u00dddo......           \r\n40 por cento conclu\u00dddo.                \r\n61 por cento conclu\u00dddo..               \r\n63 por cento conclu\u00dddo...              \r\n65 por cento conclu\u00dddo....             \r\n67 por cento conclu\u00dddo.....            \r\n69 por cento conclu\u00dddo......           \r\n70 por cento conclu\u00dddo.                \r\n72 por cento conclu\u00dddo..               \r\n74 por cento conclu\u00dddo...              \r\n76 por cento conclu\u00dddo....             \r\n78 por cento conclu\u00dddo.....            \r\n80 por cento conclu\u00dddo......           \r\n81 por cento conclu\u00dddo.                \r\n83 por cento conclu\u00dddo..               \r\n85 por cento conclu\u00dddo...              \r\n87 por cento conclu\u00dddo....             \r\n89 por cento conclu\u00dddo.....            \r\n90 por cento conclu\u00dddo......           \r\n92 por cento conclu\u00dddo.                \r\n94 por cento conclu\u00dddo..               \r\n96 por cento conclu\u00dddo...              \r\n98 por cento conclu\u00dddo....             \r\n100 por cento conclu\u00dddo.....            \r\nVerifica\u00fe\u00d2o de arquivos e pastas conclu\u00ddda.\r\n\r\nN\u00d2o h\u00df problemas no sistema de arquivos.\r\nNenhuma a\u00fe\u00d2o necess\u00dfria.\r\n\r\n  531.562.496 bytes de espa\u00feo total em disco.\r\n        4.096 bytes em 1 pastas.\r\n      217.088 bytes em 27 arquivos.\r\n  531.337.216 bytes dispon\u00ddveis em disco.\r\n\r\n        4.096 bytes em cada unidade de aloca\u00fe\u00d2o.\r\nTotal de       129.776 unidades de aloca\u00fe\u00d2o no disco.\r\n      129.721 unidades de aloca\u00fe\u00d2o dispon\u00ddveis em disco.\r\n"
+      },
+      {
+        "name": "library-generic-default",
+        "program": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\workload.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-default.vhd",
+          "exercise",
+          "4096"
+        ],
+        "exitCode": 0,
+        "output": "NATIVE_BATCH,exercise,8950,6802,31,85,3,0\r\nPASS external exFAT exercise (cluster size 4096)\r\n"
+      },
+      {
+        "name": "library-lfn-default",
+        "program": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\workload.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-default.vhd",
+          "exercise-lfn",
+          "4096",
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\aliases-default.txt"
+        ],
+        "exitCode": 0,
+        "output": "PASS native FAT32 LFN: Windows aliases, native collisions, long-name truncate/rename, case, directories and enumeration\r\nNATIVE_BATCH,exercise-lfn,2924,607,19,55,0,0\r\nPASS external exFAT exercise-lfn (cluster size 4096)\r\n"
+      },
+      {
+        "name": "library-concurrent-default",
+        "program": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\workload.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-default.vhd",
+          "exercise-lfn-concurrent",
+          "4096"
+        ],
+        "exitCode": 0,
+        "output": "PASS concurrent native LFN: 3 pending creates/closes, 2 writers, prefetch reader, rename overlap 722 polls\r\nNATIVE_BATCH,exercise-lfn-concurrent,1037,343,73,197,0,0\r\nPASS external exFAT exercise-lfn-concurrent (cluster size 4096)\r\n"
+      },
+      {
+        "name": "after-library-chkdsk-default",
+        "program": "C:\\WINDOWS\\System32\\chkdsk.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\mount-fat32-default\\"
+        ],
+        "exitCode": 0,
+        "output": "O tipo do sistema de arquivos \u00da FAT32.\r\nArmazenamento insuficiente dispon\u00ddvel para criar o arquivo de armazenamento de c\u00bepias de sombra ou outros dados de c\u00bepias de sombra.\r\n\r\nO volume AFATFS_TEST criou 10/11/2026 \u00d3s 22:16\r\nO N\u00b7mero de S\u00darie do Volume \u00da F452-2BD2\r\nO Windows est\u00df verificando os arquivos e pastas...\r\n0 por cento conclu\u00dddo.                \r\n1 por cento conclu\u00dddo..               \r\n2 por cento conclu\u00dddo...              \r\n3 por cento conclu\u00dddo....             \r\n4 por cento conclu\u00dddo.....            \r\n5 por cento conclu\u00dddo......           \r\n6 por cento conclu\u00dddo.                \r\n7 por cento conclu\u00dddo..               \r\n76 por cento conclu\u00dddo...              \r\n77 por cento conclu\u00dddo....             \r\n78 por cento conclu\u00dddo.....            \r\n80 por cento conclu\u00dddo......           \r\n82 por cento conclu\u00dddo.                \r\n83 por cento conclu\u00dddo..               \r\n84 por cento conclu\u00dddo...              \r\n85 por cento conclu\u00dddo....             \r\n86 por cento conclu\u00dddo.....            \r\n87 por cento conclu\u00dddo......           \r\n88 por cento conclu\u00dddo.                \r\n89 por cento conclu\u00dddo..               \r\n90 por cento conclu\u00dddo...              \r\n91 por cento conclu\u00dddo....             \r\n92 por cento conclu\u00dddo.....            \r\n93 por cento conclu\u00dddo......           \r\n94 por cento conclu\u00dddo.                \r\n95 por cento conclu\u00dddo..               \r\n96 por cento conclu\u00dddo...              \r\n97 por cento conclu\u00dddo....             \r\n98 por cento conclu\u00dddo.....            \r\n99 por cento conclu\u00dddo......           \r\n100 por cento conclu\u00dddo.                \r\nVerifica\u00fe\u00d2o de arquivos e pastas conclu\u00ddda.\r\n\r\nN\u00d2o h\u00df problemas no sistema de arquivos.\r\nNenhuma a\u00fe\u00d2o necess\u00dfria.\r\n\r\n  531.562.496 bytes de espa\u00feo total em disco.\r\n    2.150.400 bytes em 2 arquivos ocultos.\r\n       40.960 bytes em 9 pastas.\r\n      921.600 bytes em 173 arquivos.\r\n  528.441.344 bytes dispon\u00ddveis em disco.\r\n\r\n        4.096 bytes em cada unidade de aloca\u00fe\u00d2o.\r\nTotal de       129.776 unidades de aloca\u00fe\u00d2o no disco.\r\n      129.014 unidades de aloca\u00fe\u00d2o dispon\u00ddveis em disco.\r\n"
+      },
+      {
+        "name": "after-native-write-chkdsk-default",
+        "program": "C:\\WINDOWS\\System32\\chkdsk.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\mount-fat32-default\\"
+        ],
+        "exitCode": 0,
+        "output": "O tipo do sistema de arquivos \u00da FAT32.\r\nArmazenamento insuficiente dispon\u00ddvel para criar o arquivo de armazenamento de c\u00bepias de sombra ou outros dados de c\u00bepias de sombra.\r\n\r\nO volume AFATFS_TEST criou 10/11/2026 \u00d3s 22:16\r\nO N\u00b7mero de S\u00darie do Volume \u00da F452-2BD2\r\nO Windows est\u00df verificando os arquivos e pastas...\r\n0 por cento conclu\u00dddo.                \r\n1 por cento conclu\u00dddo..               \r\n2 por cento conclu\u00dddo...              \r\n4 por cento conclu\u00dddo....             \r\n5 por cento conclu\u00dddo.....            \r\n6 por cento conclu\u00dddo......           \r\n7 por cento conclu\u00dddo.                \r\n78 por cento conclu\u00dddo..               \r\n79 por cento conclu\u00dddo...              \r\n80 por cento conclu\u00dddo....             \r\n81 por cento conclu\u00dddo.....            \r\n82 por cento conclu\u00dddo......           \r\n83 por cento conclu\u00dddo.                \r\n84 por cento conclu\u00dddo..               \r\n85 por cento conclu\u00dddo...              \r\n86 por cento conclu\u00dddo....             \r\n87 por cento conclu\u00dddo.....            \r\n88 por cento conclu\u00dddo......           \r\n89 por cento conclu\u00dddo.                \r\n90 por cento conclu\u00dddo..               \r\n91 por cento conclu\u00dddo...              \r\n92 por cento conclu\u00dddo....             \r\n93 por cento conclu\u00dddo.....            \r\n94 por cento conclu\u00dddo......           \r\n95 por cento conclu\u00dddo.                \r\n96 por cento conclu\u00dddo..               \r\n97 por cento conclu\u00dddo...              \r\n98 por cento conclu\u00dddo....             \r\n99 por cento conclu\u00dddo.....            \r\n100 por cento conclu\u00dddo......           \r\nVerifica\u00fe\u00d2o de arquivos e pastas conclu\u00ddda.\r\n\r\nN\u00d2o h\u00df problemas no sistema de arquivos.\r\nNenhuma a\u00fe\u00d2o necess\u00dfria.\r\n\r\n  531.562.496 bytes de espa\u00feo total em disco.\r\n    2.150.400 bytes em 2 arquivos ocultos.\r\n       40.960 bytes em 9 pastas.\r\n      823.296 bytes em 173 arquivos.\r\n  528.535.552 bytes dispon\u00ddveis em disco.\r\n\r\n        4.096 bytes em cada unidade de aloca\u00fe\u00d2o.\r\nTotal de       129.776 unidades de aloca\u00fe\u00d2o no disco.\r\n      129.037 unidades de aloca\u00fe\u00d2o dispon\u00ddveis em disco.\r\n"
+      },
+      {
+        "name": "library-lfn-roundtrip-default",
+        "program": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\workload.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-default.vhd",
+          "verify-lfn-roundtrip",
+          "4096"
+        ],
+        "exitCode": 0,
+        "output": "PASS native FAT32 LFN roundtrip: Windows rename/delete, maximum name, nested path and final library write\r\nNATIVE_BATCH,verify-lfn-roundtrip,190,30,0,0,0,0\r\nPASS external exFAT verify-lfn-roundtrip (cluster size 4096)\r\n"
+      },
+      {
+        "name": "library-concurrent-roundtrip-default",
+        "program": "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\workload.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\fat32-default.vhd",
+          "verify-lfn-concurrent-roundtrip",
+          "4096"
+        ],
+        "exitCode": 0,
+        "output": "PASS concurrent native LFN roundtrip: Windows parallel overwrites and final library write\r\nNATIVE_BATCH,verify-lfn-concurrent-roundtrip,206,30,1,2,0,0\r\nPASS external exFAT verify-lfn-concurrent-roundtrip (cluster size 4096)\r\n"
+      },
+      {
+        "name": "final-chkdsk-default",
+        "program": "C:\\WINDOWS\\System32\\chkdsk.exe",
+        "arguments": [
+          "C:\\Users\\user\\Github\\asyncfatfs\\tests\\build\\windows-fat32-lfn\\run-io-batching-native-final-20261110\\mount-fat32-default\\"
+        ],
+        "exitCode": 0,
+        "output": "O tipo do sistema de arquivos \u00da FAT32.\r\nArmazenamento insuficiente dispon\u00ddvel para criar o arquivo de armazenamento de c\u00bepias de sombra ou outros dados de c\u00bepias de sombra.\r\n\r\nO volume AFATFS_TEST criou 10/11/2026 \u00d3s 22:16\r\nO N\u00b7mero de S\u00darie do Volume \u00da F452-2BD2\r\nO Windows est\u00df verificando os arquivos e pastas...\r\n0 por cento conclu\u00dddo.                \r\n1 por cento conclu\u00dddo..               \r\n2 por cento conclu\u00dddo...              \r\n4 por cento conclu\u00dddo....             \r\n5 por cento conclu\u00dddo.....            \r\n6 por cento conclu\u00dddo......           \r\n7 por cento conclu\u00dddo.                \r\n77 por cento conclu\u00dddo..               \r\n78 por cento conclu\u00dddo...              \r\n79 por cento conclu\u00dddo....             \r\n80 por cento conclu\u00dddo.....            \r\n81 por cento conclu\u00dddo......           \r\n82 por cento conclu\u00dddo.                \r\n83 por cento conclu\u00dddo..               \r\n84 por cento conclu\u00dddo...              \r\n85 por cento conclu\u00dddo....             \r\n86 por cento conclu\u00dddo.....            \r\n87 por cento conclu\u00dddo......           \r\n88 por cento conclu\u00dddo.                \r\n89 por cento conclu\u00dddo..               \r\n90 por cento conclu\u00dddo...              \r\n91 por cento conclu\u00dddo....             \r\n92 por cento conclu\u00dddo.....            \r\n93 por cento conclu\u00dddo......           \r\n94 por cento conclu\u00dddo.                \r\n95 por cento conclu\u00dddo..               \r\n96 por cento conclu\u00dddo...              \r\n97 por cento conclu\u00dddo....             \r\n98 por cento conclu\u00dddo.....            \r\n99 por cento conclu\u00dddo......           \r\n100 por cento conclu\u00dddo.                \r\nVerifica\u00fe\u00d2o de arquivos e pastas conclu\u00ddda.\r\n\r\nN\u00d2o h\u00df problemas no sistema de arquivos.\r\nNenhuma a\u00fe\u00d2o necess\u00dfria.\r\n\r\n  531.562.496 bytes de espa\u00feo total em disco.\r\n    2.150.400 bytes em 2 arquivos ocultos.\r\n       40.960 bytes em 9 pastas.\r\n      831.488 bytes em 175 arquivos.\r\n  528.527.360 bytes dispon\u00ddveis em disco.\r\n\r\n        4.096 bytes em cada unidade de aloca\u00fe\u00d2o.\r\nTotal de       129.776 unidades de aloca\u00fe\u00d2o no disco.\r\n      129.035 unidades de aloca\u00fe\u00d2o dispon\u00ddveis em disco.\r\n"
+      }
+    ],
+    "error": null,
+    "cleanupErrors": []
+  },
+  "cleanup": {
+    "status": "passed",
+    "checkedUtc": "2026-11-11T01:18:22.5580158Z",
+    "auditScriptSha256": "E416144EE955B8FEF8F523F47085FE1598598C348C4DC09917ED102DB2AB0FF1",
+    "images": [
+      {
+        "name": "512",
+        "attached": false,
+        "footerSha256": "242D8B3917C7C36746CFD18C092DD2D681A76A9B2BE585C758FB1BCF11B70CAF",
+        "aliases": [
+          {
+            "name": "Concurrent library collision filename number 00.bin",
+            "alias": "CONCUR~1.BIN",
+            "sha256": "6055981D0942A53D044D42209068DF05EBB16F2605F23E22557986F6CB2A9441"
+          },
+          {
+            "name": "Concurrent library collision filename number 01.bin",
+            "alias": "CONCUR~2.BIN",
+            "sha256": "03C93564D00B303357615A081F939BC769FC3C0CC0398891A5896FF619F871CE"
+          },
+          {
+            "name": "Concurrent library renamed while writers pending.bin",
+            "alias": "CONCUR~4.BIN",
+            "sha256": "BA01A81B6FF1C58AB0B99703C4D22CDFF270845ECCA9B0742F5870C7466AD918"
+          },
+          {
+            "name": "Concurrent library final roundtrip.bin",
+            "alias": "CONCUR~3.BIN",
+            "sha256": "9838208D5270133E640298886C44AAEBF7A1E2543D82FAB3775B036610D3D495"
+          }
+        ]
+      },
+      {
+        "name": "4096",
+        "attached": false,
+        "footerSha256": "2BA8D1FD0D2EB437E985212EEE1AFB1C88CF6BD72D5248B19BD5FE6007603188",
+        "aliases": [
+          {
+            "name": "Concurrent library collision filename number 00.bin",
+            "alias": "CONCUR~1.BIN",
+            "sha256": "6055981D0942A53D044D42209068DF05EBB16F2605F23E22557986F6CB2A9441"
+          },
+          {
+            "name": "Concurrent library collision filename number 01.bin",
+            "alias": "CONCUR~2.BIN",
+            "sha256": "03C93564D00B303357615A081F939BC769FC3C0CC0398891A5896FF619F871CE"
+          },
+          {
+            "name": "Concurrent library renamed while writers pending.bin",
+            "alias": "CONCUR~4.BIN",
+            "sha256": "BA01A81B6FF1C58AB0B99703C4D22CDFF270845ECCA9B0742F5870C7466AD918"
+          },
+          {
+            "name": "Concurrent library final roundtrip.bin",
+            "alias": "CONCUR~3.BIN",
+            "sha256": "9838208D5270133E640298886C44AAEBF7A1E2543D82FAB3775B036610D3D495"
+          }
+        ]
+      },
+      {
+        "name": "default",
+        "attached": false,
+        "footerSha256": "B9025044FD4AB365EBCDCAB3CCFCDC2FF5EBAFB5D0303D8CFC613996EDB4E19F",
+        "aliases": [
+          {
+            "name": "Concurrent library collision filename number 00.bin",
+            "alias": "CONCUR~1.BIN",
+            "sha256": "6055981D0942A53D044D42209068DF05EBB16F2605F23E22557986F6CB2A9441"
+          },
+          {
+            "name": "Concurrent library collision filename number 01.bin",
+            "alias": "CONCUR~2.BIN",
+            "sha256": "03C93564D00B303357615A081F939BC769FC3C0CC0398891A5896FF619F871CE"
+          },
+          {
+            "name": "Concurrent library renamed while writers pending.bin",
+            "alias": "CONCUR~4.BIN",
+            "sha256": "BA01A81B6FF1C58AB0B99703C4D22CDFF270845ECCA9B0742F5870C7466AD918"
+          },
+          {
+            "name": "Concurrent library final roundtrip.bin",
+            "alias": "CONCUR~3.BIN",
+            "sha256": "9838208D5270133E640298886C44AAEBF7A1E2543D82FAB3775B036610D3D495"
+          }
+        ]
+      }
+    ]
+  },
+  "layouts_identical": 24,
+  "powercuts": {
+    "operations": 3957,
+    "recovery": 2142,
+    "guards": 28,
+    "bootstrap": 86
+  },
+  "source_sha256": {
+    "lib\\builddefs.h": "A934B93A8AAEA355E83F39FF1BB18188BECE7C023D6CA45D0373D261B5EAE623",
+    "lib\\asyncfatfs_exfatjournal.inc": "EAD2ACA6D28B9D0F8E72C7EA4725FF3F30696B5C08568859A1A5AE1BFB906CEC",
+    "tests\\sdcard_sim.c": "66E6A13278700ED2286704584C3C48F4C8080257D6D96C3E9FC1C68B525DDFCD",
+    "lib\\asyncfatfs_format.inc": "64158FE17360962DD7920C6B6C69DAEE9E34BC96D789FFEC2432784A761AF26B",
+    "lib\\asyncfatfs.c": "41E3DA3777E7AAB246A8D7C62068FC93EBC7F7BE84929D4CAD4564D0D0C94F41",
+    "lib\\asyncfatfs.h": "3091CA85C6AB7A2255210C2766682A0E9015465BF33092E2D764799DB6D0C16A",
+    "lib\\fat_standard.h": "F1BE485A582E50A75FAA62897EB75672514B8E5AB066F17F36F44E75D68BAB99",
+    "tests\\run_windows_fat32_lfn_tests.ps1": "D9CAF2E31C9E521B8CEC6A76EB823B456B9F6353C823792C5286D4895AB98FD9",
+    "tests\\test_exfat_external.c": "82AE66F7818D2833E04BEAAB03EE3C1AC022B05326302EDDAC3630FD5E0EC8AA",
+    "tests\\exfat_native_api.inc": "087E0857E22A83F7DF37F933DACD18C821CE1541E2F76187C006E51D1A2BB295",
+    "lib\\asyncfatfs_lfn.inc": "B61BA9DAC8F9DA58874C563260BD5EC1609DCBF24B79F1A05ABF87B92B59025E",
+    "tests\\fat_lfn_native.inc": "C8B23E9EA97006F2AB54B71101C05F3A8190E9C8F2EF4CBB57F20BC640D240EF",
+    "lib\\asyncfatfs_journal.inc": "AD20BA1F9F97992632225676CDB8116E2F481ADE2709AAD0F546B89AE4B95A62",
+    "lib\\asyncfatfs_api.inc": "8319B3584917B80C514F02DC97F5C4430F60F4D797346358728C568DC1EB67F3",
+    "lib\\asyncfatfs_fatjournal.inc": "1C2078E0458013F3C88BA4AE113AE3ADA8AA2E22138934500D0F723196506492",
+    "lib\\sdcard.h": "9F8A380378011A98461DC7BA3545DA9219389B6DC1350D16337F4510FF636955",
+    "lib\\asyncfatfs_journal.h": "DCAF6259F125A8D3FD763E91FDA42D1AD20035B714ADB06247C1CA7BC5E22028",
+    "lib\\fat_standard.c": "68B93D04744F34374988DBAFC91D7315C25A1E14C1FB1F609581F1EFD3220F40"
+  },
+  "evidence_sha256": {
+    "tests/build/windows-native-batching-final/layout/report.json": "b0f69380c253b6095c6178b5a70893dd028583a90648da64f32ab298d01f75fe",
+    "tests/build/windows-native-batching-final/powercut/report.json": "5bd16a89336a5443d7d53a8ef32809257a2e554180593d1c5e5c96d1a97c433f",
+    "tests/build/windows-native-batching-final/powercut/guards/report.json": "b5ee59516103575354b4f9658f9d1c8f9b76cddac1a43eb36eb1265ec169c63a",
+    "tests/build/windows-native-batching-final/powercut/provision/report.json": "574daccaf2cc2c02d71e7ab8e12a1657aaa4c5001d967eca272d1557f9980066",
+    "tests/build/windows-native-batching-final/powercut/recovery/report.json": "48b3f804c8b4e2de5d21fc71d3823b15903895d3e3c6a29609e0e2b77a8f86eb",
+    "tests/build/windows-native-batching-final/asan.log": "3fc1716b32431dcc60f1e521e2aa5e4ebeab1b5abb0d3477cc3b849ee306970e",
+    "tests/build/windows-native-batching-final/benchmark.log": "423f3f3fb3f99c24a95122c8429ed5b8fd19fe147e9b9b6246d133aa26fe8360",
+    "tests/build/windows-native-batching-final/layout.log": "a93fa86bd2a90132a452eec0beb742c3ff806f36d15cb586ddcb3e8c2fa73569",
+    "tests/build/windows-native-batching-final/multi.log": "1f9520bce93c7157ffbe91367ee1acab97011a96d49048f9e102921efdd01abb",
+    "tests/build/windows-native-batching-final/powercut.log": "c25f476b252cd9fe1f7d817399f78b58b8874f699f053c5f1e8df34ed8fb32e1",
+    "tests/build/windows-native-batching-final/regression.log": "880ba41bd278192c3165128f9be11bf4a41a4daf28ad7fb115d6b0f42f3c5f50",
+    "tests/build/windows-native-batching-final/multi-combined-after/test.log": "777be74bd4836809c11872e8a435a4b6d97125a01906d3e866685f1eac29b04f",
+    "tests/build/windows-native-batching-final/multi-combined-before/test.log": "bf492a376d26be8ac9dfbac02fb2e7d008a533ecf756886938d96b956531da3a",
+    "tests/build/windows-native-batching-final/multi-default-after/test.log": "b98ade424855f81035a456d2b76162ccfdf47d0a9183706f40ab66a9386af0e9",
+    "tests/build/windows-native-batching-final/multi-default-before/test.log": "9336550f7ee051c9e92ef2db296590bb8276c2f0c29c163c929fdea5b1e8c4b4",
+    "tests/build/windows-native-batching-final/cache-default/test.log": "81b1a949e9af66aafa47d26ccd53fbe2c7eae643ade1cecfe86c7260f77ed56b",
+    "tests/build/windows-native-batching-final/cache-no_multiblock/test.log": "81b1a949e9af66aafa47d26ccd53fbe2c7eae643ade1cecfe86c7260f77ed56b",
+    "tests/build/windows-fat32-lfn/run-io-batching-native-final-20261110/cleanup-verification.json": "b33b7dee6b22d716c3ad0c2d123be0e4edc87396c0c2f84d7a9e17ca52e6abb8"
+  }
+}

@@ -1,0 +1,328 @@
+{
+  "status": "passed",
+  "baseline_revision": "fc6a2939fcea90efd53f905c3381a68fc82d93ae",
+  "memory": [
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": false,
+      "before": 4140,
+      "after": 4128,
+      "saved": 12
+    },
+    {
+      "configuration": "default",
+      "bits": 16,
+      "short_enums": true,
+      "before": 4120,
+      "after": 4108,
+      "saved": 12
+    },
+    {
+      "configuration": "default",
+      "bits": 32,
+      "short_enums": false,
+      "before": 4244,
+      "after": 4232,
+      "saved": 12
+    },
+    {
+      "configuration": "default",
+      "bits": 64,
+      "short_enums": false,
+      "before": 4328,
+      "after": 4320,
+      "saved": 8
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": false,
+      "before": 9424,
+      "after": 8356,
+      "saved": 1068
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 16,
+      "short_enums": true,
+      "before": 9412,
+      "after": 8344,
+      "saved": 1068
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 32,
+      "short_enums": false,
+      "before": 9792,
+      "after": 8672,
+      "saved": 1120
+    },
+    {
+      "configuration": "exfat_freefile",
+      "bits": 64,
+      "short_enums": false,
+      "before": 9944,
+      "after": 8808,
+      "saved": 1136
+    },
+    {
+      "configuration": "exfat_only",
+      "bits": 16,
+      "short_enums": false,
+      "before": 8356,
+      "after": 7288,
+      "saved": 1068
+    },
+    {
+      "configuration": "exfat_only",
+      "bits": 16,
+      "short_enums": true,
+      "before": 8344,
+      "after": 7276,
+      "saved": 1068
+    },
+    {
+      "configuration": "exfat_only",
+      "bits": 32,
+      "short_enums": false,
+      "before": 8668,
+      "after": 7548,
+      "saved": 1120
+    },
+    {
+      "configuration": "exfat_only",
+      "bits": 64,
+      "short_enums": false,
+      "before": 8800,
+      "after": 7656,
+      "saved": 1144
+    },
+    {
+      "configuration": "fat_lfn",
+      "bits": 16,
+      "short_enums": false,
+      "before": 4140,
+      "after": 4128,
+      "saved": 12
+    },
+    {
+      "configuration": "fat_lfn",
+      "bits": 16,
+      "short_enums": true,
+      "before": 4120,
+      "after": 4108,
+      "saved": 12
+    },
+    {
+      "configuration": "fat_lfn",
+      "bits": 32,
+      "short_enums": false,
+      "before": 4244,
+      "after": 4232,
+      "saved": 12
+    },
+    {
+      "configuration": "fat_lfn",
+      "bits": 64,
+      "short_enums": false,
+      "before": 4328,
+      "after": 4320,
+      "saved": 8
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 16,
+      "short_enums": false,
+      "before": 2520,
+      "after": 2520,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 16,
+      "short_enums": true,
+      "before": 2500,
+      "after": 2500,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 32,
+      "short_enums": false,
+      "before": 2636,
+      "after": 2636,
+      "saved": 0
+    },
+    {
+      "configuration": "fat_only",
+      "bits": 64,
+      "short_enums": false,
+      "before": 2736,
+      "after": 2736,
+      "saved": 0
+    },
+    {
+      "configuration": "lfn_exfat",
+      "bits": 16,
+      "short_enums": false,
+      "before": 8536,
+      "after": 7432,
+      "saved": 1104
+    },
+    {
+      "configuration": "lfn_exfat",
+      "bits": 16,
+      "short_enums": true,
+      "before": 8512,
+      "after": 7412,
+      "saved": 1100
+    },
+    {
+      "configuration": "lfn_exfat",
+      "bits": 32,
+      "short_enums": false,
+      "before": 8848,
+      "after": 7692,
+      "saved": 1156
+    },
+    {
+      "configuration": "lfn_exfat",
+      "bits": 64,
+      "short_enums": false,
+      "before": 9000,
+      "after": 7816,
+      "saved": 1184
+    }
+  ],
+  "io": [
+    {
+      "filesystem": "exfat",
+      "files": 1,
+      "before": {
+        "bytes": 65536,
+        "reads": 37,
+        "writes": 534,
+        "mount_reads": 22,
+        "mount_writes": 561
+      },
+      "after": {
+        "bytes": 65536,
+        "reads": 37,
+        "writes": 534,
+        "mount_reads": 22,
+        "mount_writes": 284
+      }
+    },
+    {
+      "filesystem": "exfat",
+      "files": 2,
+      "before": {
+        "bytes": 131072,
+        "reads": 1440,
+        "writes": 2453,
+        "mount_reads": 22,
+        "mount_writes": 561
+      },
+      "after": {
+        "bytes": 131072,
+        "reads": 1440,
+        "writes": 2453,
+        "mount_reads": 22,
+        "mount_writes": 284
+      }
+    },
+    {
+      "filesystem": "fat32",
+      "files": 1,
+      "before": {
+        "bytes": 65536,
+        "reads": 52,
+        "writes": 815,
+        "mount_reads": 41,
+        "mount_writes": 4381
+      },
+      "after": {
+        "bytes": 65536,
+        "reads": 222,
+        "writes": 451,
+        "mount_reads": 41,
+        "mount_writes": 2221
+      }
+    },
+    {
+      "filesystem": "fat32",
+      "files": 2,
+      "before": {
+        "bytes": 131072,
+        "reads": 1342,
+        "writes": 4407,
+        "mount_reads": 41,
+        "mount_writes": 4381
+      },
+      "after": {
+        "bytes": 131072,
+        "reads": 1348,
+        "writes": 1099,
+        "mount_reads": 41,
+        "mount_writes": 2221
+      }
+    }
+  ],
+  "fat32": {
+    "cuts": 4363,
+    "recovery_cuts": 2142,
+    "guards": 28,
+    "bootstrap_cuts": 86,
+    "bootstrap_read_only": 66
+  },
+  "exfat": {
+    "cuts": 1898,
+    "structural_errors": 440,
+    "unmarked_errors": 0,
+    "dirty_mounts_wrote": 0,
+    "keep_failures": 0,
+    "close_failures": 0,
+    "sync_failures": 0,
+    "premature_flush": 0,
+    "repair_checks": 0,
+    "repair_failures": 0,
+    "repair_target_prefix_lost": 0,
+    "recovery_failures": 0,
+    "recovery_fsck_errors": 0,
+    "recovery_target_prefix_lost": 0,
+    "protected_shutdown_cuts": 0,
+    "protected_startup_cuts": 56
+  },
+  "source_sha256": {
+    "lib/asyncfatfs.c": "97c98b0d2b4bb41cadf8961cf465f67e5d4fe8901f38dcf3def76a6e8be39a8a",
+    "lib/asyncfatfs.h": "3091ca85c6ab7a2255210c2766682a0e9015465bf33092e2d764799db6d0c16a",
+    "lib/asyncfatfs_api.inc": "8319b3584917b80c514f02dc97f5c4430f60f4d797346358728c568dc1eb67f3",
+    "lib/asyncfatfs_exfatjournal.inc": "5ecd628f8d296318a7948743aad3774c801aab8d35e08725d9d1bd03788d49b0",
+    "lib/asyncfatfs_fatjournal.inc": "35cd32ae6df3f043f230151d2dcf8cb28aa5b5b3622ce3244628df87b79aa067",
+    "lib/asyncfatfs_format.inc": "64158fe17360962dd7920c6b6c69daee9e34bc96d789ffec2432784a761af26b",
+    "lib/asyncfatfs_journal.h": "62f6b3865cf4ae7ebc3e94400506448c32d0ebf1804bc1aa453ddca4cf597e1c",
+    "lib/asyncfatfs_journal.inc": "da5cb64e0be73f09999f9590dadd6c3c85f6024ac89d3cd9c8d39357827968df",
+    "lib/asyncfatfs_lfn.inc": "31a98ad7c3b63225ea9afa6c4b22cb3fbfeb26e62f4f5010c5196a8b4941eedd",
+    "lib/builddefs.h": "a934b93a8aaea355e83f39ff1bb18188bece7c023d6ca45d0373d261b5eae623",
+    "lib/fat_standard.c": "68b93d04744f34374988dbafc91d7315c25a1e14c1fb1f609581f1efd3220f40",
+    "lib/fat_standard.h": "f1be485a582e50a75faa62897eb75672514b8e5ab066f17f36f44e75d68bab99",
+    "lib/sdcard.h": "9f8a380378011a98461dc7ba3545da9219389b6dc1350d16337f4510ff636955"
+  },
+  "evidence_sha256": {
+    "tests/build/optimization/fat32/report.json": "561eafc3ce74f99451abe580814d53163b81758e1d21e7cfdeb402e985fea5eb",
+    "tests/build/optimization/fat32/recovery/report.json": "ec4e8e47912e7639282b32140e3bbd58f5bf8019dcfb6b9ee6005e65372ec44c",
+    "tests/build/optimization/fat32/guards/report.json": "b5ee59516103575354b4f9658f9d1c8f9b76cddac1a43eb36eb1265ec169c63a",
+    "tests/build/optimization/fat32/provision/report.json": "574daccaf2cc2c02d71e7ab8e12a1657aaa4c5001d967eca272d1557f9980066",
+    "tests/build/optimization/exfat/report.json": "1735d9c7405ba25e0f5b5f7a608d0e267f86df1be01cb2a7f19ec4dc3b4ba096",
+    "tests/build/optimization-before/report.json": "864ca492dab3f809812c000e39ade3149081e344d36e01490223b5e7b605d51a",
+    "tests/build/optimization-after/report.json": "43d5e342a0e714295130af7126aad239ccd627f647756430592bb5f2a10876c6",
+    "tests/build/optimization/benchmark/default-before.log": "4a7fc715e0b50f50b07b44816b6a6aa680829376c72c0511058bba87960b4f7f",
+    "tests/build/optimization/benchmark/default-after.log": "a895127304fe62b60e91ad59ce7fa4dac0476ce36cbe07c62b4649d7fc3c66ae",
+    "tests/build/optimization/benchmark/combined-before.log": "717692c72a6973969d38b4c8553feff0997bfee6afe46f3d835b7785de734837",
+    "tests/build/optimization/benchmark/combined-after.log": "d38343019ba06c14aae69d1f5d94dd0c048f47aaab98c94ba5a013d26d8fb432",
+    "tests/metadata_batch.c": "741587c76d4e61c87ed38272647fc3c001a0ba52450a1ad518f095c0f5f90b65",
+    "tests/test_exfat.c": "ff542eb472d35c00cf34100a37f3197d74df7ff96423029495b63a979fd6dacc",
+    "tests/run_metadata_benchmark.ps1": "45ab1725bce44d4de1e7565497d9e3ef9079833cc3aa2914e2c5c1476da10a2a"
+  }
+}

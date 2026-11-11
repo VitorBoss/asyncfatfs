@@ -125,6 +125,36 @@ This protects metadata, not in-place payload overwrites or unsynced data still i
 acknowledgments must represent durable, ordered writes. See the [FAT32 power-cut and shared-journal
 validation](../tests/FAT32_LFN_POWERCUT.md) for tested cuts, limits and measured RAM costs.
 
+#### Memory and Metadata I/O
+
+The journal shares provisioning, capture and recovery workspaces whose lifetimes do not overlap.
+Its initialization and shutdown selectors share one byte, reset to the initial shutdown step before
+`READY`. The runtime phase remains separate so pending commits and mount errors retain their state.
+exFAT temporarily borrows the first public handle during initialization and releases it before `READY`,
+including protected read-only mounts. There is no permanent journal handle, extra sector buffer or heap.
+The public handle limit and file/directory/request sizes remain unchanged.
+
+During the first journal reservation, FAT-chain and bitmap allocation updates stay in the existing
+cache until cache pressure requires I/O or the allocation reaches its final durability barrier. That
+barrier still acknowledges every allocation sector before publishing the journal file's extent.
+Zeroing of the reserved extent and all undo-record ordering remain unchanged.
+
+On writable journaled FAT32, regular-file allocation also combines changes to the new and previous
+FAT entries where the cache permits. Background flushing pauses only during those allocation phases;
+a cache miss that cannot find a reusable buffer starts a flush so fragmented chains, other writers
+and retained readers can make progress. The directory update, sync/close and transaction checkpoint
+continue to wait for the required writes. Directory initialization and unjournaled allocations retain
+their ordering barriers. exFAT's normal file-allocation barriers are retained.
+
+This reduces repeated media writes without promising that every workload needs fewer reads. See
+[memory and I/O measurements](../tests/MEMORY_IO_OPTIMIZATION.md) for before/after ABI sizes, transfer
+counts, interrupted-write checks and the measured tradeoff for a single FAT32 writer. The subsequent
+[journal lifetime layout report](../tests/JOURNAL_LIFETIME_MEMORY.md) describes the workspace unions,
+remaining simultaneous fields and the additional RAM savings.
+The [operation and mount lifetime report](../tests/OPERATION_LIFETIME_MEMORY.md) covers further
+workspace sharing during file creation, truncation, directory growth and exFAT initialization,
+with measured sizes for 16-, 32- and 64-bit targets.
+
 #### exFAT Development Support
 
 exFAT is disabled by default. With `AFATFS_EXTERNAL_CONFIG`, define `ASYNCFS_ENABLE_EXFAT` in
@@ -854,8 +884,30 @@ cannot be accepted right now, return `false`.
 
 This function is used by AsyncFatFS to indicate the beginning of a multi-block write operation. The size of
 potential multi-block writes (in number of blocks) will never be less than the value of
-`AFATFS_MIN_MULTIPLE_BLOCK_WRITE_COUNT`, and will never be more than the value of `AFATFS_NUM_CACHE_SECTORS`.
-Currently, the only way multi-block writes can trigger is when `AFATFS_USE_FREEFILE` is enabled. This function must return either `SDCARD_OPERATION_SUCCESS` or `SDCARD_OPERATION_BUSY`.
+`AFATFS_MIN_MULTIPLE_BLOCK_WRITE_COUNT`.
+The cache also uses this feature without `AFATFS_USE_FREEFILE` when dirty, unlocked sectors are physically
+consecutive in their existing write order and meet `AFATFS_MIN_MULTIPLE_BLOCK_WRITE_COUNT`. These runs
+contain at most `AFATFS_NUM_CACHE_SECTORS` blocks. Contiguous append through freefile may announce a
+longer range of future data sectors, up to 65535 blocks. Metadata never announces uncached future sectors:
+pre-erasing them could destroy contents before their undo records are durable.
+
+The library retries `SDCARD_OPERATION_BUSY` and `SDCARD_OPERATION_FAILURE` without submitting the data
+block, retaining the pending buffers. Failure also records `AFATFS_ERROR_BACKEND_IO`. Sync, close and
+shutdown continue to wait for completion and the end of the multi-block operation.
+
+Background flushing is deferred only during selected journal-protected metadata production phases:
+LFN/exFAT entry publication, FAT32 allocation, chain conversion and chain release. Cache pressure and
+explicit durability barriers override this deferral; allocation blocked on a journal checkpoint allows
+background flushing to continue. An open but inactive file does not defer flushing.
+During LFN free-slot search/publication, fewer than two reusable cache pages also resumes flushing:
+the FAT walk and target entry must not continually evict each other's scratch page.
+
+See the [I/O batching measurements](../tests/IO_BATCHING.md) for operation counts, multi-block coverage,
+unchanged RAM measurements and interrupted-write validation. Multi-block writes reduce the number
+of write-sequence starts, not the number of payload sectors. Actual time saved depends on the card
+and backend; the simulated backend does not measure physical SD timing.
+The [native Windows FAT32 validation](../tests/WINDOWS_FAT32_IO_BATCHING.md) covers concurrent LFN
+operations, native parallel writes, multi-block instrumentation and CHKDSK on isolated test VHDs.
 
 `void sdcard_setProfilerCallback(sdcard_profilerCallback_c callback)`
 

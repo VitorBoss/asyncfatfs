@@ -32,11 +32,16 @@ LAYOUT_ASSERT(check_exfat_cluster_offset, offsetof(exFatStreamEntry_t, firstClus
 LAYOUT_ASSERT(check_boot_shift_offset, offsetof(fatVolumeID_t, exFat.bytesPerSectorShift) == 108);
 LAYOUT_ASSERT(check_extend_prefix, offsetof(afatfsExtendSubdirectory_t, appendFreeCluster) == 0);
 LAYOUT_ASSERT(check_unlink_prefix, offsetof(afatfsUnlinkFile_t, truncateFile) == 0);
+LAYOUT_ASSERT(check_truncate_traversal, MEMBER_ALIGNED(afatfsTruncateFile_t, traversal, uint32_t));
+LAYOUT_ASSERT(check_truncate_workspace, sizeof(((afatfsTruncateFile_t *)0)->traversal) == sizeof(uint32_t));
+LAYOUT_ASSERT(check_append_progress, MEMBER_ALIGNED(afatfsAppendFreeCluster_t, progress, uint32_t));
+LAYOUT_ASSERT(check_append_workspace, sizeof(((afatfsAppendFreeCluster_t *)0)->progress) == sizeof(uint32_t));
 #ifdef ASYNCFS_ENABLE_LFN
 LAYOUT_ASSERT(check_lfn_cluster, MEMBER_ALIGNED(afatfsFile_t, lfnCluster, uint32_t));
 LAYOUT_ASSERT(check_lfn_offset, MEMBER_ALIGNED(afatfsFile_t, lfnOffset, uint32_t));
 LAYOUT_ASSERT(check_lfn_output, MEMBER_ALIGNED(afatfsFile_t, lfnOutput, afatfsFileInfo_t *));
 LAYOUT_ASSERT(check_lfn_alias, MEMBER_ALIGNED(afatfsCreateFile_t, location, uint32_t));
+LAYOUT_ASSERT(check_lfn_scan, sizeof(((afatfsCreateFile_t *)0)->scan) == sizeof(afatfsLongNameState_t));
 LAYOUT_ASSERT(check_lfn_entry_size, sizeof(fatLfnDirectoryEntry_t) == 32);
 LAYOUT_ASSERT(check_lfn_cluster_offset, offsetof(fatLfnDirectoryEntry_t, lfnAlwaysZero) == 26);
 #endif
@@ -45,12 +50,32 @@ LAYOUT_ASSERT(check_16bit_int, sizeof(int) == 2);
 #endif
 #ifdef ASYNCFS_ENABLE_EXFAT
 LAYOUT_ASSERT(check_valid_length, MEMBER_ALIGNED(afatfsFile_t, validDataLength, uint32_t));
+LAYOUT_ASSERT(check_mount_state, MEMBER_ALIGNED(afatfs_t, initState.exfat, afatfsExfatMount_t));
+LAYOUT_ASSERT(check_mount_finder, MEMBER_ALIGNED(afatfsExfatMount_t, progress.directory.finder, afatfsFinder_t));
+LAYOUT_ASSERT(check_mount_progress, MEMBER_ALIGNED(afatfsExfatMount_t, progress, uint32_t));
+LAYOUT_ASSERT(check_mount_workspace, sizeof(afatfsExfatMount_t) == 8 * sizeof(uint32_t));
 #endif
 #ifdef AFATFS_ENABLE_JOURNAL
+LAYOUT_ASSERT(check_journal_init_zero, AFATFS_JOURNAL_INIT_PREPARE == 0);
+LAYOUT_ASSERT(check_journal_init_range, AFATFS_JOURNAL_INIT_COUNT <= UINT8_MAX + 1U);
+LAYOUT_ASSERT(check_journal_init_storage, sizeof(((afatfsJournal_t *)0)->lifecycle.initPhase) == 1);
+LAYOUT_ASSERT(check_journal_shutdown_zero, AFATFS_JOURNAL_SHUTDOWN_WAIT_COMMIT == 0);
+LAYOUT_ASSERT(check_journal_shutdown_range, AFATFS_JOURNAL_SHUTDOWN_COUNT <= UINT8_MAX + 1U);
+LAYOUT_ASSERT(check_journal_shutdown_storage, sizeof(((afatfsJournal_t *)0)->lifecycle.shutdownPhase) == 1);
+LAYOUT_ASSERT(check_journal_recovery_zero, AFATFS_JOURNAL_RECOVERY_PREPARE == 0);
+LAYOUT_ASSERT(check_journal_recovery_range, AFATFS_JOURNAL_RECOVERY_COUNT <= UINT8_MAX + 1U);
+LAYOUT_ASSERT(check_journal_recovery_storage, sizeof(((afatfsJournal_t *)0)->mount.recoveryPhase) == 1);
 LAYOUT_ASSERT(check_journal_member, MEMBER_ALIGNED(afatfs_t, journal, afatfsJournal_t));
 LAYOUT_ASSERT(check_journal_alignment, TYPE_ALIGNMENT(afatfsJournal_t) >= 4);
 LAYOUT_ASSERT(check_journal_io, offsetof(afatfsJournal_t, io) % 4 == 0);
 LAYOUT_ASSERT(check_journal_cluster, MEMBER_ALIGNED(afatfsJournal_t, firstCluster, uint32_t));
+LAYOUT_ASSERT(check_journal_work, MEMBER_ALIGNED(afatfsJournal_t, work, uint32_t));
+LAYOUT_ASSERT(check_journal_capture_index, MEMBER_ALIGNED(afatfsJournal_t, work.capture.pendingCache, int));
+LAYOUT_ASSERT(check_journal_capture_record, MEMBER_ALIGNED(afatfsJournal_t, work.capture.record, uint32_t));
+LAYOUT_ASSERT(check_journal_work_size, sizeof(((afatfsJournal_t *)0)->work) == 3 * sizeof(uint32_t));
+LAYOUT_ASSERT(check_journal_lifecycle_size, sizeof(((afatfsJournal_t *)0)->lifecycle) == 1);
+LAYOUT_ASSERT(check_journal_lifecycle_overlap,
+    offsetof(afatfsJournal_t, lifecycle.initPhase) == offsetof(afatfsJournal_t, lifecycle.shutdownPhase));
 #endif
 
 #define DIRECTORY_FLAGS(APPLY)                                                                                         \
@@ -168,7 +193,8 @@ DEFINE_FLAG_TEST(check_filesystem_flags, afatfs_t, FILESYSTEM_FLAGS)
     APPLY(ioFailed)                                                                                                    \
     APPLY(startupDirty)                                                                                                \
     APPLY(provision)                                                                                                   \
-    APPLY(blockAllocation)
+    APPLY(blockAllocation)                                                                                             \
+    APPLY(headerSlot)
 DEFINE_FLAG_TEST(check_shared_journal_flags, afatfsJournal_t, JOURNAL_FLAGS)
 #endif
 #ifdef ASYNCFS_ENABLE_LFN
@@ -193,6 +219,13 @@ const uint16_t afatfs_layout_sizes[] = {
     0, // Removed before-image buffer; keep the historical metric columns.
     0, // Removed header buffer.
 #endif
+};
+
+const uint16_t afatfs_operation_layout_sizes[] = {
+    sizeof(afatfsCreateFile_t),
+    sizeof(afatfsAppendFreeCluster_t),
+    sizeof(afatfsExtendSubdirectory_t),
+    sizeof(afatfsFinder_t),
 };
 
 int main(void)
@@ -221,6 +254,9 @@ int main(void)
         printf("%u%s", (unsigned)afatfs_layout_sizes[index],
             index + 1 == sizeof(afatfs_layout_sizes) / sizeof(afatfs_layout_sizes[0]) ? "\n" : ",");
     }
+    printf("OPERATIONS,%u,%u,%u,%u\n", (unsigned)afatfs_operation_layout_sizes[0],
+        (unsigned)afatfs_operation_layout_sizes[1], (unsigned)afatfs_operation_layout_sizes[2],
+        (unsigned)afatfs_operation_layout_sizes[3]);
     puts("PASS C99 Boolean conversions, all flag combinations and natural/sector alignment");
     return 0;
 }

@@ -320,7 +320,7 @@ static afatfsOperationStatus_e afatfs_createLfnContinue(afatfsFilePtr_t file)
                     AFATFS_OPERATION_SUCCESS) {
                     return AFATFS_OPERATION_IN_PROGRESS;
                 }
-                memset(&state->lfn, 0, sizeof(state->lfn));
+                memset(&state->scan.lfn, 0, sizeof(state->scan.lfn));
                 state->phase = AFATFS_CREATEFILE_PHASE_FIND_FILE;
                 break;
             case AFATFS_CREATEFILE_PHASE_FIND_FILE:
@@ -335,7 +335,7 @@ static afatfsOperationStatus_e afatfs_createLfnContinue(afatfsFilePtr_t file)
                         return AFATFS_OPERATION_FAILURE;
                     }
                     afatfs_findFirst(&afatfs.currentDirectory, &file->directoryEntryPos);
-                    memset(&state->lfn, 0, sizeof(state->lfn));
+                    memset(&state->scan.lfn, 0, sizeof(state->scan.lfn));
                     if (finding) {
                         state->phase = AFATFS_CREATEFILE_PHASE_CREATE_NEW_FILE;
                         break;
@@ -348,12 +348,14 @@ static afatfsOperationStatus_e afatfs_createLfnContinue(afatfsFilePtr_t file)
                         }
                     }
                     state->location.orphanSector = 0;
+                    state->scan.counters.freeEntries = 0;
+                    state->scan.counters.writeIndex = 0;
                     state->phase = AFATFS_CREATEFILE_PHASE_WRITE_FILE_ATTRIB;
                     break;
                 }
                 uint8_t *bytes = (uint8_t *)entry;
                 if (fat_isDirectoryEntryEmpty(entry)) {
-                    memset(&state->lfn, 0, sizeof(state->lfn));
+                    memset(&state->scan.lfn, 0, sizeof(state->scan.lfn));
                     break;
                 }
                 if (fat_isLfnEntry(entry)) {
@@ -371,11 +373,11 @@ static afatfsOperationStatus_e afatfs_createLfnContinue(afatfsFilePtr_t file)
                         }
                     }
                     candidate[written] = 0;
-                    afatfs_lfnConsume(&state->lfn, bytes, finding ? name : candidate, NULL);
+                    afatfs_lfnConsume(&state->scan.lfn, bytes, finding ? name : candidate, NULL);
                     break;
                 }
-                bool attached = afatfs_lfnAttached(&state->lfn, bytes);
-                bool matched = (attached && state->lfn.matched) ||
+                bool attached = afatfs_lfnAttached(&state->scan.lfn, bytes);
+                bool matched = (attached && state->scan.lfn.matched) ||
                     ((!finding || !state->location.aliasNumber) && !memcmp(bytes, state->shortName, 11));
                 if ((!finding || !fat_isVolumeLabel(entry)) && matched) {
                     // A rename may resolve the new spelling to its own source (case/alias change).
@@ -385,7 +387,7 @@ static afatfsOperationStatus_e afatfs_createLfnContinue(afatfsFilePtr_t file)
                         afatfs_request->file->directoryEntryPos.sectorNumberPhysical ==
                             file->directoryEntryPos.sectorNumberPhysical &&
                         afatfs_request->file->directoryEntryPos.entryIndex == file->directoryEntryPos.entryIndex) {
-                        memset(&state->lfn, 0, sizeof(state->lfn));
+                        memset(&state->scan.lfn, 0, sizeof(state->scan.lfn));
                         break;
                     }
                     if (!finding) {
@@ -404,8 +406,8 @@ static afatfsOperationStatus_e afatfs_createLfnContinue(afatfsFilePtr_t file)
                             return AFATFS_OPERATION_FAILURE;
                         }
                         afatfs_fileLoadDirectoryEntry(file, entry);
-                        file->lfnEntryCount = attached ? state->lfn.count : 0;
-                        file->lfnAscii = attached && state->lfn.ascii;
+                        file->lfnEntryCount = attached ? state->scan.lfn.count : 0;
+                        file->lfnAscii = attached && state->scan.lfn.ascii;
                         if (file->mode & AFATFS_FILE_MODE_EXCLUSIVE_CREATE) {
                             file->error = AFATFS_ERROR_EXISTS;
                             return AFATFS_OPERATION_FAILURE;
@@ -415,7 +417,7 @@ static afatfsOperationStatus_e afatfs_createLfnContinue(afatfsFilePtr_t file)
                         return AFATFS_OPERATION_SUCCESS;
                     }
                 }
-                memset(&state->lfn, 0, sizeof(state->lfn));
+                memset(&state->scan.lfn, 0, sizeof(state->scan.lfn));
                 break;
             }
             case AFATFS_CREATEFILE_PHASE_WRITE_FILE_ATTRIB:
@@ -438,16 +440,16 @@ static afatfsOperationStatus_e afatfs_createLfnContinue(afatfsFilePtr_t file)
                     state->directoryEnd = true;
                 }
                 if (!state->directoryEnd && !fat_isDirectoryEntryEmpty(entry)) {
-                    state->freeEntries = 0;
+                    state->scan.counters.freeEntries = 0;
                     state->location.orphanSector =
                         fat_isLfnEntry(entry) ? file->directoryEntryPos.sectorNumberPhysical : 0;
                     state->orphanIndex = (uint8_t)file->directoryEntryPos.entryIndex;
                     break;
                 }
-                if (!state->freeEntries) {
+                if (!state->scan.counters.freeEntries) {
                     afatfs_lfnRememberStart(file, &file->directoryEntryPos);
                 }
-                if (++state->freeEntries <= file->lfnEntryCount) {
+                if (++state->scan.counters.freeEntries <= file->lfnEntryCount) {
                     break;
                 }
                 state->phase = AFATFS_CREATEFILE_PHASE_WRITE_FILE_ENTRY;
@@ -478,15 +480,15 @@ static afatfsOperationStatus_e afatfs_createLfnContinue(afatfsFilePtr_t file)
                     state->directoryEnd = false;
                 }
                 afatfs_findLast(&afatfs.currentDirectory);
-                while (state->writeIndex < file->lfnEntryCount) {
+                while (state->scan.counters.writeIndex < file->lfnEntryCount) {
                     uint8_t *bytes;
-                    status = afatfs_lfnEntry(file, state->writeIndex, &bytes, true);
+                    status = afatfs_lfnEntry(file, state->scan.counters.writeIndex, &bytes, true);
                     if (status != AFATFS_OPERATION_SUCCESS) {
                         return status;
                     }
-                    afatfs_lfnWrite(bytes, name, file->lfnEntryCount - state->writeIndex, file->lfnEntryCount,
-                        fat_createCheckSum((const char *)state->shortName));
-                    state->writeIndex++;
+                    afatfs_lfnWrite(bytes, name, file->lfnEntryCount - state->scan.counters.writeIndex,
+                        file->lfnEntryCount, fat_createCheckSum((const char *)state->shortName));
+                    state->scan.counters.writeIndex++;
                 }
                 state->phase = AFATFS_CREATEFILE_PHASE_LFN_FLUSH;
                 break;
